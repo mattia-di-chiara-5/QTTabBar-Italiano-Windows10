@@ -1,0 +1,63 @@
+name: Validate Italian edition
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Italian XML
+        shell: powershell
+        run: |
+          $path = ".\I18N\Lng_QTTabBar_it_IT.xml"
+          if (-not (Test-Path -LiteralPath $path)) {
+            throw "File lingua italiano non trovato: $path"
+          }
+
+          [xml]$x = Get-Content -LiteralPath $path -Raw
+          $language = [string]$x.root.Language
+
+          if ($language.Trim() -ne "it_IT") {
+            throw "Codice lingua non valido: '$($language.Trim())'"
+          }
+
+          Write-Host "Localizzazione italiana valida: $($language.Trim())"
+
+      - name: Parse Italian PowerShell scripts
+        shell: powershell
+        run: |
+          $scriptPath = ".\Italiano\installer"
+          if (-not (Test-Path -LiteralPath $scriptPath)) {
+            throw "Cartella script non trovata: $scriptPath"
+          }
+
+          $allErrors = @()
+
+          Get-ChildItem -LiteralPath $scriptPath -Filter "*.ps1" -File | ForEach-Object {
+            $tokens = $null
+            $parseErrors = $null
+
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              $_.FullName,
+              [ref]$tokens,
+              [ref]$parseErrors
+            )
+
+            if ($parseErrors.Count -gt 0) {
+              Write-Host "Errori in $($_.FullName)"
+              $allErrors += $parseErrors
+            }
+          }
+
+          if ($allErrors.Count -gt 0) {
+            $allErrors | Format-List
+            throw "Sono presenti errori di parsing PowerShell."
+          }
+
+          Write-Host "Parsing PowerShell completato senza errori."
