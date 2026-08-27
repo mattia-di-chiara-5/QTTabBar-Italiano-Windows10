@@ -1108,6 +1108,7 @@ namespace QTTabBarLib {
                 case 5: keyValuePairs = Resources_String_fr_FR.ResourceManager.GetResourceStrings(); break;
                 case 6: keyValuePairs = Resources_String_tr_TR.ResourceManager.GetResourceStrings(); break;
                 case 7: keyValuePairs = Resources_String_ru_RU.ResourceManager.GetResourceStrings(); break;
+                case 8: keyValuePairs = Resources_String_it_IT.ResourceManager.GetResourceStrings(); break;
             }
 
             // 如果加载为空， 则读取默认的应用语言

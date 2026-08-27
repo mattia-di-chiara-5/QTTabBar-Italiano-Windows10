@@ -1,3 +1,17 @@
+# QTTabBar Italiano per Windows 10
+
+Questo fork mantiene la localizzazione italiana built-in di QTTabBar 1.5.6.1
+per Windows 10 x64. La linea italiana v0.4.0 è basata sul commit upstream
+44a83bef8cdf5fb67c6d7f6434821c6f602542e7 e non richiede un file lingua XML.
+
+- [Documentazione italiana](Italiano/README.md)
+- [Note di rilascio v0.4.0](Italiano/release/RELEASE_NOTES_v0.4.0.md)
+- [Istruzioni GitHub e release](Italiano/GITHUB_PASSO_PASSO.md)
+
+La documentazione upstream originale continua qui sotto.
+
+---
+
 - [QTTabBar Document](https://www.yuque.com/indiff/qttabbar/zqtdig)
 - [QTTabBar V1.5.6-beta.1 update log](https://www.yuque.com/indiff/qttabbar/rhyprn)
 - [汉化GitHub modify by indiff](https://openuserjs.org/scripts/indiff/GitHub_%E6%B1%89%E5%8C%96%E6%8F%92%E4%BB%B6_(indiff)%E4%BF%AE%E6%94%B9)
