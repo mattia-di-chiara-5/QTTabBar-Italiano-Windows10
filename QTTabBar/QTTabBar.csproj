@@ -339,6 +339,7 @@
     <Compile Include="Resources_String.cs" />
     <Compile Include="Resources_String_de_DE.cs" />
     <Compile Include="Resources_String_es_ES.cs" />
+    <Compile Include="Resources_String_it_IT.cs" />
     <Compile Include="Resources_String_fr_FR.cs" />
     <Compile Include="Resources_String_pt_BR.cs" />
     <Compile Include="Resources_String_ru_RU.cs" />
@@ -575,6 +576,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Resources_String_es_ES.resx">
       <DependentUpon>Resources_String_es_ES.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources_String_it_IT.resx">
+      <DependentUpon>Resources_String_it_IT.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources_String_fr_FR.resx">
       <DependentUpon>Resources_String_fr_FR.cs</DependentUpon>

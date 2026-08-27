@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Author" xml:space="preserve">
+    <value>Localizzazione italiana: OpenAI per Mattia di Chiara</value>
+  </data>
+  <data name="ButtonBar_BtnName" xml:space="preserve">
+    <value>Separatore;Indietro;Avanti;Gruppi;Chiuse di recente;Applicazioni;Nuova finestra;Clona questa scheda;Blocca;Strumento Copia;Sempre in primo piano;Chiudi;Chiudi tutte tranne quella corrente;Chiudi finestra;Chiudi a sinistra;Chiudi a destra;Livello superiore;Aggiorna;Cerca;Opacità;Casella di ricerca;Opzioni</value>
+  </data>
+  <data name="ButtonBar_Misc" xml:space="preserve">
+    <value>Percorso;Nome;Percorso della cartella corrente;Nome della cartella corrente;MD5; elementi;Percorsi di tutte le schede aperte</value>
+  </data>
+  <data name="Country" xml:space="preserve">
+    <value>Italia</value>
+  </data>
+  <data name="DateModified" xml:space="preserve">
+    <value>26/08/2026</value>
+  </data>
+  <data name="Desktop" xml:space="preserve">
+    <value>Elenco;Dettagli;Riquadri;Predefinito</value>
+  </data>
+  <data name="DialogButtons" xml:space="preserve">
+    <value>OK;Annulla;&amp;Applica;&amp;Predefinito;Reimposta &amp;pagina;&amp;Reimposta tutto;Reimposta;Aggiungi;Aggiungi...;Rimuovi;Opzioni;Abilita;Disabilita;Annulla operazione;Carica...;Salva...</value>
+  </data>
+  <data name="DragDropToolTip" xml:space="preserve">
+    <value>Copia in:;Sposta in:;Crea collegamento in:</value>
+  </data>
+  <data name="ErrorDialogs" xml:space="preserve">
+    <value>Operazione non riuscita.\r\nVerificare che il file o la destinazione del collegamento esista:\r\n\r\n{0};Errore - QTTabBar;Avviso: impossibile abilitare automaticamente QTTabBar. Per abilitarla manualmente, premere e rilasciare Alt, quindi selezionare QTTabBar dal menu Visualizza/Barre degli strumenti.;Impossibile abilitare;Errore;Impossibile caricare la libreria hook di QTTabBar.;Impossibile inizializzare la libreria hook di QTTabBar.;Alcune funzioni potrebbero non essere disponibili. Per risolvere il problema potrebbe essere necessario reinstallare l'applicazione.;Impossibile collegare QTTabBar al Desktop. Riabilitare lo strumento QT Tab Desktop.;Operazione non riuscita.\r\nVerificare che la cartella esista o di disporre delle autorizzazioni necessarie:\r\n\r\n\t{0}</value>
+  </data>
+  <data name="FileFilters" xml:space="preserve">
+    <value>File immagine;File di lingua;File dei plugin</value>
+  </data>
+  <data name="FileHashComputer" xml:space="preserve">
+    <value>Percorso;Hash;Chiudi;Pulisci;Aggiorna;Sempre in primo piano;Mostra risultato;Pulisci alla chiusura;Percorso completo;(Calcolo in corso...)</value>
+  </data>
+  <data name="MarginDropDown" xml:space="preserve">
+    <value>Tutti;Sinistra;Alto;Destra;Basso</value>
+  </data>
+  <data name="Misc_Strings" xml:space="preserve">
+    <value>Ricerca Desktop;Il file immagine non è valido.\r\n\r\nSpecificare un'immagine di 432 x 40 px.;Risultati della ricerca in;collegamento;Scegli un file;Scegli una cartella;Sperimentale;segnaposto</value>
+  </data>
+  <data name="OptionsDialog" xml:space="preserve">
+    <value>Opzioni di QTTabBar;Ripristinare i valori predefiniti per tutte le opzioni di questa pagina?;Ripristinare tutte le opzioni predefinite? Gruppi, applicazioni e plugin non verranno modificati.;Conferma</value>
+  </data>
+  <data name="Options_Page01_Window" xml:space="preserve">
+    <value>Modifica il comportamento delle finestre di Esplora file.;Modalità finestra singola;Acquisisci le nuove finestre di Esplora file come nuove schede;Non acquisire le nuove finestre di Esplora file;Percorso predefinito per nuove finestre e schede;Salvataggio della sessione;Avvia ogni volta una nuova sessione;Ripristina tutte le schede della sessione precedente;Ripristina solo le schede bloccate della sessione precedente;Quando viene premuto il pulsante di chiusura;Chiudi la finestra;Chiudi la scheda corrente;Chiudi tutte le schede non bloccate;Invia la finestra nell'area di notifica quando si seleziona;Chiudi;Riduci a icona;Pulsante + blu</value>
+  </data>
+  <data name="Options_Page02_Tabs" xml:space="preserve">
+    <value>Modifica le opzioni relative alle schede.;Apri le nuove schede:;Quando si chiude la scheda corrente, passa a:;Passa immediatamente alle nuove schede;Riutilizza le schede già aperte;Rinomina le schede con nomi ambigui;Quando il puntatore viene trascinato sopra una scheda,;passa alla scheda;mostra il menu delle sottocartelle;Icone delle schede;Mostra le icone delle cartelle nelle schede;Mostra il menu delle sottocartelle quando si fa clic sull'icona;Mostra la lettera dell'unità sull'icona;Pulsante di chiusura;Mostra il pulsante di chiusura nelle schede;Solo quando è premuto Alt;Solo al passaggio del mouse;Barra delle schede;Mostra i pulsanti di navigazione sulla barra delle schede;A sinistra;A destra;Consenti più righe di schede;Posiziona sempre in basso la riga con la scheda attiva;A sinistra della scheda corrente;A destra della scheda corrente;Nella posizione più a sinistra;Nella posizione più a destra;Scheda a sinistra;Scheda a destra;Prima scheda;Ultima scheda;Ultima scheda attivata;Comportamento</value>
+  </data>
+  <data name="Options_Page03_Tweaks" xml:space="preserve">
+    <value>Abilita o disabilita le personalizzazioni della visualizzazione elenco di Esplora file.;Personalizzazioni utilizzabili con entrambe le visualizzazioni elenco;Mostra le intestazioni delle colonne in tutte le modalità di visualizzazione (Windows Vista/7);Usa la visualizzazione standard del file system per le Raccolte (Windows 7);Non selezionare l'estensione durante la rinomina dei file (Windows XP);Premi F2 ripetutamente per scorrere gli elementi durante la rinomina;Riparti dall'inizio quando si sposta la selezione con i tasti freccia;Backspace sale di un livello (Windows Vista/7);Maiusc + rotellina del mouse scorre orizzontalmente;Personalizzazioni utilizzabili solo con la visualizzazione elenco precedente;Abilita il controllo elenco precedente (Windows 7);Selezione dell'intera riga nella visualizzazione Dettagli;Mostra la griglia nella visualizzazione Dettagli;Alterna i colori delle righe nella visualizzazione Dettagli;Colore del testo:;Colore di sfondo:</value>
+  </data>
+  <data name="Options_Page04_Tooltips" xml:space="preserve">
+    <value>Modifica il comportamento dei suggerimenti per sottocartelle e anteprime.;Suggerimenti sottocartelle;Abilita i suggerimenti per le sottocartelle;Solo quando è premuto Maiusc;Mostra i file;Mostra le anteprime al passaggio del mouse sulle voci di menu;Suggerimenti di anteprima;Abilita i suggerimenti di anteprima;Solo quando è premuto Maiusc;Mostra le informazioni del file sotto le immagini;Larghezza massima x altezza:;Carattere:;Tipi di file di testo;Tipi di file immagine e video</value>
+  </data>
+  <data name="Options_Page05_General" xml:space="preserve">
+    <value>Opzioni generali per il comportamento di QTTabBar.;Integrazione con la barra delle applicazioni;Mostra le anteprime delle schede sulla barra delle applicazioni;Cronologia;Conserva la cronologia delle schede chiuse;Pulisci ora;Conserva la cronologia dei file aperti;Rete;Timeout di rete (immettere 0 per usare il valore di sistema):;Controlla periodicamente la presenza di aggiornamenti;Controlla ora;Esporta;Esporta impostazioni...;Eliminare la cronologia dei file?;Eliminare la cronologia delle schede?;Audio;Abilita audio;Abilita log</value>
+  </data>
+  <data name="Options_Page06_Appearance" xml:space="preserve">
+    <value>Modifica l'aspetto delle schede o della barra delle schede.;Immagine della scheda;Usa un'immagine personalizzata per le schede:;Margini di ridimensionamento:;Area di sovrapposizione:;Margini del contenuto:;Considera trasparenti le aree nel rilevamento dei clic;Dimensione schede;Altezza:;Larghezza minima:;Larghezza massima:;Modalità di dimensionamento:;Larghezza completa;Stessa dimensione;Testo delle schede;Colori del testo:;Colori dell'ombra:;Colore attivo;Colore inattivo;Colore al passaggio del mouse;Carattere del testo:;Allineamento:;Sinistra;Centro;Sfondo della barra degli strumenti;Immagine;Colore uniforme;Immagine separata per ogni barra;Modalità di adattamento:;Margini di ridimensionamento:;File skin;Importa skin...;Esporta skin...;Adatta;Dimensione reale;Affianca</value>
+  </data>
+  <data name="Options_Page07_Mouse" xml:space="preserve">
+    <value>Assegna comandi alle diverse azioni del mouse.;Per aggiungere un'associazione, eseguire l'azione del mouse sull'icona più a sinistra del tipo di destinazione. Per rimuoverla, selezionarla nell'elenco e premere Canc.;Altre opzioni del mouse;La rotellina scorre la finestra sotto il puntatore;Combinazione del mouse;Azione;Ovunque;Scheda;Sfondo della barra delle schede;Collegamento cartella;File o cartella;Sfondo di Esplora file;Clic sinistro;Clic destro;Clic centrale;Doppio clic;Clic X1;Clic X2;Questo pulsante del mouse non può essere usato per questa destinazione.;I pulsanti validi per questa destinazione sono:;Pulsante non valido</value>
+  </data>
+  <data name="Options_Page08_Keys" xml:space="preserve">
+    <value>Modifica le scorciatoie da tastiera.;Selezionare un'azione e premere la combinazione di tasti da associare. Premere Esc per rimuovere l'associazione.;Altre opzioni della tastiera;Mostra il selettore delle schede quando si preme Ctrl + Tab;Azione;Combinazione di tasti;Questa combinazione è già assegnata a:;Riassegnarla?;Conflitto di scorciatoia</value>
+  </data>
+  <data name="Options_Page09_Groups" xml:space="preserve">
+    <value>Crea e gestisce i gruppi di schede.;Per assegnare una scorciatoia a un gruppo, selezionarlo e premere la combinazione desiderata. Premere Esc per rimuoverla.;Crea nuovo gruppo;Cartella;Avvio;Scorciatoia;Nuovo gruppo;Apri gruppo "{0}"</value>
+  </data>
+  <data name="Options_Page10_Apps" xml:space="preserve">
+    <value>Crea collegamenti ai file o alle applicazioni usati più spesso.;Per assegnare una scorciatoia a un'applicazione, selezionarla e premere la combinazione desiderata. Premere Esc per rimuoverla.;Crea nuova cartella;Percorso:;Argomenti:;Directory di lavoro:;Applicazione;Scorciatoia;Le seguenti parole chiave vengono sostituite durante l'esecuzione con percorsi racchiusi tra virgolette.;File selezionati.;Cartelle selezionate.;File e cartelle selezionati.;Cartella corrente.;Cartella corrente se non è selezionato nulla, altrimenti cartella selezionata.;Nuova cartella;Rimuovere questa cartella e tutto il suo contenuto?;Avvia applicazione "{0}"</value>
+  </data>
+  <data name="Options_Page11_ButtonBar" xml:space="preserve">
+    <value>Personalizza la barra dei pulsanti.;Pulsanti;Opzioni della barra dei pulsanti;Icone grandi;Mostra le etichette sui pulsanti;Blocca l'ordine dei menu dei pulsanti a discesa;Blocca la dimensione della casella di ricerca;Immagini personalizzate dei pulsanti</value>
+  </data>
+  <data name="Options_Page12_Plugins" xml:space="preserve">
+    <value>Gestisce i plugin di terze parti.;Installa un plugin;(Disabilitato);di {0};{0} è stato rimosso.;Il plugin verrà installato quando si preme OK o Applica.;Il plugin verrà abilitato quando si preme OK o Applica.;Il plugin verrà disabilitato quando si preme OK o Applica.;La disinstallazione di questo plugin rimuoverà anche i seguenti plugin:;Continuare?;Abilita;Disabilita</value>
+  </data>
+  <data name="Options_Page13_Language" xml:space="preserve">
+    <value>Modifica la lingua.;Lingua principale;Usa lingua integrata:;Usa file di lingua:;File di lingua dei plugin;Editor dei file di lingua;Mostra editor della lingua...;Originale;Traduzione;Reimpostare tutte le voci al valore originale?;Errore durante il salvataggio del file.;Cinese semplificato;Inglese;Tedesco</value>
+  </data>
+  <data name="Options_Page14_About" xml:space="preserve">
+    <value>Visualizza riconoscimenti e informazioni sulla versione.;Codice originale di {0};Sviluppatore principale:;Altri sviluppatori:;Icone e grafica:;Se QTTabBar ti è utile, valuta una donazione al progetto originale.;Localizzazione italiana:;Build di: {0}</value>
+  </data>
+  <data name="PayPalURL" xml:space="preserve">
+    <value>https://github.com/indiff/qttabbar</value>
+  </data>
+  <data name="ShortcutKeys_ActionNames" xml:space="preserve">
+    <value>Indietro;Avanti;Torna all'inizio della cronologia;Vai alla fine della cronologia;Seleziona scheda successiva;Seleziona scheda precedente;Seleziona prima scheda;Seleziona ultima scheda;Passa all'ultima scheda attivata;Apri nuova scheda;Apri nuova finestra;Unisci le schede delle altre finestre;Chiudi scheda corrente;Chiudi tutte tranne quella corrente;Chiudi a sinistra;Chiudi a destra;Chiudi finestra;Riapri scheda chiusa;Clona scheda corrente;Apri la cartella corrente in una nuova finestra;Blocca / sblocca scheda corrente;Blocca / sblocca tutte le schede;Sfoglia cartella;Crea nuovo gruppo;Apri finestra delle opzioni;Mostra menu della barra degli strumenti;Mostra menu della scheda corrente;Mostra menu gruppi (barra pulsanti);Mostra menu cartelle recenti (barra pulsanti);Mostra menu applicazioni utente (barra pulsanti);Mostra menu file recenti (barra pulsanti);Crea nuovo file vuoto;Crea nuova cartella;Copia percorso dei file selezionati;Copia nome dei file selezionati;Copia percorso della cartella corrente;Copia nome della cartella corrente;Calcola MD5 dei file selezionati;Mantieni la finestra sempre in primo piano;Aumenta trasparenza;Riduci trasparenza;Attiva elenco file;Attiva casella di ricerca di Esplora file;Attiva casella di ricerca della barra pulsanti;Mostra menu sottocartelle per la cartella selezionata;Invia la finestra nell'area di notifica;Attiva barra delle schede;Ordina schede per nome;Ordina schede per percorso;Ordina schede per ultima attivazione;Nessuna azione;Livello superiore;Aggiorna;Incolla;Ingrandisci;Riduci a icona;Apri in nuova scheda;Apri in nuova scheda senza attivarla;Apri in nuova finestra;Taglia;Copia;Elimina;Proprietà;Copia percorso;Copia nome;Visualizza checksum;Chiudi scheda;Chiudi schede a sinistra;Chiudi schede a destra;Livello superiore;Blocca;Mostra menu contestuale;Apri in nuova finestra;Clona;Copia percorso;Proprietà;Mostra menu sottodirectory;Chiudi tutte tranne questa;Apri Prompt dei comandi;Apri le cartelle selezionate in nuove schede senza attivarle;Aggiungi al gruppo</value>
+  </data>
+  <data name="ShortcutKeys_Groups" xml:space="preserve">
+    <value>QTTabBar;{0} (Plugin)</value>
+  </data>
+  <data name="SiteURL" xml:space="preserve">
+    <value>https://github.com/indiff/qttabbar</value>
+  </data>
+  <data name="TabBar_Menu" xml:space="preserve">
+    <value>Chiudi;Chiudi a destra;Chiudi a sinistra;Chiudi tutte tranne questa;Aggiungi al gruppo;Crea nuovo gruppo;Blocca;Clona questa scheda;Nuova finestra;Copia percorso;Proprietà;Cronologia scheda;Gruppi;Riapri chiuse;Ultima attivata;File aperti di recente;Sfoglia cartella;Chiudi tutte tranne quella corrente;Chiudi finestra;Opzioni;Sblocca;Aggiungi al menu Applicazioni:;elementi;Annulla;Rami;Rimuovi questa voce dal menu;A&amp;pri cartella contenitore;Etichetta scheda;Ordine schede;Nome;Percorso;Attiva;Blocca le barre degli strumenti;Unisci le schede delle altre finestre;Inverti;Apri Prompt dei comandi</value>
+  </data>
+  <data name="TabBar_Message" xml:space="preserve">
+    <value>QTTabBar non è riuscita ad aprire\r\n\r\n "{0}".</value>
+  </data>
+  <data name="TabBar_NewGroup" xml:space="preserve">
+    <value>Crea nuovo gruppo;Nome del gruppo:;Aggiungi tutte le schede</value>
+  </data>
+  <data name="TabBar_Option_Genre" xml:space="preserve">
+    <value>Finestra;Schede;Personalizzazioni;Suggerimenti;Generale;Aspetto;Mouse;Tastiera;Gruppi;Applicazioni;Barra pulsanti;Plugin;Lingua;Informazioni</value>
+  </data>
+  <data name="TaskBar_Menu" xml:space="preserve">
+    <value>Barra delle applicazioni;Desktop;Blocca elementi;Disegna lo sfondo del titolo;Menu con un clic;Abilita le scorciatoie delle applicazioni</value>
+  </data>
+  <data name="TaskBar_Titles" xml:space="preserve">
+    <value>Gruppi;Riapri chiuse;Applicazioni;File aperti di recente</value>
+  </data>
+  <data name="TrayIcon" xml:space="preserve">
+    <value>1 finestra;{0} finestre;Ripristina tutto;Chiudi tutto</value>
+  </data>
+  <data name="UpdateCheck" xml:space="preserve">
+    <value>È disponibile una nuova versione di QTTabBar:;Premere OK per aprire il sito web.;La versione di QTTabBar installata è aggiornata.;È disponibile una nuova versione di sviluppo:;File della versione non trovato (404).;Errore di rete sconosciuto.;Server non trovato.;Il server ha restituito dati non validi.</value>
+  </data>
+  <data name="Version_LangFile" xml:space="preserve">
+    <value>1.0</value>
+  </data>
+  <data name="Version_QTTabBar" xml:space="preserve">
+    <value>Compatibile con il formato lingua QTTabBar 1.5.x</value>
+  </data>
+</root>

@@ -982,6 +982,11 @@ namespace QTTabBarLib {
                     BuiltInLangSelectedIndex = 7;
                     BuiltInLang = "Russian";
                 }
+                else if (uiCulture.Equals("it_IT") || uiCulture.Equals("it-IT") || lUiCulture.Equals("it"))
+                {
+                    BuiltInLangSelectedIndex = 8;
+                    BuiltInLang = "Italiano";
+                }
                 else {
                     BuiltInLangSelectedIndex = 0;
                     BuiltInLang = "English";
