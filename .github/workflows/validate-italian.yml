@@ -1,0 +1,56 @@
+name: Validate Italian localization
+
+on:
+  push:
+    branches:
+      - feature/italian-built-in
+      - release/0.4
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  resources:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Validate PowerShell syntax
+        shell: powershell
+        run: |
+          $failures = 0
+          Get-ChildItem .\Italiano -Filter *.ps1 -File -Recurse | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              $_.FullName,
+              [ref]$tokens,
+              [ref]$errors
+            )
+            if ($errors.Count) {
+              $failures++
+              Write-Error "$($_.FullName): $($errors.Message -join '; ')"
+            }
+          }
+          if ($failures) { throw "$failures script PowerShell non validi." }
+      - name: Validate Italian resource contract
+        shell: powershell
+        run: .\Italiano\tools\Test-ItalianResources.ps1
+      - name: Check expected source routing
+        shell: powershell
+        run: |
+          $checks = @(
+            @{ Path = 'QTTabBar\Config.cs'; Pattern = 'BuiltInLangSelectedIndex = 8' },
+            @{ Path = 'QTTabBar\QTUtility.cs'; Pattern = 'case 8: keyValuePairs = Resources_String_it_IT' },
+            @{ Path = 'QTTabBar\OptionsDialog\Options13_Language.xaml'; Pattern = 'Content="Italiano"' }
+          )
+          foreach ($check in $checks) {
+            if (-not (Select-String -LiteralPath $check.Path -SimpleMatch $check.Pattern -Quiet)) {
+              throw "Marker assente: $($check.Path) -> $($check.Pattern)"
+            }
+          }
