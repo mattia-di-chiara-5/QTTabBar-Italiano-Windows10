@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -52,7 +52,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -64,7 +64,6 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>QTTabBar1.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
@@ -74,7 +73,6 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>QTTabBar1.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %28No Reg%29|x86'">
@@ -83,11 +81,9 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
-    <CodeAnalysisRuleSet>QTTabBar1.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %28No Reg%29|AnyCPU'">
-    <CodeAnalysisRuleSet>QTTabBar1.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
@@ -98,19 +94,38 @@
       <HintPath>Resources\Ricciolo.Controls.TreeListView.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Text.Encoding.CodePages, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.4.7.1\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="UtfUnknown, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90217ce7a23260d4, processorArchitecture=MSIL">
+      <HintPath>..\packages\UTF.Unknown.2.7.0\lib\netstandard2.0\UtfUnknown.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -118,6 +133,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionDelayer.cs" />
+    <Compile Include="ThreadImageListStore.cs" />
+    <Compile Include="Resources_String_it_IT.cs" />
     <Compile Include="AppsManager.cs" />
     <Compile Include="AutoLoader.cs" />
     <Compile Include="ContextMenuOptions.cs" />
@@ -230,6 +247,8 @@
     </Compile>
     <Compile Include="FreeBitmap.cs" />
     <Compile Include="Graphic.cs" />
+    <Compile Include="ICommandInvokerWindow.cs" />
+    <Compile Include="Interop\CoreErrorHelper.cs" />
     <Compile Include="Interop\GWL.cs" />
     <Compile Include="Interop\IShellExecuteHook.cs" />
     <Compile Include="Interop\IVisualProperties.cs" />
@@ -243,6 +262,7 @@
     <Compile Include="Interop\VPCOLORFLAGS.cs" />
     <Compile Include="Interop\VPWATERMARKFLAGS.cs" />
     <Compile Include="Interop\WINDOWPOS.cs" />
+    <Compile Include="LruCache.cs" />
     <Compile Include="MsgEnum.cs" />
     <Compile Include="Multilang\CMLangConvertCharset.cs" />
     <Compile Include="Multilang\CMLangConvertCharsetClass.cs" />
@@ -332,6 +352,7 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="PreMergeToMergedDeserializationBinder.cs" />
+    <Compile Include="ProcessUtil.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -498,6 +519,19 @@
     <Compile Include="Interop\WTS_THUMBNAILID.cs" />
     <Compile Include="Interop\_IDropTarget.cs" />
     <Compile Include="Interop\_ShellLinkObject.cs" />
+    <Compile Include="Dpi\IDpiAwareObject.cs" />
+    <Compile Include="Dpi\DpiManager.cs" />
+    <Compile Include="Dpi\DpiAwareControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Dpi\DpiAwareForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dpi\DpiAwareUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FileRename\FileRenamerEngine.cs" />
+    <Compile Include="FileRename\FileRenameDialog.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="ListViewMonitor.cs" />
     <Compile Include="ExtendedListViewCommon.cs" />
@@ -567,6 +601,17 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FileRename\FileRenameDialog.resx">
       <DependentUpon>FileRenameDialog.cs</DependentUpon>
+      <WithCulture>false</WithCulture>
+      <LogicalName>QTTabBar.FileRename.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileRename\FileRenameDialog.en.resx">
+      <SubType>Designer</SubType>
+      <WithCulture>false</WithCulture>
+      <LogicalName>QTTabBar.FileRename.en.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileRename\FileRenameDialog.ja.resx">
+      <WithCulture>false</WithCulture>
+      <LogicalName>QTTabBar.FileRename.ja.resources</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -581,6 +626,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Resources_String_de_DE.resx">
       <DependentUpon>Resources_String_de_DE.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources_String_it_IT.resx">
+      <DependentUpon>Resources_String_it_IT.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources_String_es_ES.resx">
       <DependentUpon>Resources_String_es_ES.cs</DependentUpon>
@@ -708,8 +756,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="ClassDiagram1.cd" />
     <None Include="ExplorerBrowser\ExplorerBrowserDiagram.cd" />
+    <None Include="packages.config" />
     <None Include="Resources\ButtonStrip24.png" />
   </ItemGroup>
   <ItemGroup>
@@ -953,4 +1003,24 @@
   <Target Name="AfterBuild">
     <NotifyPropertyWeaverMsBuildTask.WeavingTask TargetPath="$(TargetPath)" References="@(ReferencePath)" />
   </Target>
+  <ItemGroup>
+    <EmbeddedResource Include="..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Buffers.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Memory.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Numerics.Vectors.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Runtime.CompilerServices.Unsafe.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\System.Text.Encoding.CodePages.4.7.1\lib\net461\System.Text.Encoding.CodePages.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Text.Encoding.CodePages.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\UTF.Unknown.2.7.0\lib\netstandard2.0\UtfUnknown.dll">
+      <LogicalName>QTTabBarLib.Resources.UtfUnknown.dll</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

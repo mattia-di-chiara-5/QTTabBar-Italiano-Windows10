@@ -1,6 +1,6 @@
-//    This file is part of QTTabBar, a shell extension for Microsoft
+﻿//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
-//    Copyright (C) 2007-2021  Quizo, Paul Accisano
+//    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
 //    QTTabBar is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ namespace QTTabBarLib {
     internal class DropDownMenuBase : ToolStripDropDownMenu {
         private bool fChangeImageSelected;
         protected bool fEnableShiftKey;
-        private static bool fFirstDropDownOpened;
+
         protected static bool fImageMarginModified;
         private bool fOnceKeyDown;
         private static bool fRendererInitialized;
@@ -169,14 +169,7 @@ namespace QTTabBarLib {
         }
 
         protected override void OnOpening(CancelEventArgs e) {
-            if(!fFirstDropDownOpened) {
-                QTUtility.ImageListGlobal.Images.Add("control", Resources_Image.imgNewWindow);
-                QTUtility.ImageListGlobal.Images.Add("shift", Resources_Image.imgNewTab);
-                QTUtility.ImageListGlobal.Images.Add("back", Resources_Image.imgBack);
-                QTUtility.ImageListGlobal.Images.Add("forward", Resources_Image.imgForward);
-                QTUtility.ImageListGlobal.Images.Add("current", Resources_Image.imgCurrent);
-                fFirstDropDownOpened = true;
-            }
+            // Standard images are initialized in each thread-local image list.
             base.OnOpening(e);
         }
 
