@@ -66,6 +66,15 @@ internal static class StabilityRegression {
             var resources = new ResourceManager("Resources_String_it_IT", assembly);
             Require(!string.IsNullOrEmpty(resources.GetString("TabBar_Menu")), "Italian resources missing");
             Console.WriteLine("PASS: built-in Italian resources and culture");
+            // The test runs without NuGet DLLs next to QTTabBar.dll, as in the GAC.
+            var detectorAssembly = Assembly.Load("UtfUnknown, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90217ce7a23260d4");
+            Require(string.IsNullOrEmpty(detectorAssembly.Location), "Encoding detector did not load from embedded resources");
+            var detector = detectorAssembly.GetType("UtfUnknown.CharsetDetector", true);
+            var detect = detector.GetMethod("DetectFromBytes", new Type[] { typeof(byte[]) });
+            Require(detect != null, "Encoding detector API missing");
+            var detected = detect.Invoke(null, new object[] { System.Text.Encoding.UTF8.GetBytes("Citta italiana: àèìòù. Ripetizione àèìòù.") });
+            Require(detected != null, "Encoding detection failed");
+            Console.WriteLine("PASS: embedded encoding detector and its dependencies load without sidecar DLLs");
 
             var controlType = assembly.GetType("QTTabBarLib.QTabControl", true);
             string errorLog = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "QTTabBar\\QTTabBarException.log");
