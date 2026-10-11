@@ -1,4 +1,4 @@
-//    This file is part of QTTabBar, a shell extension for Microsoft
+Ôªø//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -27,50 +27,85 @@ namespace QTTabBarLib {
     // All interaction with AutomationElements MUST be done in a thread other
     // than the UI thread.  Use this class to execute code in the Automation 
     // thread.
-    // ”ÎAutomationElementsµƒÀ˘”–Ωªª•±ÿ–Î‘⁄¡Ì“ª∏ˆœﬂ≥Ã÷–ÕÍ≥…
-    // ∂¯≤ª «UIœﬂ≥Ã°£ π”√¥À¿‡‘⁄◊‘∂ØªØ÷–÷¥––¥˙¬Î
+    // ‰∏éAutomationElementsÁöÑÊâÄÊúâ‰∫§‰∫íÂøÖÈ°ªÂú®Âè¶‰∏Ä‰∏™Á∫øÁ®ã‰∏≠ÂÆåÊàê
+    // ËÄå‰∏çÊòØUIÁ∫øÁ®ã„ÄÇ‰ΩøÁî®Ê≠§Á±ªÂú®Ëá™Âä®Âåñ‰∏≠ÊâßË°å‰ª£Á†Å
     // http://msdn.microsoft.com/en-us/library/ee671692%28VS.85%29.aspx
 
     public static class AutomationManager {
         private static readonly Guid IID_IUIAutomation = new Guid("{30CBE57D-D9D0-452A-AB13-7AC5AC4825EE}");
         private static readonly Guid CLSID_CUIAutomation = new Guid("{FF48DBA4-60EF-4201-AA87-54103EEF594E}");
-        private static IUIAutomation pAutomation;
-        private static Dispatcher automationDispatch;
+        private static readonly AutomationWorker worker = new AutomationWorker();
         public delegate T Query<out T>(AutomationElementFactory factory);
 
-        static AutomationManager() {
-            Guid rclsid = CLSID_CUIAutomation;
-            Guid riid = IID_IUIAutomation;
-            object obj;
-            PInvoke.CoCreateInstance(ref rclsid, IntPtr.Zero, 1, ref riid, out obj);
-            pAutomation = obj as IUIAutomation;
-            Thread automationThread = new Thread(Dispatcher.Run) { IsBackground = true };
-            automationThread.Start();
-            while(true) {
-                automationDispatch = Dispatcher.FromThread(automationThread);
-                if(automationDispatch != null) break;
-                Thread.Sleep(50);
+        private sealed class AutomationWorker {
+            internal Dispatcher Dispatcher;
+            internal IUIAutomation Automation;
+            internal readonly ManualResetEvent Ready = new ManualResetEvent(false);
+
+            internal AutomationWorker() {
+                var thread = new Thread(Run) { IsBackground = true, Name = "QTTabBar UI Automation" };
+                thread.SetApartmentState(ApartmentState.MTA);
+                thread.Start();
             }
+
+            private void Run() {
+                Dispatcher = Dispatcher.CurrentDispatcher;
+                // Signal before any COM initialization: startup must not wait for
+                // an Explorer provider while its UI thread is initializing us.
+                Ready.Set();
+                Dispatcher.Run();
+            }
+        }
+
+        private static T RunQuery<T>(Query<T> query) {
+            try {
+                if(worker.Automation == null) {
+                    // Create and use the COM client on the same MTA worker.
+                    Guid clsid = CLSID_CUIAutomation;
+                    Guid iid = IID_IUIAutomation;
+                    object obj;
+                    Marshal.ThrowExceptionForHR(PInvoke.CoCreateInstance(ref clsid, IntPtr.Zero, 1, ref iid, out obj));
+                    worker.Automation = (IUIAutomation)obj;
+                }
+                using(var factory = new AutomationElementFactory(worker.Automation)) {
+                    return query(factory);
+                }
+            }
+            catch(Exception exception) {
+                QTUtility2.MakeErrorLog(exception, "Automation Thread");
+                return default(T);
+            }
+        }
+
+        public static void BeginQuery<T>(Query<T> query, SynchronizationContext context, Action<T> completed) {
+            if(query == null) throw new ArgumentNullException("query");
+            if(context == null) throw new ArgumentNullException("context");
+            if(completed == null) throw new ArgumentNullException("completed");
+            // This short wait is only for creation of the dispatcher, never for
+            // a provider query. Subsequent requests use the already signaled event.
+            if(!worker.Ready.WaitOne(1000)) {
+                context.Post(_ => completed(default(T)), null);
+                return;
+            }
+            worker.Dispatcher.BeginInvoke(new Action(() => {
+                T result = RunQuery(query);
+                try {
+                    context.Post(_ => completed(result), null);
+                }
+                catch(InvalidOperationException) {
+                    // The owning Explorer UI thread has already shut down.
+                }
+            }), DispatcherPriority.Background);
         }
 
         public static T DoQuery<T>(Query<T> query) {
             try {
-                // ø’÷µ“˝”√≈–∂œ£¨’‚¿Ô∑µªÿ“ª∏ˆƒ¨»œ÷µ
-                if (null == automationDispatch) {
+                // Á©∫ÂÄºÂºïÁî®Âà§Êñ≠ÔºåËøôÈáåËøîÂõû‰∏Ä‰∏™ÈªòËÆ§ÂÄº
+                if (!worker.Ready.WaitOne(1000)) {
                     return default(T);
                 }
 
-                return (T)automationDispatch.Invoke(new Func<T>(() => {
-                    try {
-                        using(AutomationElementFactory factory = new AutomationElementFactory(pAutomation)) {
-                            return query(factory);
-                        }
-                    }
-                    catch(Exception exception) {
-                        QTUtility2.MakeErrorLog(exception, "Automation Thread");
-                        return default(T);
-                    }
-                }), DispatcherPriority.Normal);                
+                return (T)worker.Dispatcher.Invoke(new Func<T>(() => RunQuery(query)), DispatcherPriority.Normal);
             }
             catch (Exception exception)
             {
@@ -288,7 +323,7 @@ namespace QTTabBarLib {
                 object obj;
                 pElement.GetCurrentPropertyValue(UIA_BoundingRectanglePropertyId, out obj);
                 double[] rect = obj as double[];
-                return rect == null ?
+                return rect == null || rect.Length != 4 ?
                     new Rectangle(0, 0, 0, 0) :
                     new Rectangle((int)rect[0], (int)rect[1], (int)rect[2], (int)rect[3]);
             }

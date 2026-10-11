@@ -85,6 +85,16 @@ namespace QTTabBarLib {
         private Timer timer_HoverSubDirTipMenu;
         private Timer timer_Thumbnail;
         protected bool fDragging;
+        private bool afterPaintQueued;
+
+        protected void RequestAfterPaint() {
+            if(afterPaintQueued || ListViewController == null) return;
+            afterPaintQueued = PInvoke.PostMessage(ListViewController.Handle, WM_AFTERPAINT, IntPtr.Zero, IntPtr.Zero);
+        }
+
+        protected virtual void AfterPaint() {
+            RefreshSubDirTip(true);
+        }
 
         // private IntPtr hwndListView;
         private static string BG_IMG = Environment.GetEnvironmentVariable("ProgramData") + @"\QTTabBar\Image\bgImage.png";
@@ -587,7 +597,8 @@ namespace QTTabBarLib {
         protected virtual bool ListViewController_MessageCaptured(ref Message msg) {
             // QTUtility2.log("ListViewController msg\t" + Enum.GetName(typeof(MsgEnum), msg.Msg) + "\tw\t" + msg.WParam + "\tl\t" + msg.LParam);
             if(msg.Msg == WM_AFTERPAINT) {
-                RefreshSubDirTip(true);
+                afterPaintQueued = false;
+                AfterPaint();
                 // SetBackgroundImage(true, true, 0, 0);
                 /*
                 RECT rect;
@@ -777,7 +788,7 @@ namespace QTTabBarLib {
                     // 直接在 Paint 消息内部操作不行
                     // It's very dangerous to do automation-related things
                     // during WM_PAINT.  So, use PostMessage to do it later.
-                    PInvoke.PostMessage(ListViewController.Handle, WM_AFTERPAINT, IntPtr.Zero, IntPtr.Zero);
+                    RequestAfterPaint();
                     break;
 
                 case WM.MOUSEMOVE:
@@ -924,6 +935,7 @@ namespace QTTabBarLib {
                 }
                 else if(byKey) {
                     Rectangle rect = GetFocusedItemRect();
+                    if(rect.IsEmpty) return false;
                     Point pt = new Point(rect.Right - 32, rect.Bottom - 16);
                     PInvoke.ClientToScreen(Handle, ref pt);
                     return ShowThumbnailTooltip(iItem, pt, true);
@@ -1175,6 +1187,7 @@ namespace QTTabBarLib {
                         return false;
                     }
                     Point pnt = GetSubDirTipPoint(fByKey);
+                    if(pnt.IsEmpty) return false;
                     if(subDirTip == null) {
                         subDirTip = new SubDirTipForm(hwndSubDirTipMessageReflect, true, this);
                         subDirTip.MenuClosed += subDirTip_MenuClosed;

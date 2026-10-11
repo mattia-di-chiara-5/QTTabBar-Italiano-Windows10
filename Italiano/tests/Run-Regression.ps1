@@ -11,5 +11,18 @@ foreach ($file in @('QTTabBar.dll','QTPluginLib.dll','BandObjectLib.dll','Intero
 $output = Join-Path $isolated 'StabilityRegression.exe'
 & $compiler /nologo /r:System.Drawing.dll /r:System.Windows.Forms.dll "/out:$output" (Join-Path $PSScriptRoot 'StabilityRegression.cs')
 if ($LASTEXITCODE -ne 0) { throw 'Compilazione test non riuscita.' }
-& $output (Join-Path $isolated 'QTTabBar.dll')
+$devConfig = '<configuration><runtime><developmentMode developerInstallation="true" /></runtime></configuration>'
+[IO.File]::WriteAllText(($output + '.config'), $devConfig)
+$previousDevPath = $env:DEVPATH
+$env:DEVPATH = $isolated
+try { & $output (Join-Path $isolated 'QTTabBar.dll') }
+finally { $env:DEVPATH = $previousDevPath }
 if ($LASTEXITCODE -ne 0) { throw 'Regressione rilevata.' }
+$performance = Join-Path $isolated 'PerformanceRegression.exe'
+& $compiler /nologo /debug:full /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.Core.dll "/out:$performance" (Join-Path $PSScriptRoot 'PerformanceRegression.cs') (Join-Path $PSScriptRoot '..\..\QTTabBar\CoalescedQuery.cs')
+if ($LASTEXITCODE -ne 0) { throw 'Compilazione test prestazioni non riuscita.' }
+[IO.File]::WriteAllText(($performance + '.config'), $devConfig)
+$env:DEVPATH = $isolated
+try { & $performance (Join-Path $isolated 'QTTabBar.dll') }
+finally { $env:DEVPATH = $previousDevPath }
+if ($LASTEXITCODE -ne 0) { throw 'Regressione prestazioni rilevata.' }
