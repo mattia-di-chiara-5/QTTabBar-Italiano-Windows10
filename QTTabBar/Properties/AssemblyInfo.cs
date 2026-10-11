@@ -34,7 +34,7 @@ using System.Resources;
 [assembly: AssemblyCopyright("Copyright (C)  2007-2025")]
 [assembly: AssemblyTrademark("indiff")]
 [assembly: AssemblyCulture("")]
-// [assembly: AssemblyFileVersion("1.6.3.5")]
+// [assembly: AssemblyFileVersion("1.6.3.6")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -55,7 +55,7 @@ using System.Resources;
 // by using the '*' as shown below:
 
 [assembly: AssemblyVersion("1.6.3.0")]
-[assembly: AssemblyFileVersion("1.6.3.5")]	// edit this
+[assembly: AssemblyFileVersion("1.6.3.6")]	// edit this
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
 // Microsoft .NET Framework documentation for more information on assembly signing.
@@ -87,4 +87,4 @@ using System.Resources;
 // This improves lookup performance for the first resource you load, and can reduce your working set. 
 [assembly: NeutralResourcesLanguage("zh-CN")]
 
-[assembly: AssemblyInformationalVersion("1.6.3+italiano.0.5.0")]
+[assembly: AssemblyInformationalVersion("1.6.3+italiano.0.6.0")]

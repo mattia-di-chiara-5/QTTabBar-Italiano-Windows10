@@ -18,6 +18,7 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using QTTabBarLib.Interop;
 
@@ -28,9 +29,32 @@ namespace QTTabBarLib {
         private Point lastMouseMovePoint;
         private CachedListItemElement hotElement;
         private CachedListItemElement focusedElement;
+        private readonly System.Windows.Forms.Timer refreshTimer;
+        private readonly CoalescedQuery<AutomationElementFactory, CacheSnapshot> cacheQuery;
 
         internal ExtendedItemsView(ShellBrowserEx ShellBrowser, IntPtr hwndShellView, IntPtr hwndListView, IntPtr hwndSubDirTipMessageReflect)
                 : base(ShellBrowser, hwndShellView, hwndListView, hwndSubDirTipMessageReflect) {
+            var context = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
+            cacheQuery = new CoalescedQuery<AutomationElementFactory, CacheSnapshot>(
+                (query, completed) => AutomationManager.BeginQuery(factory => query(factory), context, completed),
+                ApplyCache);
+            refreshTimer = new System.Windows.Forms.Timer { Interval = 33 };
+            refreshTimer.Tick += (sender, args) => {
+                refreshTimer.Stop();
+                BeginRefreshCache();
+            };
+        }
+
+        public override void Dispose(bool disposing) {
+            if(fDisposed) return;
+            refreshTimer.Stop();
+            refreshTimer.Dispose();
+            cacheQuery.Dispose();
+            base.Dispose(disposing);
+        }
+
+        protected override void AfterPaint() {
+            RefreshCache();
         }
 
         private AutomationElement ListItemElementFromPoint(AutomationElementFactory factory, Point pt) {
@@ -181,7 +205,7 @@ namespace QTTabBarLib {
                         if(elem == null) return -1;
                         return viewMode == FVM.LIST ? elem.GetRowCount() : elem.GetColumnCount();
                     });
-                    if(pageCount == -1) return false;
+                    if(pageCount <= 0) return false;
                     int page = focusedIdx % pageCount;
                     if(key == KeyNextItem && (page == pageCount - 1 || focusedIdx == itemCount - 1)) {
                         selectMe = focusedIdx - page;
@@ -219,7 +243,7 @@ namespace QTTabBarLib {
                         // HandleShiftKey is called by a Hook callback, which apparently causes
                         // problems with automation.  Use PostMessage to update the SubDirTip later.
                         hotElement = null;
-                        PInvoke.PostMessage(Handle, (int) WM_AFTERPAINT, IntPtr.Zero, IntPtr.Zero);
+                        RequestAfterPaint();
                     }
                 }
                 else if(!SubDirTipMenuIsShowing()) {
@@ -277,10 +301,8 @@ namespace QTTabBarLib {
                 return hotElement.LabelRect.Contains(pt);
             }
             else {
-                return AutomationManager.DoQuery(factory => {
-                    AutomationElement elem = factory.FromPoint(pt);
-                    return elem != null && elem.GetAutomationId() == "System.ItemNameDisplay";
-                });
+                RefreshCache();
+                return false;
             }
         }
 
@@ -300,10 +322,7 @@ namespace QTTabBarLib {
         }
 
         protected override bool ListViewController_MessageCaptured(ref Message msg) {
-            if(msg.Msg == WM_AFTERPAINT) {
-                RefreshCache();
-            }
-            else if(msg.Msg == WM_ISITEMSVIEW) {
+            if(msg.Msg == WM_ISITEMSVIEW) {
                 msg.Result = (IntPtr)1;
                 return true;
             }
@@ -378,14 +397,14 @@ namespace QTTabBarLib {
                     if(pt != lastMouseMovePoint) {
                         lastMouseMovePoint = pt;
                         if(IsHotTrackingEnabled()) {
-                            PInvoke.PostMessage(Handle, WM_AFTERPAINT, IntPtr.Zero, IntPtr.Zero);
+                            RequestAfterPaint();
                         }
                         if(focusedElement != null) {
                             if(hotElement == null && focusedElement.FullRect.Contains(pt)) {
-                                PInvoke.PostMessage(Handle, WM_AFTERPAINT, IntPtr.Zero, IntPtr.Zero);
+                                RequestAfterPaint();
                             }
                             else if(hotElement != null && hotElement.Index == focusedElement.Index && !focusedElement.FullRect.Contains(pt)) {
-                                PInvoke.PostMessage(Handle, WM_AFTERPAINT, IntPtr.Zero, IntPtr.Zero);
+                                RequestAfterPaint();
                             }
                         }
                     }
@@ -395,7 +414,7 @@ namespace QTTabBarLib {
                 case WM.MOUSELEAVE:
                     if(focusedElement != null) {
                         if(hotElement != null && hotElement.Index == focusedElement.Index) {
-                            PInvoke.PostMessage(Handle, WM_AFTERPAINT, IntPtr.Zero, IntPtr.Zero);
+                            RequestAfterPaint();
                         }
                     }
                     break;
@@ -463,31 +482,72 @@ namespace QTTabBarLib {
         }
 
         private void RefreshCache() {
-            int prevItem = hotElement == null ? -1 : hotElement.Index;
-            hotElement = null;
-            focusedElement = null;
-            if(!IsHotTrackingEnabled()) return;
+            if(fDisposed) return;
+            // A timer bounds refreshes to 30 Hz. Mouse/paint messages never wait
+            // for a provider, and bursts occupy only one slot in the queue.
+            if(!refreshTimer.Enabled) refreshTimer.Start();
+        }
+
+        private void BeginRefreshCache() {
+            if(fDisposed) return;
+            if(!IsHotTrackingEnabled()) {
+                hotElement = null;
+                focusedElement = null;
+                return;
+            }
             bool hasFocus = HasFocus();
             bool hasMouse = MouseIsOverListView();
-            int nextItem = AutomationManager.DoQuery(factory => {
+            Point cursor = Control.MousePosition;
+            Point origin = GetWindowPos();
+            IntPtr viewHandle = Handle;
+            cacheQuery.Request(factory => {
+                var snapshot = new CacheSnapshot { Cursor = cursor, Origin = origin };
                 AutomationElement elem;
                 if(hasFocus) {
                     elem = factory.FromKeyboardFocus();
-                    if(elem != null) {
-                        focusedElement = new CachedListItemElement(elem, this);
+                    if(elem != null && elem.GetClassName() == "UIItem") {
+                        snapshot.Focused = new CachedListItemElement(elem, origin);
                     }
                 }
-                if(hasMouse) {
-                    elem = ListItemElementFromPoint(factory, Control.MousePosition);
-                    if(elem == null) return -1;
-                    hotElement = new CachedListItemElement(elem, this);
-                    return hotElement.Index;
+                if(hasMouse && PInvoke.WindowFromPoint(cursor) == viewHandle) {
+                    elem = factory.FromPoint(cursor);
+                    if(elem != null && elem.GetClassName() != "UIItem") elem = elem.GetParent();
+                    if(elem != null && elem.GetClassName() == "UIItem") {
+                        if(snapshot.Focused != null && elem.GetItemIndex() == snapshot.Focused.Index)
+                            snapshot.Hot = snapshot.Focused;
+                        else snapshot.Hot = new CachedListItemElement(elem, origin);
+                    }
                 }
-                return -1;
+                return snapshot;
             });
+        }
+
+        private void ApplyCache(CacheSnapshot snapshot) {
+            if(fDisposed || snapshot == null) return;
+            if(snapshot.Cursor != Control.MousePosition || snapshot.Origin != GetWindowPos()) {
+                RefreshCache();
+                return;
+            }
+            if(!IsHotTrackingEnabled()) {
+                hotElement = null;
+                focusedElement = null;
+                return;
+            }
+            int prevItem = hotElement == null ? -1 : hotElement.Index;
+            hotElement = snapshot.Hot;
+            focusedElement = snapshot.Focused;
+            int nextItem = hotElement == null ? -1 : hotElement.Index;
             if(nextItem != prevItem) {
                 OnHotItemChanged(nextItem);
             }
+            else RefreshSubDirTip();
+        }
+
+        private sealed class CacheSnapshot {
+            internal Point Cursor;
+            internal Point Origin;
+            internal CachedListItemElement Hot;
+            internal CachedListItemElement Focused;
         }
 
         protected override bool ShellViewController_MessageCaptured(ref Message msg) {
@@ -537,8 +597,15 @@ namespace QTTabBarLib {
 
         private class CachedListItemElement {
             public CachedListItemElement(AutomationElement elem, ExtendedItemsView parent) {
-                Point offset = parent.GetWindowPos();
-                offset = new Point(-offset.X, -offset.Y);
+                Initialize(elem, parent.GetWindowPos());
+            }
+
+            public CachedListItemElement(AutomationElement elem, Point origin) {
+                Initialize(elem, origin);
+            }
+
+            private void Initialize(AutomationElement elem, Point origin) {
+                Point offset = new Point(-origin.X, -origin.Y);
                 Index = elem.GetItemIndex();
                 Rectangle rect = elem.GetBoundingRect();
                 rect.Offset(offset);

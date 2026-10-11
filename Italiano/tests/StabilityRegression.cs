@@ -18,6 +18,7 @@ internal static class StabilityRegression {
     private static int Main(string[] args) {
         try {
             var assembly = Assembly.LoadFrom(Path.GetFullPath(args[0]));
+            Require(string.Equals(assembly.Location, Path.GetFullPath(args[0]), StringComparison.OrdinalIgnoreCase), "Test loaded installed GAC assembly instead of candidate");
             var storeType = assembly.GetType("QTTabBarLib.ThreadImageListStore", true);
             var store = Activator.CreateInstance(storeType, BindingFlags.Instance | BindingFlags.NonPublic,
                 null, new object[] { new Func<ImageList>(() => new ImageList()) }, null);
@@ -75,6 +76,13 @@ internal static class StabilityRegression {
             var detected = detect.Invoke(null, new object[] { System.Text.Encoding.UTF8.GetBytes("Citta italiana: àèìòù. Ripetizione àèìòù.") });
             Require(detected != null, "Encoding detection failed");
             Console.WriteLine("PASS: embedded encoding detector and its dependencies load without sidecar DLLs");
+            var codePages = Assembly.Load("System.Text.Encoding.CodePages, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
+            Require(codePages.GetName().Version.ToString() == "10.0.0.12" && string.IsNullOrEmpty(codePages.Location), "Updated CodePages did not load from embedded resources");
+            var providerType = codePages.GetType("System.Text.CodePagesEncodingProvider", true);
+            var provider = providerType.GetProperty("Instance").GetValue(null, null);
+            var legacyEncoding = (System.Text.Encoding)providerType.GetMethod("GetEncoding", new Type[] { typeof(int) }).Invoke(provider, new object[] { 1252 });
+            Require(legacyEncoding.GetString(new byte[] { 99, 105, 116, 116, 224 }) == "città", "Legacy Italian encoding failed");
+            Console.WriteLine("PASS: embedded Microsoft CodePages 10.0.12 decodes Windows-1252; old dependency identity resolves correctly");
 
             var controlType = assembly.GetType("QTTabBarLib.QTabControl", true);
             string errorLog = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "QTTabBar\\QTTabBarException.log");

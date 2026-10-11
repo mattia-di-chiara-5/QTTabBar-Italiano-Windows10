@@ -1,35 +1,39 @@
-# QTTabBar Italiano — Windows 10 Edition 0.5.0
+﻿# QTTabBar Italiano — Windows 10 Edition 0.6.0
 
-Edizione italiana con correzioni di stabilita, basata sui sorgenti upstream **QTTabBar 1.6.3** (tag `v1.6.3`, commit `8e5434b`). Mantiene l'italiano integrato introdotto nella 0.4.0.
+Edizione italiana basata sui sorgenti upstream **QTTabBar 1.6.3** (tag `v1.6.3`, commit `8e5434b`). La 0.6.0 corregge il lavoro ripetuto sul percorso mouse/disegno di Explorer. Resta una release preliminare: i test non garantiscono la risoluzione di ogni rallentamento.
 
 ## Correzioni
 
-- Ogni thread di Esplora file ha la propria lista delle icone: evita gli accessi concorrenti a `ImageList`, coerenti con le eccezioni `IndexOfKey/ContainsKey` osservate durante il disegno delle schede.
-- Riutilizzo dei pennelli grafici delle schede: elimina le allocazioni ripetute senza `Dispose` durante ogni ridisegno.
-- Dipendenze dell'anteprima testo incorporate nella DLL, risolvibili anche quando la libreria viene caricata dalla GAC.
-- Aggiornamento MSI transazionale dalla 1.5.6.1, backup dei dati di ripristino e riavvio limitato alla sessione corrente.
-- L'installer non elimina la chiave condivisa di tutte le barre di Esplora file e non esegue `taskkill /IM explorer.exe` dal servizio MSI.
+- Cache degli elementi aggiornata in modo asincrono, senza attendere il provider UI Automation durante il passaggio del mouse.
+- Un solo lavoro in corso, richieste accorpate ogni 33 ms e risultati superati ignorati.
+- Client COM creato e usato sul medesimo thread MTA.
+- Percorsi UNC e unita di rete rifiutati prima dei controlli sincroni dei menu delle sottocartelle.
+- Protezioni per geometrie incomplete e conteggi di pagina nulli.
+- Microsoft System.Text.Encoding.CodePages aggiornato a 10.0.12 e incorporato nella DLL.
+- Mantenute le correzioni 0.5.0: icone separate per thread STA e pennelli delle schede riutilizzati.
 
-Queste correzioni non dimostrano che ogni crash di Explorer sia causato da QTTabBar. Il crash `ntdll.dll / 0xc0000409` richiede un dump per essere attribuito con certezza.
+La ricerca nei fork, i confronti e i limiti sono descritti nell'[audit](Italiano/docs/AUDIT_PRESTAZIONI_0.6.0.md). Alcune operazioni esplicite mantengono chiamate UI Automation sincrone.
 
 ## Installazione
 
-Richiesti Windows 10 x64 e .NET Framework 4.8. Scaricare dalla [release italiana](https://github.com/mattia-di-chiara-5/QTTabBar-Italiano-Windows10/releases) `QTTabBar-Italiano-Windows10-v0.5.0.zip`, estrarre e avviare **INSTALLA_STABILITA.cmd**. Accettare l'elevazione UAC. L'aggiornamento chiude le finestre di Esplora file: terminare prima copie ed estrazioni in corso.
+Richiesti Windows 10 x64 e .NET Framework 4.8. Scaricare dalla [release italiana](https://github.com/mattia-di-chiara-5/QTTabBar-Italiano-Windows10/releases) `QTTabBar-Italiano-Windows10-v0.6.0.zip`, estrarre e avviare **INSTALLA_STABILITA.cmd**. Accettare l'elevazione UAC. Terminare prima copie ed estrazioni: l'aggiornamento riavvia Esplora file nella sessione corrente. Riavviare Windows se richiesto.
 
-La migrazione automatica supporta una nuova installazione o la 1.5.6.1 originale/italiana 0.4.0 con hash riconosciuto. Versioni diverse vengono rifiutate. La lingua integrata viene impostata su Italiano (indice 8). Se la barra non e visibile, abilitarla da Visualizza > Opzioni > QTTabBar.
+Migrazione automatica dalla **0.5.0 verificata** oppure nuova installazione. Le versioni precedenti devono prima passare alla 0.5.0. Versioni/DLL sconosciute vengono rifiutate. L'italiano integrato viene selezionato automaticamente. Se necessario, abilitare la barra da Visualizza > Opzioni > QTTabBar.
 
-La versione dell'edizione e **0.5.0**, la base e **1.6.3** e la versione file e **1.6.3.5**. L'identita COM rimane `1.6.3.0` per compatibilita con i plugin upstream; la versione interna MSI `1.6.4` serve all'aggiornamento e non indica un aggiornamento upstream alla 1.6.4.
+Il profilo rapido predefinito mostra anteprime e menu delle sottocartelle tenendo premuto **Maiusc (Shift)**. Per conservare le impostazioni delle anteprime automatiche, eseguire invece da PowerShell `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Installa-Stabilita.ps1 -MantieniAnteprimeAutomatiche`. Le opzioni rimangono modificabili nella configurazione di QTTabBar.
+
+Versione dell'edizione **0.6.0**, base **1.6.3**, versione file **1.6.3.6**. L'identita COM resta `1.6.3.0`; la versione interna MSI `1.6.5` serve all'aggiornamento e non indica una nuova base upstream.
 
 ## Ripristino
 
-Avviare **RIPRISTINA_VERSIONE_PRECEDENTE.cmd** con lo stesso account Windows. Rimuove la nuova edizione e, se presente prima dell'aggiornamento, reinstalla l'MSI 1.5.6.1 verificato e la DLL esatta precedente; ripristina inoltre la configurazione salvata prima dell'installazione. I backup restano in `%ProgramData%\QTTabBar-Italiano\v0.5.0`, protetti per amministratori e SYSTEM. Non pubblicare i backup o i log personali.
+Avviare **RIPRISTINA_VERSIONE_PRECEDENTE.cmd** con lo stesso account Windows. Rimuove la 0.6.0 e reinstalla la 0.5.0 verificata, se presente prima, ripristinando la configurazione salvata. Backup protetti in `%ProgramData%\QTTabBar-Italiano\v0.6.0`. I precedenti backup della 0.5.0 restano disponibili separatamente. Non pubblicare backup o log personali.
 
 ## Compilazione e verifica
 
-Usare Visual Studio Build Tools/MSBuild con targeting pack .NET 4.8, SDK Windows per l'interoperabilita COM, NuGet e WiX 3.14.1. Il workflow `italiano-stability.yml` documenta la sequenza completa. Ripristinare `QTTabBar/packages.config`, compilare `QTTabBar/QTTabBar.csproj` in Release/AnyCPU, eseguire `Italiano/tests/Run-Regression.ps1`, quindi `Italiano/scripts/Build-StabilityPackage.ps1`.
+Usare Visual Studio Build Tools/MSBuild, targeting pack .NET 4.8, SDK Windows, NuGet e WiX 3.14.1. Il workflow `italiano-stability.yml` documenta ripristino pacchetti, build, test e creazione del pacchetto. Eseguire `Italiano/tests/Run-Regression.ps1`, quindi `Italiano/scripts/Build-StabilityPackage.ps1` e `Italiano/tests/Test-OfflinePackage.ps1`.
 
-La creazione usa l'installer ufficiale 1.6.3 con SHA-256 `2F91AD5B04DE7518C9BDE708768E88BE4EBF8EB92AA3649B1FEED1B3DF239FDF` per i plugin e gli hook nativi. L'MSI originale di ripristino e incluso con SHA-256 `AAE4F2BEC2F4CA0EDE488638B9F31543B7CFCBFC90F1C6DDB74F5FB47B890287`. I sorgenti corrispondenti alla base sono inclusi nella cronologia Git e nel merge del tag upstream.
+Input fissati tramite SHA-256: installer ufficiale 1.6.3 `2F91AD5B04DE7518C9BDE708768E88BE4EBF8EB92AA3649B1FEED1B3DF239FDF`; MSI di ripristino 0.5.0 `675C49C0681304CC537D3626AF5794BAA035610DA321A8CC9934A2A67332522E`.
 
-I test coprono quattro thread STA con 2.000 cicli sulle icone, cultura e risorse italiane integrate, 2.000 ridisegni reali delle schede senza sostituzione dei pennelli e senza nuove eccezioni nel log. Il pacchetto non ha firma Authenticode; la DLL conserva lo strong name del progetto. La stabilita nell'uso prolungato, sulle cartelle di rete e con antivirus/altre estensioni richiede verifica sul PC.
+Test: icone su quattro thread STA, 2.000 ridisegni, risorse italiane, dipendenze incorporate, 10.000 richieste accorpate, provider lento e percorso UNC irraggiungibile. L'isolamento DEVPATH/developmentMode riguarda soltanto i processi di test; non modifica Explorer o il sistema. Il pacchetto non ha firma Authenticode; la DLL conserva lo strong name del progetto.
 
-Licenza GNU GPL v3: vedere LICENSE.txt. Crediti a Quizo, Paul Accisano, indiff e ai contributori upstream; localizzazione italiana dal commit `d2eddd9` dell'edizione 0.4.0.
+Licenza GNU GPL v3: vedere LICENSE.txt. Crediti a Quizo, Paul Accisano, indiff e ai contributori upstream; localizzazione italiana dall'edizione 0.4.0.

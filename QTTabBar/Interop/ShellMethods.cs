@@ -1,4 +1,4 @@
-//    This file is part of QTTabBar, a shell extension for Microsoft
+﻿//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -708,8 +708,15 @@ namespace QTTabBarLib.Interop {
             return false;
         }
 
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, EntryPoint = "PathIsNetworkPathW")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool PathIsNetworkPath(string path);
+
         public static bool TryMakeSubDirTipPath(ref string path) {
             if(!string.IsNullOrEmpty(path)) {
+                // Hover must reject remote paths before Directory.Exists or
+                // shortcut target probing can block the Explorer UI thread.
+                if(path.StartsWith(@"\\", StringComparison.Ordinal) || PathIsNetworkPath(path)) return false;
                 bool flag;
                 if(path.StartsWith("::")) {
                     using(IDLWrapper wrapper = new IDLWrapper(path)) {
@@ -724,6 +731,7 @@ namespace QTTabBarLib.Interop {
                         return false;
                     }
                     path = GetLinkTargetPath(path);
+                    if(string.IsNullOrEmpty(path) || path.StartsWith(@"\\", StringComparison.Ordinal) || PathIsNetworkPath(path)) return false;
                     if(!Directory.Exists(path)) {
                         return false;
                     }
