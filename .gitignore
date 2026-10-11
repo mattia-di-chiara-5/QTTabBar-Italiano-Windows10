@@ -819,3 +819,6 @@ MigrationBackup/
 /BandObjectLib/*.ruleset
 *.ruleset
 /.idea
+
+/Italiano/build/
+/Italiano/dist/

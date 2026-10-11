@@ -1,0 +1,52 @@
+name: Italian stability build and regression
+on:
+  push:
+    branches: [master, 'fix/**']
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+      - uses: nuget/setup-nuget@d105a947828025cd7a980103c35ba2bfae586d0f # v2
+      - name: Restore and build managed shell extension
+        shell: powershell
+        run: |
+          nuget restore QTTabBar/packages.config -PackagesDirectory packages -NonInteractive
+          if ($LASTEXITCODE) { throw 'NuGet restore failed' }
+          msbuild QTTabBar/QTTabBar.csproj /p:Configuration=Release /p:Platform=AnyCPU "/p:SolutionDir=$env:GITHUB_WORKSPACE\" /nologo /v:minimal
+          if ($LASTEXITCODE) { throw 'Build failed' }
+      - name: Run stability regression
+        shell: powershell
+        run: .\Italiano\tests\Run-Regression.ps1
+      - name: Parse every Italian PowerShell script
+        shell: powershell
+        run: |
+          Get-ChildItem Italiano -Recurse -Filter *.ps1 -File | ForEach-Object {
+            $tokens = $null; $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName,[ref]$tokens,[ref]$errors)
+            if ($errors.Count) { throw ($errors | Out-String) }
+          }
+      - name: Download pinned packaging inputs and build offline package
+        shell: powershell
+        run: |
+          New-Item inputs -ItemType Directory -Force | Out-Null
+          Invoke-WebRequest https://github.com/indiff/qttabbar/releases/download/v1.6.3/QTTabBar.Setup.1.6.3.exe -OutFile inputs/upstream.exe
+          Invoke-WebRequest https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip -OutFile inputs/wix.zip
+          if ((Get-FileHash inputs/wix.zip).Hash -ne '6AC824E1642D6F7277D0ED7EA09411A508F6116BA6FAE0AA5F2C7DAA2FF43D31') { throw 'WiX hash mismatch' }
+          Expand-Archive inputs/wix.zip inputs/wix
+          Invoke-WebRequest https://github.com/mattia-di-chiara-5/QTTabBar-Italiano-Windows10/releases/download/it-v0.4.0/QTTabBar-Italiano-Windows10-v0.4.0.zip -OutFile inputs/previous.zip
+          if ((Get-FileHash inputs/previous.zip).Hash -ne 'D31D917E3C41342F27D24E7310C82700567D162FADD8EF4B564F416B2C79B221') { throw 'Previous release hash mismatch' }
+          Expand-Archive inputs/previous.zip inputs/previous
+          $rollback = Get-ChildItem inputs/previous -Recurse -Filter *.msi | Select-Object -First 1
+          .\Italiano\scripts\Build-StabilityPackage.ps1 -UpstreamInstaller "$pwd\inputs\upstream.exe" -WixDirectory "$pwd\inputs\wix" -RollbackMsi $rollback.FullName
+          .\Italiano\tests\Test-OfflinePackage.ps1 -PackageDirectory "$pwd\Italiano\dist\QTTabBar-Italiano-v0.5.0"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: QTTabBar-Italiano-v0.5.0
+          path: Italiano/dist/QTTabBar-Italiano-Windows10-v0.5.0.zip

@@ -1,4 +1,4 @@
-//    This file is part of QTTabBar, a shell extension for Microsoft
+ï»¿//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -52,7 +52,7 @@ namespace QTTabBarLib {
         internal static readonly string BuildVerion = "117"; // 117  Build version, incremented by the build script
         internal const int FIRST_MOUSE_ONLY_ACTION = 1000;
         internal static readonly string REG_PERSONALIZE = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
-        // ¿ì½İ¼üÆôÓÃ±êÊ¶
+        // å¿«æ·é”®å¯ç”¨æ ‡è¯†
         internal const int FLAG_KEYENABLED = 0x100000;
         internal const string IMAGEKEY_FOLDER = "folder";
         internal const string IMAGEKEY_MYNETWORK = "mynetwork";
@@ -82,7 +82,7 @@ namespace QTTabBarLib {
         internal const string REGUSER = RegConst.Root;
         internal static readonly char[] SEPARATOR_CHAR = new char[] { ';' };
         internal const string SEPARATOR_PATH_HASH_SESSION = "*?*?*";
-		// ÊÇ·ñÎªµ÷ÊÔ×´Ì¬£¿
+		// æ˜¯å¦ä¸ºè°ƒè¯•çŠ¶æ€ï¼Ÿ
         internal const bool NOW_DEBUGGING =
 #if DEBUG
             true;
@@ -100,10 +100,22 @@ namespace QTTabBarLib {
         internal static bool fRestoreFolderTree;
         internal static bool fSingleClick;
         internal static int iIconUnderLineVal;
-        internal static ImageList ImageListGlobal;
+        // Explorer windows have independent STA threads. ImageList is not thread safe,
+        // even for ContainsKey (it caches the last index), so each STA owns its list.
+        private static readonly ThreadImageListStore threadImages = new ThreadImageListStore(() => {
+            var images = new ImageList { ColorDepth = ColorDepth.Depth32Bit };
+            images.Images.Add("folder", GetIcon(string.Empty, false));
+            images.Images.Add("control", Resources_Image.imgNewWindow);
+            images.Images.Add("shift", Resources_Image.imgNewTab);
+            images.Images.Add("back", Resources_Image.imgBack);
+            images.Images.Add("forward", Resources_Image.imgForward);
+            images.Images.Add("current", Resources_Image.imgCurrent);
+            return images;
+        });
+        internal static ImageList ImageListGlobal { get { return threadImages.Current; } }
         internal static Dictionary<string, byte[]> ITEMIDLIST_Dic_Session = new Dictionary<string, byte[]>();
-        // PIDL »º´æ£º¶ş½øÖÆÊı¾İ½Ï´ó£¬ÏŞÖÆ128Ìõ·ÀÖ¹ÄÚ´æÅòÕÍ
-        // byte[] µ¥Ìõ¿É´ïÊıKB£¬128 ¡Á 4KB ¡Ö 512KB ÉÏ½ç¿É¿Ø
+        // PIDL ç¼“å­˜ï¼šäºŒè¿›åˆ¶æ•°æ®è¾ƒå¤§ï¼Œé™åˆ¶128æ¡é˜²æ­¢å†…å­˜è†¨èƒ€
+        // byte[] å•æ¡å¯è¾¾æ•°KBï¼Œ128 Ã— 4KB â‰ˆ 512KB ä¸Šç•Œå¯æ§
         //internal static readonly LruCache<string, byte[]> ITEMIDLIST_Dic_Session = new LruCache<string, byte[]>(128);
         internal static List<string> NoCapturePathsList = new List<string>();
         internal static string[] ResMain;
@@ -114,7 +126,7 @@ namespace QTTabBarLib {
         internal static Dictionary<string, string[]> TextResourcesDic;
         internal static byte WindowAlpha = 0xff;
 
-        // ÊÇ·ñÎª°µºÚÄ£Ê½
+        // æ˜¯å¦ä¸ºæš—é»‘æ¨¡å¼
         internal static bool InNightMode;
 
         // {
@@ -123,9 +135,9 @@ namespace QTTabBarLib {
         // }
 
 
-        ///////////////////////// ĞÂÔö by indiff ////////////////////////////////////
+        ///////////////////////// æ–°å¢ by indiff ////////////////////////////////////
 
-        // QTTabBar/QTUtility.cs »ò QTTabBarClass.cs ¾²Ì¬¹¹Ôìº¯ÊıÖĞ
+        // QTTabBar/QTUtility.cs æˆ– QTTabBarClass.cs é™æ€æ„é€ å‡½æ•°ä¸­
         [DllImport("user32.dll")]
         private static extern bool SetProcessDpiAwarenessContext(IntPtr dpiContext);
         [DllImport("user32.dll")]
@@ -145,7 +157,7 @@ namespace QTTabBarLib {
         public static int CurrentDpi => _currentDpi;
 
         /// <summary>
-        /// ¸ù¾İ´°¿Ú¾ä±ú¸üĞÂµ±Ç° DPI Ëõ·ÅÒò×Ó£¨Per-Monitor£©
+        /// æ ¹æ®çª—å£å¥æŸ„æ›´æ–°å½“å‰ DPI ç¼©æ”¾å› å­ï¼ˆPer-Monitorï¼‰
         /// </summary>
         public static void UpdateDpiForWindow(IntPtr hwnd)
         {
@@ -158,7 +170,7 @@ namespace QTTabBarLib {
             }
             catch
             {
-                // »ØÍË£ºÓÃÆÁÄ» DC
+                // å›é€€ï¼šç”¨å±å¹• DC
                 try
                 {
                     using (var g = Graphics.FromHwnd(hwnd))
@@ -173,53 +185,53 @@ namespace QTTabBarLib {
 
   
 
-        // ±ã½İËõ·Å·½·¨±£³Ö²»±ä
+        // ä¾¿æ·ç¼©æ”¾æ–¹æ³•ä¿æŒä¸å˜
         public static int Scale(int px) => (int)Math.Round(px * _dpiScale);
         public static float ScaleF(float px) => px * _dpiScale;
 
 
         public static void InitializeDpiAwareness()
         {
-            // Windows 10 1703+ Ö§³Ö Per-Monitor V2
-            // Ê§°ÜÊ±»ØÍËµ½ System DPI Aware
+            // Windows 10 1703+ æ”¯æŒ Per-Monitor V2
+            // å¤±è´¥æ—¶å›é€€åˆ° System DPI Aware
             try
             {
                 if (!SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2))
                 {
-                    // »ØÍË£ºVista+ µÄ»ù´¡ DPI ¸ĞÖª
+                    // å›é€€ï¼šVista+ çš„åŸºç¡€ DPI æ„ŸçŸ¥
                     PInvoke.SetProcessDPIAware();
                 }
             }
             catch {
                 try
                 {
-                    // ½µ¼¶£ºPer-Monitor£¨Win8.1+£©
+                    // é™çº§ï¼šPer-Monitorï¼ˆWin8.1+ï¼‰
                     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
                 }
                 catch
                 {
-                    try { PInvoke.SetProcessDPIAware(); }  // ½µ¼¶£ºSystem DPI
+                    try { PInvoke.SetProcessDPIAware(); }  // é™çº§ï¼šSystem DPI
                     catch { }
                 }
             }
 
-            UpdateTextScale();  // ¡û ĞÂÔö
+            UpdateTextScale();  // â† æ–°å¢
             _dpiScale = DpiManager.SystemDpiScale;
         }
         private static float _textScale = 1f;
-        private static float _baseFontSize = 9.0f;  // Ä¬ÈÏÏµÍ³×ÖÌå 9pt
+        private static float _baseFontSize = 9.0f;  // é»˜è®¤ç³»ç»Ÿå­—ä½“ 9pt
 
-        /// <summary>ÏµÍ³ÎÄ±¾Ëõ·ÅÒò×Ó£¨¸¨Öú¹¦ÄÜ¡úÎÄ±¾´óĞ¡£©</summary>
+        /// <summary>ç³»ç»Ÿæ–‡æœ¬ç¼©æ”¾å› å­ï¼ˆè¾…åŠ©åŠŸèƒ½â†’æ–‡æœ¬å¤§å°ï¼‰</summary>
         public static float TextScale => _textScale;
 
-        /// <summary>×ÛºÏËõ·ÅÒò×Ó = DPIËõ·Å ¡Á ÎÄ±¾Ëõ·Å</summary>
+        /// <summary>ç»¼åˆç¼©æ”¾å› å­ = DPIç¼©æ”¾ Ã— æ–‡æœ¬ç¼©æ”¾</summary>
         public static float TotalScale => _dpiScale * _textScale;
 
-        // 2048 Beta2 Ê¹ÓÃ»ù×¼×ÖÌå´óĞ¡£¬Ã¿´Î´ÓÏµÍ³×ÖÌå¼ÆËã
+        // 2048 Beta2 ä½¿ç”¨åŸºå‡†å­—ä½“å¤§å°ï¼Œæ¯æ¬¡ä»ç³»ç»Ÿå­—ä½“è®¡ç®—
         private const float UNSCALED_FONTSIZE = 9.0f;
         private const float UNSCALED_LINEHEIGHT = 13.0f;
 
-        // ´´½¨×ÖÌåÊ±ÓÃ SystemFonts£¬²»Ó²±àÂë
+        // åˆ›å»ºå­—ä½“æ—¶ç”¨ SystemFontsï¼Œä¸ç¡¬ç¼–ç 
         public static Font CreateDefaultFont()
         {
             float textScale = System.Drawing.SystemFonts.DefaultFont.SizeInPoints / UNSCALED_FONTSIZE;
@@ -228,7 +240,7 @@ namespace QTTabBarLib {
                             System.Drawing.FontStyle.Regular);
         }
 
-        /// <summary>¸üĞÂÎÄ±¾Ëõ·ÅÒò×Ó£¨´ÓÏµÍ³×ÖÌå´óĞ¡¼ÆËã£©</summary>
+        /// <summary>æ›´æ–°æ–‡æœ¬ç¼©æ”¾å› å­ï¼ˆä»ç³»ç»Ÿå­—ä½“å¤§å°è®¡ç®—ï¼‰</summary>
         public static void UpdateTextScale()
         {
             try
@@ -243,7 +255,7 @@ namespace QTTabBarLib {
         }
 
 
-        // ×ÖÌå×¨ÓÃËõ·Å£¨Ö»³ËÎÄ±¾Ëõ·Å£¬²»³Ë DPI£¬ÒòÎª Font ÊÇ point µ¥Î»£©
+        // å­—ä½“ä¸“ç”¨ç¼©æ”¾ï¼ˆåªä¹˜æ–‡æœ¬ç¼©æ”¾ï¼Œä¸ä¹˜ DPIï¼Œå› ä¸º Font æ˜¯ point å•ä½ï¼‰
         public static float ScaleFont(float pt) => pt * _textScale;
 
 
@@ -252,7 +264,7 @@ namespace QTTabBarLib {
 
         internal static bool ShowInfoTip { get; private set; }
         /**
-         * Ë¢ĞÂ×´Ì¬
+         * åˆ·æ–°çŠ¶æ€
          */
         public static void RefreshShellStateValues()
         {
@@ -291,12 +303,12 @@ namespace QTTabBarLib {
             //     QTUtility2.MakeErrorLog(ex, "QTUtility.RefreshShellStateValues" );
             // }
         }
-        ///////////////////////// ĞÂÔö by indiff ////////////////////////////////////
+        ///////////////////////// æ–°å¢ by indiff ////////////////////////////////////
 
 
 
         /// <summary>
-        /// Ö»Ö´ĞĞÒ»´Î
+        /// åªæ‰§è¡Œä¸€æ¬¡
         /// </summary>
         static QTUtility() {
             // I'm tempted to just return for everything except "explorer"
@@ -332,27 +344,27 @@ namespace QTTabBarLib {
 
                 // Load the config
                 ConfigManager.Initialize();
-                QTUtility2.log("QTUtility ¼ÓÔØÅäÖÃ");
-                
+                QTUtility2.log("QTUtility åŠ è½½é…ç½®");
+
                 // Initialize the instance manager
                 InstanceManager.Initialize();
-                QTUtility2.log("QTUtility ³õÊ¼»¯InstanceManager");
+                QTUtility2.log("QTUtility åˆå§‹åŒ–InstanceManager");
 
                 // Create and enable the API hooks
                 HookLibManager.Initialize();
-                QTUtility2.log("QTUtility ´´½¨²¢ÇÒÆôÓÃ API hooks");
+                QTUtility2.log("QTUtility åˆ›å»ºå¹¶ä¸”å¯ç”¨ API hooks");
 
                 // Create the global imagelist
-                ImageListGlobal = new ImageList { ColorDepth = ColorDepth.Depth32Bit };
-                ImageListGlobal.Images.Add("folder", GetIcon(string.Empty, false));
-                QTUtility2.log("QTUtility ´´½¨È«¾ÖÎÄ¼ş¼ĞÍ¼Æ¬ÁĞ±í");
+                // Image lists are initialized lazily on their owning thread.
+
+                QTUtility2.log("QTUtility åˆ›å»ºå…¨å±€æ–‡ä»¶å¤¹å›¾ç‰‡åˆ—è¡¨");
 
                 // Load groups/apps
                 GroupsManager.LoadGroups();
-                QTUtility2.log("QTUtility ¼ÓÔØ·Ö×éÍê³É");
-                
+                QTUtility2.log("QTUtility åŠ è½½åˆ†ç»„å®Œæˆ");
+
                 AppsManager.LoadApps();
-                QTUtility2.log("QTUtility ´´½¨È«¾ÖÎÄ¼ş¼ĞÍ¼Æ¬ÁĞ±í");
+                QTUtility2.log("QTUtility åˆ›å»ºå…¨å±€æ–‡ä»¶å¤¹å›¾ç‰‡åˆ—è¡¨");
 
                 if(Config.Lang.UseLangFile && File.Exists(Config.Lang.LangFile)) {
                     TextResourcesDic = ReadLanguageFile(Config.Lang.LangFile);
@@ -388,8 +400,8 @@ namespace QTTabBarLib {
 
                
 
-                // ÅäÖÃ²»²¶»ñ¿ØÖÆÃæ°å
-                /*QTUtility2.log("QTUtility ¼ÓÔØºöÂÔµÄÂ·¾¶ ¿ØÖÆÃæ°å ÍøÂçÁ¬½Ó");
+                // é…ç½®ä¸æ•è·æ§åˆ¶é¢æ¿
+                /*QTUtility2.log("QTUtility åŠ è½½å¿½ç•¥çš„è·¯å¾„ æ§åˆ¶é¢æ¿ ç½‘ç»œè¿æ¥");
                 string[] theNoCaptures = { "::{26EE0668-A00A-44D7-9371-BEB064C98683}",
                                            "::{26EE0668-A00A-44D7-9371-BEB064C98683}\0",
                                            "::{7007ACC7-3202-11D1-AAD2-00805FC1270E}" };
@@ -400,39 +412,39 @@ namespace QTTabBarLib {
                         NoCapturePathsList.Add(item);
                     } 
                 }*/
-                
+
                 // default add ::{20D04FE0-3AEA-1069-A2D8-08002B30309D};::{26EE0668-A00A-44D7-9371-BEB064C98683}
                 /*
                 NoCapturePathsList.Add("::{26EE0668-A00A-44D7-9371-BEB064C98683}");
                 NoCapturePathsList.Add("::{26EE0668-A00A-44D7-9371-BEB064C98683}\0");
 
-                NoCapturePathsList.Add("::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");// ÍøÂçÁ¬½Ó
+                NoCapturePathsList.Add("::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");// ç½‘ç»œè¿æ¥
                 */
 
-                // ¿ØÖÆÃæ°å ::{26EE0668-A00A-44D7-9371-BEB064C98683} ::{26EE0668-A00A-44D7-9371-BEB064C98683}\0
+                // æ§åˆ¶é¢æ¿ ::{26EE0668-A00A-44D7-9371-BEB064C98683} ::{26EE0668-A00A-44D7-9371-BEB064C98683}\0
               
-               // NoCapturePathsList.Add("::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"); // ÎÒµÄµçÄÔ
-              //  NoCapturePathsList.Add("::{21EC2020-3AEA-1069-A2DD-08002B30309D}"); // ËùÓĞ¿ØÖÆÃæ°å
+               // NoCapturePathsList.Add("::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"); // æˆ‘çš„ç”µè„‘
+              //  NoCapturePathsList.Add("::{21EC2020-3AEA-1069-A2DD-08002B30309D}"); // æ‰€æœ‰æ§åˆ¶é¢æ¿
                // NoCapturePathsList.Add("::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0\\::{ED834ED6-4B5A-4BFE-8F11-A626DCB6A921}");
-                
-                // »ØÊÕÕ¾      NoCapturePathsList.Add("::{645FF040-5081-101B-9F08-00AA002F954E}");
+
+                // å›æ”¶ç«™      NoCapturePathsList.Add("::{645FF040-5081-101B-9F08-00AA002F954E}");
                 /*
-                                               »ØÊÕÕ¾ ¨C {645FF040-5081-101B-9F08-00AA002F954E}
-                               ¿ØÖÆÃæ°å ¨C {21EC2020-3AEA-1069-A2DD-08002B30309D}
-                               ÔËĞĞ ¨C {2559A1F3-21D7-11D4-BDAF-00C04F60B9F0}
-                               ËÑË÷ ¨C {2559A1F0-21D7-11D4-BDAF-00C04F60B9F0}
-                               Internet Explorer ¨C {871C5380-42A0-1069-A2EA-08002B30309D}
-                               ¹ÜÀí¹¤¾ß ¨C {D20EA4E1-3957-11D2-A40B-0C5020524153}
-                               ÍøÂçÁ¬½Ó ¨C {7007ACC7-3202-11D1-AAD2-00805FC1270E}
-                               ´òÓ¡»úºÍ´«Õæ ¨C {2227A280-3AEA-1069-A2DE-08002B30309D}
+                                               å›æ”¶ç«™ â€“ {645FF040-5081-101B-9F08-00AA002F954E}
+                               æ§åˆ¶é¢æ¿ â€“ {21EC2020-3AEA-1069-A2DD-08002B30309D}
+                               è¿è¡Œ â€“ {2559A1F3-21D7-11D4-BDAF-00C04F60B9F0}
+                               æœç´¢ â€“ {2559A1F0-21D7-11D4-BDAF-00C04F60B9F0}
+                               Internet Explorer â€“ {871C5380-42A0-1069-A2EA-08002B30309D}
+                               ç®¡ç†å·¥å…· â€“ {D20EA4E1-3957-11D2-A40B-0C5020524153}
+                               ç½‘ç»œè¿æ¥ â€“ {7007ACC7-3202-11D1-AAD2-00805FC1270E}
+                               æ‰“å°æœºå’Œä¼ çœŸ â€“ {2227A280-3AEA-1069-A2DE-08002B30309D}
                                                */
-                // ÅäÖÃ²»²¶»ñ¿ØÖÆÃæ°å
+                // é…ç½®ä¸æ•è·æ§åˆ¶é¢æ¿
                 GetShellClickMode();
                 QTUtility2.log("QTUtility Get Shell Click Mode");
 
                 // Initialize plugins
                 PluginManager.Initialize();
-                QTUtility2.log("QTUtility ¼ÓÔØËùÓĞ²å¼ş");
+                QTUtility2.log("QTUtility åŠ è½½æ‰€æœ‰æ’ä»¶");
             }
             catch(Exception exception) {
                 // TODO: Any errors here would be very serious.  Alert the user as such.
@@ -967,14 +979,14 @@ namespace QTTabBarLib {
 
                         string rawValue = reader.ReadString();
 
-                        // ? ĞŞ¸´1: RemoveEmptyEntries ¡ú None£¬±£Áô¿ÕĞĞÒÔÎ¬³ÖË÷Òı¶ÔÆë
-                        //   ÀıÈç "Line1\r\nLine2\r\n" Split ºó»áµÃµ½ ["Line1", "Line2", ""]
-                        //   Õâ¸öÎ²²¿¿Õ´®²»ÊÇÓĞĞ§ÌõÄ¿£¬ĞèÒªÒÆ³ı
+                        // ? ä¿®å¤1: RemoveEmptyEntries â†’ Noneï¼Œä¿ç•™ç©ºè¡Œä»¥ç»´æŒç´¢å¼•å¯¹é½
+                        //   ä¾‹å¦‚ "Line1\r\nLine2\r\n" Split åä¼šå¾—åˆ° ["Line1", "Line2", ""]
+                        //   è¿™ä¸ªå°¾éƒ¨ç©ºä¸²ä¸æ˜¯æœ‰æ•ˆæ¡ç›®ï¼Œéœ€è¦ç§»é™¤
                         string[] str = rawValue.Split(new string[] { newValue }, StringSplitOptions.None);
 
-                        // ? ĞŞ¸´2: ·ÀÖ¹ XML ÎÄ±¾½ÚµãÄ©Î²µÄ»»ĞĞ²úÉú¶àÓàµÄÎ²²¿¿ÕÔªËØ
-                        //   ÀıÈç "Line1\r\nLine2\r\n" Split ºó»áµÃµ½ ["Line1", "Line2", ""]
-                        //   Õâ¸öÎ²²¿¿Õ´®²»ÊÇÓĞĞ§ÌõÄ¿£¬ĞèÒªÒÆ³ı
+                        // ? ä¿®å¤2: é˜²æ­¢ XML æ–‡æœ¬èŠ‚ç‚¹æœ«å°¾çš„æ¢è¡Œäº§ç”Ÿå¤šä½™çš„å°¾éƒ¨ç©ºå…ƒç´ 
+                        //   ä¾‹å¦‚ "Line1\r\nLine2\r\n" Split åä¼šå¾—åˆ° ["Line1", "Line2", ""]
+                        //   è¿™ä¸ªå°¾éƒ¨ç©ºä¸²ä¸æ˜¯æœ‰æ•ˆæ¡ç›®ï¼Œéœ€è¦ç§»é™¤
                         if (str.Length > 0 && string.IsNullOrEmpty(str[str.Length - 1]))
                         {
                             Array.Resize(ref str, str.Length - 1);
@@ -987,7 +999,7 @@ namespace QTTabBarLib {
 
                         dictionary[reader.Name] = str;
                     }
-                    // reader.Close() ²»ĞèÒªÏÔÊ½µ÷ÓÃ£¬using ÒÑ±£Ö¤ Dispose
+                    // reader.Close() ä¸éœ€è¦æ˜¾å¼è°ƒç”¨ï¼Œusing å·²ä¿è¯ Dispose
                 }
                 return dictionary;
             } catch (XmlException xmlException) {
@@ -1115,7 +1127,7 @@ namespace QTTabBarLib {
         }
 
         /**
-         * ·Ç²¶»ñ path ºöÂÔµô
+         * éæ•è· path å¿½ç•¥æ‰
          */
         public static void SaveClosing(List<string> closingPaths) {
             if (null == closingPaths || closingPaths.Count == 0)
@@ -1163,7 +1175,7 @@ namespace QTTabBarLib {
             }
         }
         
-        // ÅĞ¶ÏÍ¼Æ¬ÁĞ±í²»ÄÜÎª¿Õ
+        // åˆ¤æ–­å›¾ç‰‡åˆ—è¡¨ä¸èƒ½ä¸ºç©º
         private static void SetImageKey(string key, string itemPath) {
             if( null != ImageListGlobal.Images && 
                 ImageListGlobal.Images.Count > 0 && // add by indiff check Images
@@ -1180,7 +1192,7 @@ namespace QTTabBarLib {
             value = ValidateMinMax(value, min, max);
         }
 
-        // ÅĞ¶ÏÊÇ·ñÎª°µºÚÄ£Ê½  Environment.OSVersion.Version.Major
+        // åˆ¤æ–­æ˜¯å¦ä¸ºæš—é»‘æ¨¡å¼  Environment.OSVersion.Version.Major
         public static bool getNightMode()
         {
             // if (Environment.OSVersion.Version.Major > 9)  {
@@ -1252,6 +1264,7 @@ namespace QTTabBarLib {
                     return CultureInfo.GetCultureInfo("tr-TR");
                 case 7:
                     return CultureInfo.GetCultureInfo("ru-RU");
+                case 8: return CultureInfo.GetCultureInfo("it-IT");
                 default:
                     return CultureInfo.GetCultureInfo("en-US");
             }
@@ -1290,16 +1303,16 @@ namespace QTTabBarLib {
         public static void ValidateTextResources(ref Dictionary<string, string[]> dict)
         {
             // MessageBox.Show("Config.Lang.UseLangFile:" + Config.Lang.UseLangFile + ",dict == null:" + (dict == null));
-            // ĞèÒª¹ıÂËµÄµôµÄ url
+            // éœ€è¦è¿‡æ»¤çš„æ‰çš„ url
             string[] urlKeys = { "SiteURL", "PayPalURL" };
             
-            // dict µÄ¼ì²â
+            // dict çš„æ£€æµ‹
             if (dict == null)
             {
                 dict = new Dictionary<string, string[]>();
             }
 
-            // ¼ÓÔØÄÚÖÃÓïÑÔ,ÔÚ´Ë¿ÉÌí¼ÓÄÚÖÃÓïÑÔ
+            // åŠ è½½å†…ç½®è¯­è¨€,åœ¨æ­¤å¯æ·»åŠ å†…ç½®è¯­è¨€
             IEnumerable<KeyValuePair<string, string>> keyValuePairs = null;
             switch (Config.Lang.BuiltInLangSelectedIndex)
             {
@@ -1311,15 +1324,16 @@ namespace QTTabBarLib {
                 case 5: keyValuePairs = Resources_String_fr_FR.ResourceManager.GetResourceStrings(); break;
                 case 6: keyValuePairs = Resources_String_tr_TR.ResourceManager.GetResourceStrings(); break;
                 case 7: keyValuePairs = Resources_String_ru_RU.ResourceManager.GetResourceStrings(); break;
+                case 8: keyValuePairs = Resources_String_it_IT.ResourceManager.GetResourceStrings(); break;
             }
 
-            // Èç¹û¼ÓÔØÎª¿Õ£¬ Ôò¶ÁÈ¡Ä¬ÈÏµÄÓ¦ÓÃÓïÑÔ
+            // å¦‚æœåŠ è½½ä¸ºç©ºï¼Œ åˆ™è¯»å–é»˜è®¤çš„åº”ç”¨è¯­è¨€
             if (null == keyValuePairs)
             {
                 keyValuePairs = Resources_String.ResourceManager.GetResourceStrings();
             }
 
-            // ÅĞ¶ÏÊÇ·ñÎ´Ê¹ÓÃÄÚÖÃÓïÑÔ,Èç¹ûÊÇµÄ»°£¬ÔòÖ±½Ó±éÀú ÄÚÖÃÓïÑÔ
+            // åˆ¤æ–­æ˜¯å¦æœªä½¿ç”¨å†…ç½®è¯­è¨€,å¦‚æœæ˜¯çš„è¯ï¼Œåˆ™ç›´æ¥éå† å†…ç½®è¯­è¨€
             if ( !Config.Lang.UseLangFile )
             {
                 foreach (var pair in keyValuePairs)
@@ -1327,21 +1341,21 @@ namespace QTTabBarLib {
                     dict[pair.Key] = pair.Value.Split(SEPARATOR_CHAR);
                 }
             }
-            else // ¼ÓÔØÍâ²¿ÓïÑÔÎÄ¼ş
+            else // åŠ è½½å¤–éƒ¨è¯­è¨€æ–‡ä»¶
             {
-                // ±éÀúÄÚÖÃÓïÑÔ
+                // éå†å†…ç½®è¯­è¨€
                 foreach (var pair in keyValuePairs)
                 {
                     if (urlKeys.Contains(pair.Key)) continue;
-                    // ·ÖºÅ·Ö¸ô×Ö·û´®»ñµÃÊı×éĞÎÊ½
+                    // åˆ†å·åˆ†éš”å­—ç¬¦ä¸²è·å¾—æ•°ç»„å½¢å¼
                     string[] buildinValue = pair.Value.Split(SEPARATOR_CHAR);
                     string[] res;
                     dict.TryGetValue(pair.Key, out res);
-                    if (res == null) // Èç¹û´Ó dict ÖĞÎ´»ñÈ¡µ½¶ÔÓ¦µÄ Öµ£¬ Ôò´Ó ÄÚÖÃÓïÑÔ¸²¸Çµô.
+                    if (res == null) // å¦‚æœä» dict ä¸­æœªè·å–åˆ°å¯¹åº”çš„ å€¼ï¼Œ åˆ™ä» å†…ç½®è¯­è¨€è¦†ç›–æ‰.
                     {
                         dict[pair.Key] = buildinValue;
                     }
-                    else if (res.Length < buildinValue.Length)// Èç¹û»ñÈ¡µ½£¬µ«ÊÇÓÚÄÚÖÃÓïÑÔµÄÊıÄ¿²»Ò»ÖÂ
+                    else if (res.Length < buildinValue.Length)// å¦‚æœè·å–åˆ°ï¼Œä½†æ˜¯äºå†…ç½®è¯­è¨€çš„æ•°ç›®ä¸ä¸€è‡´
                     {
                         int len = res.Length;
                         Array.Resize(ref res, buildinValue.Length);
@@ -1385,7 +1399,7 @@ namespace QTTabBarLib {
 
         internal static string DefaultNewFileName()
         {
-            return isChinese() ? "ĞÂ½¨ÎÄ±¾ÎÄµµ" : "newDocument";
+            return isChinese() ? "æ–°å»ºæ–‡æœ¬æ–‡æ¡£" : "newDocument";
         }
 
 
@@ -1401,9 +1415,9 @@ namespace QTTabBarLib {
 
         public static bool IsNoCapturePaths(string path)
         {
-            // ¿ØÖÆÃæ°å
+            // æ§åˆ¶é¢æ¿
             string controlPanel = "::{26EE0668-A00A-44D7-9371-BEB064C98683}";
-            string print = @"::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{2227A280-3AEA-1069-A2DE-08002B30309D}";// ´òÓ¡»ú
+            string print = @"::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{2227A280-3AEA-1069-A2DE-08002B30309D}";// æ‰“å°æœº
             return !IsEmptyStr(path) && (
                 path.StartsWith(controlPanel) ||
                 path.StartsWith(print) 
@@ -1426,11 +1440,11 @@ namespace QTTabBarLib {
             {
                 return false;
             }
-            string pattern = @"\d{1,2}/\d{1,2}/\d{1,2}\sÖÜ[Ò»|¶ş|Èı|ËÄ|Îå|Áù|ÈÕ]\s\d{1,2}:\d{1,2}:\d{1,2}";
+            string pattern = @"\d{1,2}/\d{1,2}/\d{1,2}\så‘¨[ä¸€|äºŒ|ä¸‰|å››|äº”|å…­|æ—¥]\s\d{1,2}:\d{1,2}:\d{1,2}";
             return Regex.IsMatch(input, pattern);
         }
 
-        // c# »ñÈ¡µ±Ç°½ø³ÌµÄ¸¸½ø³Ì
+        // c# è·å–å½“å‰è¿›ç¨‹çš„çˆ¶è¿›ç¨‹
         public static string GetParentProcessName()
         {
             Process currentProcess = Process.GetCurrentProcess();
@@ -1446,7 +1460,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// »ñÈ¡¸¸½ø³Ì¡£Èç¹û³ö´í¿ÉÄÜ·µ»Ønull
+        /// è·å–çˆ¶è¿›ç¨‹ã€‚å¦‚æœå‡ºé”™å¯èƒ½è¿”å›null
         /// </summary>
         /// <param name="process"></param>
         /// <returns></returns>

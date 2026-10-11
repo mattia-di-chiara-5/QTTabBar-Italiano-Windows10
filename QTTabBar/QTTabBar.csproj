@@ -52,7 +52,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -133,6 +133,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionDelayer.cs" />
+    <Compile Include="ThreadImageListStore.cs" />
+    <Compile Include="Resources_String_it_IT.cs" />
     <Compile Include="AppsManager.cs" />
     <Compile Include="AutoLoader.cs" />
     <Compile Include="ContextMenuOptions.cs" />
@@ -625,6 +627,9 @@
     <EmbeddedResource Include="Resources_String_de_DE.resx">
       <DependentUpon>Resources_String_de_DE.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources_String_it_IT.resx">
+      <DependentUpon>Resources_String_it_IT.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources_String_es_ES.resx">
       <DependentUpon>Resources_String_es_ES.cs</DependentUpon>
     </EmbeddedResource>
@@ -998,4 +1003,24 @@
   <Target Name="AfterBuild">
     <NotifyPropertyWeaverMsBuildTask.WeavingTask TargetPath="$(TargetPath)" References="@(ReferencePath)" />
   </Target>
+  <ItemGroup>
+    <EmbeddedResource Include="..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Buffers.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Memory.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Numerics.Vectors.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Runtime.CompilerServices.Unsafe.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\System.Text.Encoding.CodePages.4.7.1\lib\net461\System.Text.Encoding.CodePages.dll">
+      <LogicalName>QTTabBarLib.Resources.System.Text.Encoding.CodePages.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\packages\UTF.Unknown.2.7.0\lib\netstandard2.0\UtfUnknown.dll">
+      <LogicalName>QTTabBarLib.Resources.UtfUnknown.dll</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
