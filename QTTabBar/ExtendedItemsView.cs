@@ -431,6 +431,13 @@ namespace QTTabBarLib {
                 case WM.NOTIFY: {
                     NMHDR nmhdr = (NMHDR)Marshal.PtrToStructure(msg.LParam, typeof(NMHDR));
                     if(nmhdr.code == -530 /* TTN_NEEDTEXT */) {
+                        // Native Explorer infotips arrive even when QT previews
+                        // are disabled or Shift is not held. Do not hit-test via
+                        // UI Automation for a preview that cannot be displayed.
+                        if(!Config.Tips.ShowTooltipPreviews ||
+                                !(!Config.Tips.ShowPreviewsWithShift ^ (Control.ModifierKeys == Keys.Shift))) {
+                            return false;
+                        }
                         NMTTDISPINFO dispinfo = (NMTTDISPINFO)Marshal.PtrToStructure(msg.LParam, typeof(NMTTDISPINFO));
                         if((dispinfo.uFlags & 0x20 /* TTF_TRACK */) != 0) {
                             return OnGetInfoTip(ShellBrowser.GetFocusedIndex(), true);

@@ -68,13 +68,13 @@ $wxs = @'
  <?define SkuName="QTTabBar"?>
  <?define ProductVersion="1.6.3.0"?>
  <?define StrongName="QTTabBar, Version=1.6.3.0, Culture=neutral, PublicKeyToken=973461f1cd23d8eb"?>
- <Product Id="{540B7E57-F7A0-4AA5-A362-736892574234}" Name="QTTabBar Italiano 0.6.0 (base 1.6.3)" Language="1040" Version="1.6.5" Manufacturer="QTTabBar - edizione italiana" UpgradeCode="{EC9BAFF7-58FB-40CB-9F67-1C438A7524A5}">
+ <Product Id="{F70E079A-2E71-4B23-B8F2-854D700B7DAF}" Name="QTTabBar Italiano 0.6.1 (base 1.6.3)" Language="1040" Version="1.6.6" Manufacturer="QTTabBar - edizione italiana" UpgradeCode="{EC9BAFF7-58FB-40CB-9F67-1C438A7524A5}">
   <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="x64" />
   <MediaTemplate EmbedCab="yes" />
   <!-- No Language filter: the previous MSI is English, this one is Italian. -->
   <Upgrade Id="{EC9BAFF7-58FB-40CB-9F67-1C438A7524A5}">
-   <UpgradeVersion Minimum="0.0.0" IncludeMinimum="yes" Maximum="1.6.5" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDQTTABBAR" />
-   <UpgradeVersion Minimum="1.6.5" IncludeMinimum="no" OnlyDetect="yes" Property="NEWQTTABBAR" />
+   <UpgradeVersion Minimum="0.0.0" IncludeMinimum="yes" Maximum="1.6.6" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDQTTABBAR" />
+   <UpgradeVersion Minimum="1.6.6" IncludeMinimum="no" OnlyDetect="yes" Property="NEWQTTABBAR" />
   </Upgrade>
   <Condition Message="E gia installata una versione piu recente di QTTabBar.">Installed OR NOT NEWQTTABBAR</Condition>
   <InstallExecuteSequence><RemoveExistingProducts After="InstallInitialize">OLDQTTABBAR</RemoveExistingProducts></InstallExecuteSequence>
@@ -94,9 +94,9 @@ $sourceFile = Join-Path $BuildDirectory 'Italiano.wxs'
 $object = Join-Path $BuildDirectory 'Italiano.wixobj'
 & (Join-Path $WixDirectory 'candle.exe') -nologo "-dPayloadRoot=$payload" -out $object $sourceFile
 if ($LASTEXITCODE -ne 0) { throw 'Compilazione WiX non riuscita.' }
-$package = Join-Path $OutputDirectory 'QTTabBar-Italiano-v0.6.0'
+$package = Join-Path $OutputDirectory 'QTTabBar-Italiano-v0.6.1'
 New-Item -ItemType Directory -Path $package -Force | Out-Null
-$msi = Join-Path $package 'QTTabBar-Italiano-v0.6.0.msi'
+$msi = Join-Path $package 'QTTabBar-Italiano-v0.6.1.msi'
 & (Join-Path $WixDirectory 'light.exe') -nologo -sice:ICE03 -out $msi $object
 if ($LASTEXITCODE -ne 0) { throw 'Creazione MSI non riuscita.' }
 foreach ($name in @('Installa-Stabilita.ps1','Ripristina-VersionePrecedente.ps1')) {
@@ -104,8 +104,8 @@ foreach ($name in @('Installa-Stabilita.ps1','Ripristina-VersionePrecedente.ps1'
 }
 $rollbackDirectory = Join-Path $package 'Rollback'
 New-Item -ItemType Directory -Path $rollbackDirectory -Force | Out-Null
-if ((Get-FileHash $RollbackMsi).Hash -ne '675C49C0681304CC537D3626AF5794BAA035610DA321A8CC9934A2A67332522E') { throw 'MSI originale per rollback non valido.' }
-Copy-Item -LiteralPath $RollbackMsi -Destination (Join-Path $rollbackDirectory 'QTTabBar-Italiano-v0.5.0.msi') -Force
+if ((Get-FileHash $RollbackMsi).Hash -ne '7773086005FF2675E4994C895C7A828EC20966D83A0268C9AD61EE11DC837767') { throw 'MSI originale per rollback non valido.' }
+Copy-Item -LiteralPath $RollbackMsi -Destination (Join-Path $rollbackDirectory 'QTTabBar-Italiano-v0.6.0.msi') -Force
 Copy-Item -LiteralPath (Join-Path $root 'Italiano\INSTALLA_STABILITA.cmd') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'Italiano\RIPRISTINA_VERSIONE_PRECEDENTE.cmd') -Destination $package -Force
 Copy-Item -LiteralPath (Join-Path $root 'LICENSE.txt') -Destination $package -Force
@@ -118,6 +118,6 @@ $scriptPath = Join-Path $package 'Installa-Stabilita.ps1'
 $scriptText = [IO.File]::ReadAllText($scriptPath).Replace('__MSI_SHA256__',$msiHash).Replace('__DLL_SHA256__',(Get-FileHash $candidate).Hash)
 [IO.File]::WriteAllText($scriptPath,$scriptText,[Text.UTF8Encoding]::new($true))
 [IO.File]::WriteAllText((Join-Path $package 'MSI_SHA256.txt'),$msiHash,[Text.UTF8Encoding]::new($false))
-$zip = Join-Path $OutputDirectory 'QTTabBar-Italiano-Windows10-v0.6.0.zip'
+$zip = Join-Path $OutputDirectory 'QTTabBar-Italiano-Windows10-v0.6.1.zip'
 Compress-Archive -Path (Join-Path $package '*') -DestinationPath $zip -Force
 Get-FileHash -LiteralPath $zip,$msi -Algorithm SHA256
