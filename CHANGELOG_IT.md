@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## v0.6.1
+- notifiche native delle anteprime ignorate prima del hit-test quando le anteprime QT sono disabilitate o subordinate a Maiusc;
+- test sul gestore reale: nessun accesso alla vista per una notifica soppressa;
+- aggiornamento dalla 0.6.0 e ripristino alla 0.6.0 verificata.
+
 ## v0.6.0
 - cache degli elementi asincrona sul percorso mouse/disegno;
 - richieste accorpate ogni 33 ms, un solo lavoro in corso e scarto dei risultati superati;

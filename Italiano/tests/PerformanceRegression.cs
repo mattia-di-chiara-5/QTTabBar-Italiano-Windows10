@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Windows.Forms;
 using QTTabBarLib;
@@ -29,6 +31,39 @@ internal static class PerformanceRegression {
             Require(string.IsNullOrEmpty(assembly.Location) ||
                 string.Equals(assembly.Location, System.IO.Path.GetFullPath(args[0]), StringComparison.OrdinalIgnoreCase),
                 "Test loaded a different assembly: " + assembly.Location);
+            var configType = assembly.GetType("QTTabBarLib.Config", true);
+            assembly.GetType("QTTabBarLib.ConfigManager", true).GetField("LoadedConfig")
+                .SetValue(null, Activator.CreateInstance(configType, true));
+            var tips = configType.GetProperty("Tips").GetValue(null, null);
+            var previewEnabled = tips.GetType().GetProperty("ShowTooltipPreviews");
+            var previewShift = tips.GetType().GetProperty("ShowPreviewsWithShift");
+            var viewType = assembly.GetType("QTTabBarLib.ExtendedItemsView", true);
+            // No shell/view dependencies: a suppressed native infotip must
+            // return before trying to hit-test or access UI Automation.
+            var view = FormatterServices.GetUninitializedObject(viewType);
+            var handler = viewType.GetMethod("ListViewController_MessageCaptured", BindingFlags.NonPublic | BindingFlags.Instance);
+            var headerType = assembly.GetType("QTTabBarLib.Interop.NMHDR", true);
+            var header = Activator.CreateInstance(headerType);
+            headerType.GetField("code").SetValue(header, -530);
+            var infoType = assembly.GetType("QTTabBarLib.Interop.NMTTDISPINFO", true);
+            var info = Activator.CreateInstance(infoType);
+            infoType.GetField("hdr").SetValue(info, header);
+            infoType.GetField("szText").SetValue(info, "");
+            infoType.GetField("uFlags").SetValue(info, 0x20); // TTF_TRACK: focused item.
+            IntPtr notification = Marshal.AllocHGlobal(1024);
+            try {
+                Marshal.Copy(new byte[1024], 0, notification, 1024);
+                Marshal.StructureToPtr(info, notification, false);
+                previewEnabled.SetValue(tips, false, null);
+                object[] suppressed = { Message.Create(IntPtr.Zero, 0x004e, IntPtr.Zero, notification) };
+                Require(!(bool)handler.Invoke(view, suppressed), "Disabled preview consumed native infotip");
+                previewEnabled.SetValue(tips, true, null);
+                previewShift.SetValue(tips, true, null);
+                if(Control.ModifierKeys != Keys.Shift) {
+                    Require(!(bool)handler.Invoke(view, suppressed), "Shift-suppressed preview queried an unavailable view");
+                }
+                Console.WriteLine("PASS: disabled/Shift-suppressed tracking infotips return before accessing an unavailable view");
+            } finally { Marshal.FreeHGlobal(notification); }
             var pending = new Queue<Action>();
             var applied = new List<int>();
             var queue = new CoalescedQuery<object, int>(

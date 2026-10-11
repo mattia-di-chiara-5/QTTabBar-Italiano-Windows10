@@ -18,17 +18,17 @@ $locked = $false
 try {
 try { $locked = $mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $locked = $true }
 if (!$locked) { throw 'Un altra manutenzione di QTTabBar e gia in corso.' }
-$root = Join-Path $env:ProgramData 'QTTabBar-Italiano\v0.6.0'
+$root = Join-Path $env:ProgramData 'QTTabBar-Italiano\v0.6.1'
 if (!$StateDirectory) { $StateDirectory = (Get-Content (Join-Path $root 'latest-state.txt') -Raw).Trim() }
 $StateDirectory = (Resolve-Path -LiteralPath $StateDirectory).Path
 if (!(($StateDirectory + '\').StartsWith($root.TrimEnd('\') + '\',[StringComparison]::OrdinalIgnoreCase))) { throw 'Percorso di ripristino non consentito.' }
 if ((Get-Item $StateDirectory).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Directory di ripristino non valida.' }
 $state = Get-Content (Join-Path $StateDirectory 'state.json') -Raw | ConvertFrom-Json
-if ($state.UserSid -ne $UserSid -or $state.Version -ne '0.6.0') { throw 'Stato di ripristino non compatibile.' }
+if ($state.UserSid -ne $UserSid -or $state.Version -ne '0.6.1') { throw 'Stato di ripristino non compatibile.' }
 if ($state.PreviousInstalled) {
-    $oldMsi = Join-Path $StateDirectory 'QTTabBar-Italiano-v0.5.0.msi'
+    $oldMsi = Join-Path $StateDirectory 'QTTabBar-Italiano-v0.6.0.msi'
     $oldDll = Join-Path $StateDirectory 'QTTabBar.before.dll'
-    if ((Get-FileHash $oldMsi).Hash -ne '675C49C0681304CC537D3626AF5794BAA035610DA321A8CC9934A2A67332522E' -or (Get-FileHash $oldDll).Hash -ne $state.PreviousDllHash) { throw 'Backup binari non valido.' }
+    if ((Get-FileHash $oldMsi).Hash -ne '7773086005FF2675E4994C895C7A828EC20966D83A0268C9AD61EE11DC837767' -or (Get-FileHash $oldDll).Hash -ne $state.PreviousDllHash) { throw 'Backup binari non valido.' }
 }
 if ($state.ConfigExisted) {
     $config = Join-Path $StateDirectory 'config.reg'
@@ -40,7 +40,7 @@ if ($state.ConfigExisted) {
 $session = (Get-Process -Id $PID).SessionId
 Get-Process explorer -ErrorAction SilentlyContinue | Where-Object SessionId -eq $session | Stop-Process -Force -ErrorAction Stop
 try {
-    $p = Start-Process msiexec.exe -ArgumentList '/x {540B7E57-F7A0-4AA5-A362-736892574234} /qn /norestart REBOOT=ReallySuppress' -Wait -PassThru -WindowStyle Hidden
+    $p = Start-Process msiexec.exe -ArgumentList '/x {F70E079A-2E71-4B23-B8F2-854D700B7DAF} /qn /norestart REBOOT=ReallySuppress' -Wait -PassThru -WindowStyle Hidden
     if ($p.ExitCode -notin @(0,1605,3010)) { throw "Disinstallazione nuova versione non riuscita: $($p.ExitCode)" }
     if ($state.PreviousInstalled) {
         $p = Start-Process msiexec.exe -ArgumentList ('/i "{0}" /qn /norestart REBOOT=ReallySuppress' -f $oldMsi) -Wait -PassThru -WindowStyle Hidden
