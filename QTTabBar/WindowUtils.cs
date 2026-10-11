@@ -1,6 +1,6 @@
-//    This file is part of QTTabBar, a shell extension for Microsoft
+Ôªø//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
-//    Copyright (C) 2007-2021  Quizo, Paul Accisano
+//    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
 //    QTTabBar is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 using System;
 using Microsoft.Win32;
+using System.Text;
 using QTTabBarLib.Common;
 using QTTabBarLib.Interop;
 
@@ -34,8 +35,18 @@ namespace QTTabBarLib {
             PInvoke.SetForegroundWindow(hwndExplr);
         }
 
-        // πÿ±’◊ ‘¥π‹¿Ì∆˜£¨∑¢ÀÕπÿ±’œ˚œ¢
         public static void CloseExplorer(IntPtr hwndExplr, int nCode, bool doAsync = false) {
+            StringBuilder title = new StringBuilder(256);
+            if (hwndExplr != IntPtr.Zero)
+            {
+                PInvoke.GetWindowText(hwndExplr, title, title.Capacity);
+            }
+            QTUtility2.log("CloseExplorer hwnd=" + hwndExplr +
+                           " isWindow=" + PInvoke.IsWindow(hwndExplr) +
+                           " visible=" + PInvoke.IsWindowVisible(hwndExplr) +
+                           " title=" + title +
+                           " code=" + nCode +
+                           " async=" + doAsync);
             if(QTUtility.IsXP && nCode == 0) nCode = 3;
             if(QTUtility.IsXP || doAsync) {
                 PInvoke.PostMessage(hwndExplr, WM.CLOSE, IntPtr.Zero, (IntPtr)nCode);

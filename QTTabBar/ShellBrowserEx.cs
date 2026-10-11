@@ -1,6 +1,6 @@
 ﻿//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
-//    Copyright (C) 2007-2021  Quizo, Paul Accisano
+//    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
 //    QTTabBar is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -88,16 +88,34 @@ namespace QTTabBarLib {
             }
         }
 
+        private bool fDisposed;
         public void Dispose() {
-            if(shellBrowser != null) {
-              QTUtility2.log("ReleaseComObject shellBrowser");
-              Marshal.FinalReleaseComObject(shellBrowser);
-                //   shellBrowser = null; // causes problems? Object reference not set to an instance of an object
-            }
+            if (fDisposed) return;
+            fDisposed = true;
+
             if(folderView != null) {
-               QTUtility2.log("ReleaseComObject folderView");
-               Marshal.ReleaseComObject(folderView);
-                //  folderView = null;
+                try
+                {
+                    Marshal.ReleaseComObject(folderView);
+                }
+                catch (Exception ex)
+                {
+                    QTUtility2.MakeErrorLog(ex, "ShellBrowserEx.Dispose folderView");
+                }
+                folderView = null;
+            }
+            if (shellBrowser != null) {
+                try
+                {
+                    // Do not force-release this RCW because other Explorer callbacks
+                    // can still hold the same shell browser interface.
+                    Marshal.ReleaseComObject(shellBrowser);
+                }
+                catch (Exception ex)
+                {
+                    QTUtility2.MakeErrorLog(ex, "ShellBrowserEx.Dispose shellBrowser");
+                }
+                shellBrowser = null;
             }
         }
         
@@ -136,6 +154,7 @@ namespace QTTabBarLib {
         public int GetFocusedIndex()
         {
             int focusedIndex;
+            // QTUtility2.log("GetFocusedIndex  folderView " + folderView);
             return folderView != null && folderView.GetFocusedItem(out focusedIndex) == 0
                 ? focusedIndex : -1;
         }
@@ -151,6 +170,7 @@ namespace QTTabBarLib {
             if(folderView == null) return new IDLWrapper();
             IntPtr ppidl = IntPtr.Zero;
             try {
+                // QTUtility2.log("GetItem  folderView " + folderView + " idx " + idx );
                 /*if (InstanceManager.GetTotalInstanceCount() > 0)
                 {
                     var shellBrowserEx = InstanceManager.GetThreadTabBar().GetShellBrowser();
@@ -167,9 +187,33 @@ namespace QTTabBarLib {
                     }
                 }*/
 
-                if ( folderView != null)
-                {
-                    folderView.Item(idx, out ppidl);
+                if(folderView != null) {
+                    int result = folderView.Item(idx, out ppidl);
+                    if(result != 0 || ppidl == IntPtr.Zero) {
+                        QTUtility2.log("GetItem fallback enumeration index=" + idx + " result=" + result);
+                        Guid guid = ExplorerGUIDs.IID_IEnumIDList;
+                        IEnumIDList itemList = null;
+                        try {
+                            if(folderView.Items(SVGIO.FLAG_VIEWORDER | SVGIO.ALLVIEW, ref guid, out itemList) == 0 &&
+                                    itemList != null) {
+                                IntPtr itemPidl;
+                                int itemIndex = 0;
+                                while(itemList.Next(1, out itemPidl, null) == 0) {
+                                    if(itemIndex++ == idx) {
+                                        ppidl = PInvoke.ILClone(itemPidl);
+                                        PInvoke.CoTaskMemFree(itemPidl);
+                                        break;
+                                    }
+                                    PInvoke.CoTaskMemFree(itemPidl);
+                                }
+                            }
+                        }
+                        finally {
+                            if(itemList != null) {
+                                Marshal.ReleaseComObject(itemList);
+                            }
+                        }
+                    }
                 }
                 
                 if(noAppend || ppidl == IntPtr.Zero) {
@@ -227,17 +271,17 @@ namespace QTTabBarLib {
             int count = 0 ;
             try
             {
-                // Catch exceptions
+                // 增加捕获异常
                 if (folderView == null && null != shellBrowser)
                 {
-                    // Explicitly assign the folderView instance
+                    // 显示赋值 folderView 实例
                     IShellView ppshv;
                     if (shellBrowser.QueryActiveShellView(out ppshv) == 0)
                     {
                         folderView = ppshv as IFolderView;
                     }
                 }
-                QTUtility2.log(" GetSelectedCount folderView is null ? " + (folderView == null)); // Testing whether it is null, by indiff
+                QTUtility2.log(" GetSelectedCount folderView is null ? " + (folderView == null)); // 测试是否未空？  by indiff
                 return folderView != null && folderView.ItemCount(SVGIO.SELECTION, out count) == 0 ? count : 0;
             }
             catch (Exception e) {
@@ -285,7 +329,7 @@ namespace QTTabBarLib {
             IntPtr ptr;
             return IsFolderTreeVisible(out ptr);
         }
-        // Checks whether the folder tree is visible; this function is for the XP OS
+        // 判断文件夹是否显示, 函数为xp操作系统
         public bool IsFolderTreeVisible(out IntPtr hwnd) {
             hwnd = IntPtr.Zero;
             return  QTUtility.IsXP && 
@@ -294,47 +338,61 @@ namespace QTTabBarLib {
         }
 
         // Call this on navigate to refresh the FolderView
-        // Refresh the folder view on navigate
+        // 当导航的时候刷新文件夹视图
         public void OnNavigateComplete() {
             if(shellBrowser == null) return;
 
+            // 是否释放有问题 by indiff
             if (folderView != null)
             {
                 QTUtility2.log("ReleaseComObject folderView to reset");
                 Marshal.ReleaseComObject(folderView);
                 folderView = null;
-            }
 
-            // Re-acquire unconditionally (this used to be nested inside the block
-            // above, so a fresh ShellBrowserEx with folderView still null never
-            // acquired one on its first OnNavigateComplete call from the ctor).
-            IShellView ppshv;
-            if (shellBrowser.QueryActiveShellView(out ppshv) == 0)
-            {
-                folderView = ppshv as IFolderView;
+                if (folderView == null)
+                {
+                    // 显示赋值 folderView 实例
+                    IShellView ppshv;
+                    if (shellBrowser.QueryActiveShellView(out ppshv) == 0)
+                    {
+                        folderView = ppshv as IFolderView;
+                    }
+                }
+
             }
         }
 
         /**
-         System.NullReferenceException: Object reference not set to an instance of an object.
-            at QTTabBarLib.Interop.IShellBrowser.BrowseObject(IntPtr pidl, SBSP wFlags)
-            at QTTabBarLib.ShellBrowserEx.Navigate(IDLWrapper idlw, SBSP flags)
-            at QTTabBarLib.QTTabBarClass.tabControl1_SelectedIndexChanged(Object sender, EventArgs e)
+         System.NullReferenceException: 未将对象引用设置到对象的实例。
+            在 QTTabBarLib.Interop.IShellBrowser.BrowseObject(IntPtr pidl, SBSP wFlags)
+            在 QTTabBarLib.ShellBrowserEx.Navigate(IDLWrapper idlw, SBSP flags)
+            在 QTTabBarLib.QTTabBarClass.tabControl1_SelectedIndexChanged(Object sender, EventArgs e)
             
          */
         public int Navigate(IDLWrapper idlw, SBSP flags = SBSP.SAMEBROWSER) {
-            if(idlw != null && idlw.Available && shellBrowser != null) {
-                try
-                {
-                    // var qtTabBarClass = InstanceManager.GetThreadTabBar();
-                    // var shellBrowserEx = qtTabBarClass.GetShellBrowser();
-                    // shellBrowserEx.shellBrowser.BrowseObject(idlw.PIDL, flags);
-                    return shellBrowser.BrowseObject(idlw.PIDL, flags);
-                }
-                catch (COMException e)
-                {
-                    QTUtility2.MakeErrorLog(e, " ShellBrowserEx Navigate");
-                }
+            if(fDisposed || shellBrowser == null || idlw == null || !idlw.Available) {
+                QTUtility2.log("ShellBrowserEx.Navigate skipped: disposed or invalid target");
+                return 1;
+            }
+
+            try
+            {
+                QTUtility2.log("ShellBrowserEx.Navigate BrowseObject");
+                return shellBrowser.BrowseObject(idlw.PIDL, flags);
+            }
+            catch (InvalidComObjectException e)
+            {
+                QTUtility2.MakeErrorLog(e, " ShellBrowserEx Navigate InvalidComObjectException");
+                fDisposed = true;
+                shellBrowser = null;
+            }
+            catch (COMException e)
+            {
+                QTUtility2.MakeErrorLog(e, " ShellBrowserEx Navigate COMException");
+            }
+            catch (Exception e)
+            {
+                QTUtility2.MakeErrorLog(e, " ShellBrowserEx Navigate Exception");
             }
             return 1;
         }
@@ -348,14 +406,20 @@ namespace QTTabBarLib {
         }
 
         internal void SetStatusText(string status) {
-            if(shellBrowser != null) shellBrowser.SetStatusTextSB(status);
+            //if(shellBrowser != null) shellBrowser.SetStatusTextSB(status);
+
+            if (!fDisposed && shellBrowser != null)
+            {
+                try { shellBrowser.SetStatusTextSB(status); }
+                catch (Exception ex) { QTUtility2.MakeErrorLog(ex, "SetStatusText"); }
+            }
         }
 
         public void SetUsingListView(bool listview) {
             if(shellBrowser != null) {
                 try // add by indiff 2023.03.15
                 {
-                    // System.Runtime.InteropServices.InvalidComObjectException: COM object that has been separated from its underlying RCW cannot be used.
+                    // System.Runtime.InteropServices.InvalidComObjectException: COM 对象与其基础 RCW 分开后就不能再使用。 
                     IFolderViewOptions fvo = shellBrowser as IFolderViewOptions;
                     if(fvo != null) {
                         fvo.SetFolderViewOptions(FVO.VISTALAYOUT, listview ? FVO.VISTALAYOUT : FVO.DEFAULT);
@@ -380,19 +444,19 @@ namespace QTTabBarLib {
         public bool TryGetHotTrackPath(int iItem, out string path, string matchName) {
             path = null;
             try {
-                using(IDLWrapper wrapper = GetItem(iItem, true)) {
+                using(IDLWrapper wrapper = GetItem(iItem, false)) {
                     if (null != wrapper && wrapper.Available)
                     {
                         if(!string.IsNullOrEmpty(matchName) && matchName != wrapper.ParseName) {
+                          //  QTUtility2.log("TryGetHotTrackPath not match " + matchName + " wrapper.ParseName " + wrapper.ParseName);
                             return false;
                         }
-                        using(IDLWrapper wrapper2 = ILAppend(wrapper.PIDL)) {
-                            path = wrapper2.ParseName;
-                            if(!string.IsNullOrEmpty(path) && path.IndexOfAny(Path.GetInvalidPathChars()) < 0) {
-                                return true;
-                            }
-                            path = null;
+                        path = wrapper.ParseName;
+                        if(!string.IsNullOrEmpty(path) && path.IndexOfAny(Path.GetInvalidPathChars()) < 0) {
+                            QTUtility2.log("TryGetHotTrackPath path=" + path);
+                            return true;
                         }
+                        path = null;
                     }
                 }
             }
@@ -403,15 +467,10 @@ namespace QTTabBarLib {
         }
 
         public bool TryGetSelection(out Address[] adSelectedItems, bool fDisplayName) {
-            if(GetSelectedCount() == 0) {
-                adSelectedItems = new Address[0];
-                return false;
-            }
-
             adSelectedItems = GetItems(true).Select(wrapper => fDisplayName
                      ? new Address(wrapper.PIDL, wrapper.DisplayName)
                      : new Address(wrapper.PIDL, wrapper.ParseName)).ToArray();
-            return true;
+            return adSelectedItems.Length > 0;
         }
 
         public bool TryGetSelection(out Address[] adSelectedItems, out string pathFocused, bool fDisplayName, ShellBrowserEx argShell = null) {

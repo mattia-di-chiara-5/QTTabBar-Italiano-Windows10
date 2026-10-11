@@ -1,6 +1,6 @@
-//    This file is part of QTTabBar, a shell extension for Microsoft
+﻿//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
-//    Copyright (C) 2007-2022  Quizo, Paul Accisano, indiff
+//    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
 //    QTTabBar is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ using QTTabBarLib.Common;
 using QTTabBarLib.ExplorerBrowser;
 using QTTabBarLib.Interop;
 using Control = System.Windows.Forms.Control;
+using HResult = QTTabBarLib.Interop.HResult;
 using IDataObject = System.Runtime.InteropServices.ComTypes.IDataObject;
 using IShellView = QTTabBarLib.Interop.IShellView;
 using Timer = System.Windows.Forms.Timer;
@@ -124,13 +125,13 @@ namespace QTTabBarLib {
             }
 
             // RefreshViewWatermark(true);
-            // If the file doesn't exist, don't load the background
+            // 如果文件不存在则不加载背景
             /*if (File.Exists(BG_IMG))
             {
                 SetBackgroundImage(true, true, 0, 0);
             }*/
 
-            // Doesn't take effect when executed
+            // 执行不生效
             // SetBackgroundImage(true, true, 0, 0);
             // InstallHooks();
         }
@@ -167,10 +168,10 @@ namespace QTTabBarLib {
             PInvoke.GetWindowRect(Handle, out pRc);
             Size wndSize = new Size(lprc.right - pRc.left, lprc.bottom - pRc.top);
             Rectangle rctDw = pRc.ToRectangle();
-            // Calculate picture position
+            //计算图片位置 Calculate picture position
             PInvoke.InvalidateRect(Handle, IntPtr.Zero, true);
 
-            var bgPng = @"D:\Desktop\Release\Release\x64\Image\bgImage1.png";
+            var bgPng = @"D:\下载\Release\Release\x64\Image\bgImage1.png";
 
             // PInvoke.SaveDC
             if (rendererDown_Normal == null)
@@ -186,7 +187,7 @@ namespace QTTabBarLib {
                     // VisualStyleRenderer renderer2;
                     renderer = rendererDown_Normal;
                     // g.DrawImage(QTUtility.ImageListGlobal.Images[base2.ImageKey], rect);
-                    var dToutiaoX1080IntellijIdea3Png = @"D:\Desktop\Release\Release\x64\Image\bgImage.png";
+                    var dToutiaoX1080IntellijIdea3Png = @"D:\下载\Release\Release\x64\Image\bgImage.png";
                     using (FreeBitmap freeBitmap = new FreeBitmap(dToutiaoX1080IntellijIdea3Png))
                     using (Bitmap bmp = freeBitmap.Clone())
                     {
@@ -262,7 +263,7 @@ namespace QTTabBarLib {
             lvbkimage.ulFlags = LVBKIF_SOURCE_HBITMAP;
             result = PInvoke.SendMessageLVBKIMAGE(handle, LVM_SETBKIMAGE, 0, ref lvbkimage);
 
-            var dToutiaoX1080IntellijIdea3Png = @"D:\Desktop\Release\Release\x64\Image\bgImage1.png";
+            var dToutiaoX1080IntellijIdea3Png = @"D:\下载\Release\Release\x64\Image\bgImage1.png";
             // var dToutiaoX1080IntellijIdea3Png = @"D:\Users\Administrator\Documents\Tencent Files\531299332\Image\Group2\IY\S2\IYS2F)882TXGVT[JIR[`4BY.bmp";
 
             using (FreeBitmap freeBitmap = new FreeBitmap(dToutiaoX1080IntellijIdea3Png))
@@ -531,6 +532,7 @@ namespace QTTabBarLib {
             }
             // parent = PInvoke.GetParent(parent);
             // name = PInvoke.GetClassName(parent);
+            // QTUtility2.log(" parent name " + name);
             /*handle = findParent("ShellTabWindowClass");
             if (handle == IntPtr.Zero)
             {   
@@ -583,6 +585,7 @@ namespace QTTabBarLib {
         }
 
         protected virtual bool ListViewController_MessageCaptured(ref Message msg) {
+            // QTUtility2.log("ListViewController msg\t" + Enum.GetName(typeof(MsgEnum), msg.Msg) + "\tw\t" + msg.WParam + "\tl\t" + msg.LParam);
             if(msg.Msg == WM_AFTERPAINT) {
                 RefreshSubDirTip(true);
                 // SetBackgroundImage(true, true, 0, 0);
@@ -600,7 +603,7 @@ namespace QTTabBarLib {
                 PInvoke.InvalidateRect(Handle, IntPtr.Zero, true);
 
 
-                // Clip rect
+                //裁剪矩形 Clip rect
                 // SaveDC(hDC);
                 // IntersectClipRect(hDC, lprc->left, lprc->top, lprc->right, lprc->bottom);
 
@@ -618,7 +621,7 @@ namespace QTTabBarLib {
                         // VisualStyleRenderer renderer2;
                         renderer = rendererDown_Normal;
                         // g.DrawImage(QTUtility.ImageListGlobal.Images[base2.ImageKey], rect);
-                        var dToutiaoX1080IntellijIdea3Png = @"D:\Desktop\Release\Release\x64\Image\bgImage.png";
+                        var dToutiaoX1080IntellijIdea3Png = @"D:\下载\Release\Release\x64\Image\bgImage.png";
                         using (FreeBitmap freeBitmap = new FreeBitmap(dToutiaoX1080IntellijIdea3Png))
                         using (Bitmap bmp = freeBitmap.Clone())
                         {
@@ -669,6 +672,9 @@ namespace QTTabBarLib {
                                 // visualProperties.GetColor(VPCOLORFLAGS.VPCF_SORTCOLUMN, out pcr2);
                                 // int pcr3;
                                 // visualProperties.GetColor(VPCOLORFLAGS.VPCF_TEXT, out pcr3);
+                                // QTUtility2.log("on focus changed pcr1 : " + pcr1);
+                                // QTUtility2.log("on focus changed pcr2 : " + pcr2);
+                                // QTUtility2.log("on focus changed pcr3 : " + pcr3);
                                 //
                                 // visualProperties.SetColor(VPCOLORFLAGS.VPCF_BACKGROUND, pcr1);
                                 // visualProperties.SetColor(VPCOLORFLAGS.VPCF_SORTCOLUMN, pcr2);
@@ -725,7 +731,7 @@ namespace QTTabBarLib {
                      // PInvoke.InvalidateRect(Handle, IntPtr.Zero, true);
  
  
-                     // Clip rect
+                     //裁剪矩形 Clip rect
                      // SaveDC(hDC);
                      // IntersectClipRect(hDC, lprc->left, lprc->top, lprc->right, lprc->bottom);
  
@@ -743,7 +749,7 @@ namespace QTTabBarLib {
                              // VisualStyleRenderer renderer2;
                              renderer = rendererDown_Normal;
                              // g.DrawImage(QTUtility.ImageListGlobal.Images[base2.ImageKey], rect);
-                             var dToutiaoX1080IntellijIdea3Png = @"D:\Desktop\Release\Release\x64\Image\bgImage.png";
+                             var dToutiaoX1080IntellijIdea3Png = @"D:\下载\Release\Release\x64\Image\bgImage.png";
                              using (FreeBitmap freeBitmap = new FreeBitmap(dToutiaoX1080IntellijIdea3Png))
                              using (Bitmap bmp = freeBitmap.Clone())
                              {
@@ -768,7 +774,7 @@ namespace QTTabBarLib {
                     return true;
 
                 case WM.PAINT:
-                    // Just draw directly inside the Paint message
+                    // 直接在 Paint 消息内部操作不行
                     // It's very dangerous to do automation-related things
                     // during WM_PAINT.  So, use PostMessage to do it later.
                     PInvoke.PostMessage(ListViewController.Handle, WM_AFTERPAINT, IntPtr.Zero, IntPtr.Zero);
@@ -785,8 +791,16 @@ namespace QTTabBarLib {
                     break;
                 
                 case WM.MBUTTONUP:
+                    QTUtility2.log("ListView WM_MBUTTONUP handle=" + ListViewController.Handle +
+                        " wParam=" + msg.WParam + " modifiers=" + Control.ModifierKeys);
                     if(MiddleClick != null) {
-                        MiddleClick(QTUtility2.PointFromLPARAM(msg.LParam));
+                        try {
+                            return MiddleClick(QTUtility2.PointFromLPARAM(msg.LParam));
+                        }
+                        catch(Exception exception) {
+                            QTUtility2.MakeErrorLog(exception, "ExtendedListViewCommon WM_MBUTTONUP");
+                            return false;
+                        }
                     }
                     break;
 
@@ -855,8 +869,12 @@ namespace QTTabBarLib {
         }
 
         public override bool MouseIsOverListView() {
-            return (ListViewController != null &&
-                PInvoke.WindowFromPoint(Control.MousePosition) == ListViewController.Handle);
+            if(ListViewController == null) {
+                return false;
+            }
+            IntPtr window = PInvoke.WindowFromPoint(Control.MousePosition);
+            return window == ListViewController.Handle ||
+                (window != IntPtr.Zero && PInvoke.IsChild(ListViewController.Handle, window));
         }
 
         protected bool OnDoubleClick(Point pt) {
@@ -897,6 +915,9 @@ namespace QTTabBarLib {
         }
 
         protected bool OnGetInfoTip(int iItem, bool byKey) {
+            QTUtility2.log("Preview OnGetInfoTip item=" + iItem + " byKey=" + byKey +
+                " enabled=" + Config.Tips.ShowTooltipPreviews +
+                " shiftMode=" + Config.Tips.ShowPreviewsWithShift);
             if(Config.Tips.ShowTooltipPreviews && (!Config.Tips.ShowPreviewsWithShift ^ (Control.ModifierKeys == Keys.Shift))) {
                 if(((thumbnailTooltip != null) && thumbnailTooltip.IsShowing) && (iItem == thumbnailIndex)) {
                     return true;
@@ -916,23 +937,26 @@ namespace QTTabBarLib {
 
         protected void OnHotItemChanged(int iItem) {
             Keys modifierKeys = Control.ModifierKeys;
+            QTUtility2.log("ListView OnHotItemChanged item=" + iItem + " preview=" +
+                Config.Tips.ShowTooltipPreviews + " subDir=" + Config.Tips.ShowSubDirTips);
             if(Config.Tips.ShowTooltipPreviews) {
-                if((thumbnailTooltip != null) && (thumbnailTooltip.IsShowing || fThumbnailPending)) {
-                    if(!Config.Tips.ShowPreviewsWithShift ^ (modifierKeys == Keys.Shift)) {
-                        if(iItem != thumbnailIndex) {
-                            if(iItem > -1 && IsTrackingItemName()) {
-                                if(ShowThumbnailTooltip(iItem, Control.MousePosition, false)) {
-                                    return;
-                                }
-                            }
-                            if(thumbnailTooltip.HideToolTip()) {
-                                thumbnailIndex = -1;
+                if(!Config.Tips.ShowPreviewsWithShift ^ (modifierKeys == Keys.Shift)) {
+                    if(iItem != thumbnailIndex) {
+                        if(iItem > -1 && IsTrackingItemName()) {
+                            if(ShowThumbnailTooltip(iItem, Control.MousePosition, false)) {
+                                return;
                             }
                         }
+                        if(thumbnailTooltip != null && thumbnailTooltip.HideToolTip()) {
+                            thumbnailIndex = -1;
+                        }
                     }
-                    else if(thumbnailTooltip.HideToolTip()) {
+                    else if(thumbnailTooltip != null && thumbnailTooltip.HideToolTip()) {
                         thumbnailIndex = -1;
                     }
+                }
+                else if(thumbnailTooltip != null && thumbnailTooltip.HideToolTip()) {
+                    thumbnailIndex = -1;
                 }
             }
             RefreshSubDirTip();
@@ -1010,6 +1034,8 @@ namespace QTTabBarLib {
         public abstract override bool PointIsBackground(Point pt, bool screenCoords); 
 
         public override void RefreshSubDirTip(bool force = false) {
+            QTUtility2.log("SubDir Refresh force=" + force + " enabled=" +
+                Config.Tips.ShowSubDirTips + " mouseOver=" + MouseIsOverListView());
             if(fDragging) {
                 OnDragOver(Control.MousePosition);
             }
@@ -1130,15 +1156,22 @@ namespace QTTabBarLib {
 
         private bool ShowSubDirTip(int iItem, bool fByKey, bool fSkipForegroundCheck) {
             string str;
-            if((fSkipForegroundCheck || (hwndExplorer == PInvoke.GetForegroundWindow())) && ShellBrowser.TryGetHotTrackPath(iItem, out str)) {
+            QTUtility2.log("SubDir trigger item=" + iItem + " byKey=" + fByKey);
+            if(!(fSkipForegroundCheck || (hwndExplorer == PInvoke.GetForegroundWindow()))) {
+                QTUtility2.log("SubDir rejected: explorer is not foreground");
+                return false;
+            }
+            if(ShellBrowser.TryGetHotTrackPath(iItem, out str)) {
                 bool flag = false;
                 try {
                     if(!ShellMethods.TryMakeSubDirTipPath(ref str)) {
+                        QTUtility2.log("SubDir rejected: path is not a directory " + str);
                         return false;
                     }
 
                     if (QTUtility.IsNetPath(str))
                     {
+                        QTUtility2.log("SubDir rejected: network path " + str);
                         return false;
                     }
                     Point pnt = GetSubDirTipPoint(fByKey);
@@ -1154,6 +1187,7 @@ namespace QTTabBarLib {
                         }
                     }
                     subDirTip.ShowSubDirTip(str, null, pnt);
+                    QTUtility2.log("SubDir shown path=" + str);
                     flag = true;
                 }
                 catch (Exception exception)
@@ -1162,12 +1196,14 @@ namespace QTTabBarLib {
                 }
                 return flag;
             }
+            QTUtility2.log("SubDir rejected: unable to resolve item path");
             return false;
         }
 
         private bool ShowThumbnailTooltip(int iItem, Point pnt, bool fKey) {
             string linkTargetPath;
-            if (ShellBrowser == null) // Fix a null-pointer issue, by indiff
+            QTUtility2.log("Preview trigger item=" + iItem + " byKey=" + fKey);
+            if (ShellBrowser == null) // 导致空指针问题 by indiff
             {
                 return false;
             }
@@ -1199,7 +1235,9 @@ namespace QTTabBarLib {
                     }
                     thumbnailIndex = iItem;
                     thumbnailTooltip.IsShownByKey = fKey;
-                    return thumbnailTooltip.ShowToolTip(linkTargetPath, pnt);
+                    bool shown = thumbnailTooltip.ShowToolTip(linkTargetPath, pnt);
+                    QTUtility2.log("Preview result=" + shown + " path=" + linkTargetPath);
+                    return shown;
                 }
                 HideThumbnailTooltip(6);
             }
