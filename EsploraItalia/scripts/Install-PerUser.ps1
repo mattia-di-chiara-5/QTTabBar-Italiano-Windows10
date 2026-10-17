@@ -3,7 +3,7 @@ param([string]$PackageDirectory=$PSScriptRoot,[switch]$DesktopShortcut)
 $ErrorActionPreference='Stop'
 $package=(Resolve-Path -LiteralPath $PackageDirectory).Path
 if((Get-Item -LiteralPath (Join-Path $package 'SHA256SUMS.json')).Length -gt 32768){throw 'Manifest troppo grande.'}
-$manifest=@(Get-Content -LiteralPath (Join-Path $package 'SHA256SUMS.json') -Raw|ConvertFrom-Json)
+$manifest=ConvertFrom-Json -InputObject (Get-Content -LiteralPath (Join-Path $package 'SHA256SUMS.json') -Raw)
 $allowed=@('Explorer++.exe','Explorer++IT.dll','config.xml','PROFILO-RAPIDO.xml','ORIGINE.json','traduzione.json','ResourceLocalizer.cs','LICENZA-Explorer++.txt','LEGGIMI-Explorer++.txt','CRONOLOGIA-Explorer++.txt','SORGENTI-ExplorerPlusPlus-adf72c76.zip','LEGGIMI.md','SICUREZZA.md','RICERCA_OSINT.md','INSTALLA.ps1')
 if($manifest.Count -ne $allowed.Count){throw 'Manifest non valido.'}
 foreach($name in $allowed){

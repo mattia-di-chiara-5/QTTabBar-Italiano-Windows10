@@ -2,7 +2,7 @@
 param([Parameter(Mandatory=$true)][string]$PackageDirectory,[Parameter(Mandatory=$true)][string]$Localizer)
 $ErrorActionPreference='Stop'
 $package=(Resolve-Path -LiteralPath $PackageDirectory).Path
-$manifest=@(Get-Content -LiteralPath (Join-Path $package 'SHA256SUMS.json') -Raw|ConvertFrom-Json)
+$manifest=ConvertFrom-Json -InputObject (Get-Content -LiteralPath (Join-Path $package 'SHA256SUMS.json') -Raw)
 if($manifest.Count -ne 15 -or @($manifest.Name|Sort-Object -Unique).Count -ne 15){throw 'Manifest incompleto o duplicato.'}
 foreach($entry in $manifest){
  if($entry.Name -notmatch '^[A-Za-z0-9+._-]+$'){throw 'Percorso non valido nel manifest.'}
