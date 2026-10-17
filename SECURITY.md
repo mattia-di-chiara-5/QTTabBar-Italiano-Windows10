@@ -1,6 +1,6 @@
 # Security policy
 
-Esplora Italia 0.1.x is a preview packaging/localization of Explorer++ 1.5.0.2844, with an unmodified core, verified upstream provenance and a resource-only Italian DLL update. It is not an independently audited or certified product. Maintenance is best effort; no fixed response SLA or bug bounty is offered.
+Esplora Italia 0.2.x is a preview packaging/localization of Explorer++ 1.5.0.2844, with a COM pool startup fix, separately verified build provenance and a resource-only Italian DLL update. It is not an independently audited or certified product. Maintenance is best effort; no fixed response SLA or bug bounty is offered.
 
 Read the [assessment, privacy and known limitations](EsploraItalia/docs/SICUREZZA.md). Separate application processes are not a security sandbox. Windows, runtime components and Shell extensions must remain patched. Public computer diagnostics are not included in releases.
 

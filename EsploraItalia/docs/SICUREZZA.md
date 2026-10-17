@@ -2,7 +2,7 @@
 
 ## Perimetro ed esito
 
-Esplora Italia 0.1.0 e un pacchetto preliminare di Explorer++ 1.5.0.2844 con profilo rapido e integrazione della traduzione italiana. Non e una certificazione di sicurezza, un penetration test indipendente o una promessa di assenza di bug. Non viene dichiarato pronto per ogni impiego professionale.
+Esplora Italia 0.2.0 e un pacchetto preliminare di Explorer++ 1.5.0.2844 con profilo rapido e integrazione della traduzione italiana. Non e una certificazione di sicurezza, un penetration test indipendente o una promessa di assenza di bug. Non viene dichiarato pronto per ogni impiego professionale.
 
 La revisione copre provenienza del core, codice degli strumenti di confezionamento/installazione, modifica delle risorse testuali, impostazioni di prestazioni e parti selezionate del codice upstream. Non copre tutto il codice C++, le librerie di sistema o ogni estensione presente sul computer.
 
@@ -10,11 +10,11 @@ La revisione copre provenienza del core, codice degli strumenti di confezionamen
 
 Gli archivi ufficiali sono bloccati da SHA-256. Le attestazioni sono verificate con `gh attestation verify`, imponendo repository `derceg/explorerplusplus`, workflow `.github/workflows/build.yml`, commit `adf72c76b883271427ba16c39f9d6f5011488a42` e runner ospitati da GitHub. La pipeline ufficiale e disponibile su https://github.com/derceg/explorerplusplus/actions/runs/36395179975.
 
-Il core `Explorer++.exe` non viene modificato. La DLL italiana originale proviene dall'archivio attestato; il localizzatore ammette solo DLL con dimensione del codice ed entry point pari a zero. Prima di cambiare un blocco di stringhe controlla ogni testo originale previsto; dopo la scrittura rilegge ogni traduzione. Non aggiunge codice eseguibile. Il nuovo hash e elencato nel manifest. L'attestazione dell'archivio originale non costituisce una firma della DLL modificata o dell'intero pacchetto.
+Il core `Explorer++.exe` e ricompilato con eventi del pool COM creati prima dei worker e controllo WAIT_FAILED. Ha superato 864 test senza errori. La sua attestazione separata impone il repository di questa edizione, il workflow esplora-native.yml e il commit 895c39b5e985cfaf9e27c457094fa0990bb4a37e. Build riuscita: https://github.com/mattia-di-chiara-5/QTTabBar-Italiano-Windows10/actions/runs/39039770214. Hash del core, patch e test sono nel lock file. Il nuovo core non eredita l'attestazione upstream. La DLL italiana originale proviene dall'archivio attestato; il localizzatore ammette solo DLL con dimensione del codice ed entry point pari a zero. Prima di cambiare un blocco di stringhe controlla ogni testo originale previsto; dopo la scrittura rilegge ogni traduzione. Non aggiunge codice eseguibile. Il nuovo hash e elencato nel manifest. L'attestazione dell'archivio originale non costituisce una firma della DLL modificata o dell'intero pacchetto.
 
 Il pacchetto non ha firma Authenticode. Gli hash garantiscono corrispondenza rispetto ai valori pubblicati, non certificano da soli un editore o l'assenza di malware. La provenienza attestata identifica una pipeline: non dimostra che il codice non contenga vulnerabilita.
 
-Il pacchetto include sorgenti upstream del commit dichiarato, testo della licenza, attribuzioni, sorgente del localizzatore e mappa delle modifiche. Il core e distribuito sotto GPL-3.0-only; la compilazione C++ e le dipendenze vcpkg restano documentate dal progetto upstream. Nessuna libreria QTTabBar e incorporata.
+Il pacchetto include sorgenti upstream del commit dichiarato, patch C++, risultati dei test, testo della licenza, attribuzioni, sorgente del localizzatore e mappa delle modifiche. Gli script corrispondenti di compilazione sono nella cartella native del repository. Il core e distribuito sotto GPL-3.0-only; la compilazione C++ e le dipendenze vcpkg restano documentate dal progetto upstream. Nessuna libreria QTTabBar e incorporata.
 
 ## Installazione e privilegi
 
@@ -50,3 +50,5 @@ Windows 10 ha terminato il supporto ordinario il 14 ottobre 2025. Nel 2026 occor
 
 Non si dichiara una certificazione GDPR, ISO 27001 o una conformita normativa generale. Licenze, contesto d'impiego, accessi ai file, conservazione e responsabilita organizzative richiedono valutazioni specifiche. Questa documentazione rende esplicite condizioni e limiti; non e un parere legale.
 Il localizzatore viene inoltre provato con testo originale incompatibile, ID duplicati, immagine troncata e tentativo di sovrascrivere la sorgente. Questi input sono rifiutati; gli originali restano invariati. Le prove girano anche in Windows PowerShell 5.1.
+
+Il baseline dichiara Lua 5.4.8, per cui sono state pubblicate correzioni successive in Lua 5.4.9. Non e stato completato un audit di tutte le dipendenze: vedere DIPENDENZE.md. La patch al pool COM non aggiorna Lua. I plug-in non vengono abilitati dal collegamento.

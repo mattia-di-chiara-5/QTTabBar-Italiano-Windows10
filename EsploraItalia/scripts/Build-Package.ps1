@@ -32,7 +32,25 @@ function Copy-Entry($archive,$entryName,$destination){
  }finally{$zip.Dispose()}
 }
 Copy-Entry $binary 'Explorer++.exe' (Join-Path $out 'Explorer++.exe')
-if((Get-FileHash (Join-Path $out 'Explorer++.exe')).Hash -ne $origin.ExecutableSHA256){throw 'Eseguibile inatteso.'}
+if((Get-FileHash (Join-Path $out 'Explorer++.exe')).Hash -ne $origin.OfficialExecutableSHA256){throw 'Eseguibile inatteso.'}
+# The fixed core has its own provenance; it does not inherit the upstream binary attestation.
+$coreInput=Join-Path $inputs ('native-'+$origin.CoreBuild.Run)
+if(!(Test-Path -LiteralPath (Join-Path $coreInput 'Explorer++.exe'))){
+ & $Verifier run download $origin.CoreBuild.Run --repo $origin.CoreBuild.Repository --name $origin.CoreBuild.Artifact --dir $coreInput
+ if($LASTEXITCODE){
+  # Actions artifacts expire. Published release assets preserve these exact inputs.
+  New-Item -ItemType Directory -Path $coreInput -Force|Out-Null
+  $assets=@{'Explorer++.exe'='Explorer%2B%2B.exe';'core-fixes.patch'='CORE-FIXES.patch';'native-tests.xml'='TEST-NATIVI.xml'}
+  foreach($name in $assets.Keys){Invoke-WebRequest -Uri ($origin.CoreBuild.ReleaseDownloadBase+'/'+$assets[$name]) -OutFile (Join-Path $coreInput $name) -Headers @{'User-Agent'='EsploraItalia-package'}}
+ }
+}
+$nativeFiles=@{'Explorer++.exe'=$origin.ExecutableSHA256;'core-fixes.patch'=$origin.CoreBuild.PatchSHA256;'native-tests.xml'=$origin.CoreBuild.TestsSHA256}
+foreach($name in $nativeFiles.Keys){if((Get-FileHash -LiteralPath (Join-Path $coreInput $name)).Hash -ne $nativeFiles[$name]){throw ('Artefatto nativo inatteso: '+$name)}}
+$verified=& $Verifier attestation verify (Join-Path $coreInput 'Explorer++.exe') --repo $origin.CoreBuild.Repository --signer-workflow $origin.CoreBuild.Workflow --source-digest $origin.CoreBuild.SourceCommit --deny-self-hosted-runners --format json
+if($LASTEXITCODE -or !($verified -join "`n"|ConvertFrom-Json)){throw 'Attestazione del core corretto non valida.'}
+Copy-Item -LiteralPath (Join-Path $coreInput 'Explorer++.exe') -Destination (Join-Path $out 'Explorer++.exe') -Force
+Copy-Item -LiteralPath (Join-Path $coreInput 'core-fixes.patch') -Destination (Join-Path $out 'CORE-FIXES.patch') -Force
+Copy-Item -LiteralPath (Join-Path $coreInput 'native-tests.xml') -Destination (Join-Path $out 'TEST-NATIVI.xml') -Force
 Copy-Entry $binary 'License.txt' (Join-Path $out 'LICENZA-Explorer++.txt')
 Copy-Entry $binary 'Readme.txt' (Join-Path $out 'LEGGIMI-Explorer++.txt')
 Copy-Entry $binary 'History.txt' (Join-Path $out 'CRONOLOGIA-Explorer++.txt')
@@ -52,15 +70,15 @@ Copy-Item -LiteralPath (Join-Path $root 'config.xml') -Destination (Join-Path $o
 Copy-Item -LiteralPath (Join-Path $root 'origine.lock.json') -Destination (Join-Path $out 'ORIGINE.json') -Force
 Copy-Item -LiteralPath $source -Destination (Join-Path $out 'SORGENTI-ExplorerPlusPlus-adf72c76.zip') -Force
 Copy-Item -LiteralPath (Join-Path $root 'src\ResourceLocalizer.cs') -Destination (Join-Path $out 'ResourceLocalizer.cs') -Force
-foreach($name in @('SICUREZZA.md','RICERCA_OSINT.md')){Copy-Item -LiteralPath (Join-Path $root ('docs\'+$name)) -Destination (Join-Path $out $name) -Force}
+foreach($name in @('SICUREZZA.md','RICERCA_OSINT.md','DIPENDENZE.md','COLLAUDO.md')){Copy-Item -LiteralPath (Join-Path $root ('docs\'+$name)) -Destination (Join-Path $out $name) -Force}
 Copy-Item -LiteralPath (Join-Path $root 'README.md') -Destination (Join-Path $out 'LEGGIMI.md') -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Install-PerUser.ps1') -Destination (Join-Path $out 'INSTALLA.ps1') -Force
-$files=@('Explorer++.exe','Explorer++IT.dll','config.xml','PROFILO-RAPIDO.xml','ORIGINE.json','traduzione.json','ResourceLocalizer.cs','LICENZA-Explorer++.txt','LEGGIMI-Explorer++.txt','CRONOLOGIA-Explorer++.txt','SORGENTI-ExplorerPlusPlus-adf72c76.zip','LEGGIMI.md','SICUREZZA.md','RICERCA_OSINT.md','INSTALLA.ps1')
+$files=@('Explorer++.exe','Explorer++IT.dll','config.xml','PROFILO-RAPIDO.xml','ORIGINE.json','traduzione.json','ResourceLocalizer.cs','LICENZA-Explorer++.txt','LEGGIMI-Explorer++.txt','CRONOLOGIA-Explorer++.txt','SORGENTI-ExplorerPlusPlus-adf72c76.zip','LEGGIMI.md','SICUREZZA.md','RICERCA_OSINT.md','DIPENDENZE.md','COLLAUDO.md','CORE-FIXES.patch','TEST-NATIVI.xml','INSTALLA.ps1')
 $manifest=@(foreach($name in $files){[pscustomobject]@{Name=$name;SHA256=(Get-FileHash -LiteralPath (Join-Path $out $name)).Hash}})
 $manifest|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $out 'SHA256SUMS.json') -Encoding UTF8
 & (Join-Path $root 'tests\Test-Package.ps1') -PackageDirectory $out -Localizer $localizer
 & (Join-Path $root 'tests\Test-Localizer.ps1') -Localizer $localizer -OriginalDll $original
-$zip=Join-Path $out 'EsploraItalia-Windows10-x64-v0.1.0-preview.zip'
+$zip=Join-Path $out 'EsploraItalia-Windows10-x64-v0.2.0-preview.zip'
 $paths=@($files|ForEach-Object {Join-Path $out $_})+@((Join-Path $out 'SHA256SUMS.json'))
 Compress-Archive -LiteralPath $paths -DestinationPath $zip -Force
 Get-FileHash -LiteralPath $zip

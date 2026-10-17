@@ -1,21 +1,20 @@
-# Esplora Italia — anteprima 0.1.0
+# Esplora Italia — anteprima 0.2.0
 
-Un pacchetto italiano di **Explorer++**, con schede, icone Fluent, tema di sistema e un profilo che privilegia la velocita. E un'app separata da Esplora file di Windows 10. Il motore resta quello del progetto Explorer++, creato da David Erceg e collaboratori.
+File manager nativo a schede per Windows 10 x64, basato su **Explorer++ 1.5.0.2844**, creato da David Erceg e collaboratori. E un'app separata da Esplora file: usa icone Fluent, tema di sistema e un profilo che privilegia la velocita. Autori e licenze originali sono conservati.
 
-Questa edizione completa 81 stringhe dei nuovi menu rimaste in inglese nella traduzione ufficiale e prepara installazione per utente, controlli di integrita e documentazione italiana. Non viene presentata come un nuovo motore scritto da zero.
+Questa edizione completa 81 stringhe italiane dei menu, corregge l'avvio del pool COM nel core e prepara installazione per utente e verifiche di provenienza. Il core corretto ha superato **864 test nativi, zero errori**, incluso lo stress test aggiunto di 64 costruzioni/esecuzioni/arresti. Non viene presentato come un motore originale scritto da zero o come software privo di bug.
 
-## Installazione e uso
+## Installazione
 
-Richiede Windows 10 x64. Scaricare lo ZIP dalla release **esplora-it-v0.1.0-preview**, verificarne lo SHA-256 pubblicato, estrarre tutto in una cartella e avviare `Explorer++.exe`. La configurazione e portabile e deve restare accanto all'eseguibile.
+Scaricare `EsploraItalia-Windows10-x64-v0.2.0-preview.zip` dalla release **esplora-it-v0.2.0-preview**, confrontare lo SHA-256 pubblicato ed estrarre tutti i file. Avviare `Explorer++.exe`: la configurazione portabile resta accanto all'eseguibile.
 
-Lo script facoltativo `INSTALLA.ps1 -DesktopShortcut`, eseguito dalla cartella estratta, copia i file in `%LOCALAPPDATA%\Programs\EsploraItalia\0.1.0-preview` e crea il collegamento **Esplora Italia** nel menu Start e sul desktop. Non richiede diritti di amministratore. Il collegamento imposta lingua italiana e cartella di lavoro corretta. Il primo avvio dopo l'installazione apre la cartella personale; le installazioni successive conservano le preferenze esistenti.
+Lo script facoltativo `INSTALLA.ps1 -DesktopShortcut` installa in `%LOCALAPPDATA%\Programs\EsploraItalia\0.2.0-preview` e crea **Esplora Italia** nel menu Start e sul desktop. Non richiede diritti amministrativi. Il primo avvio apre la cartella personale; reinstallando la stessa versione viene conservato il suo `config.xml`. Le cartelle di versioni precedenti non vengono rimosse. Il collegamento imposta lingua italiana e cartella di lavoro corretta.
 
-Non registra DLL in Explorer, non sostituisce associazioni o Win+E, non imposta avvio automatico e non disinstalla QTTabBar. Il vecchio Explorer con QTTabBar resta distinto: per provare questa soluzione usare il nuovo collegamento.
+L'edizione non aggiunge DLL a Explorer, associazioni predefinite, intercettazione di Win+E, servizi o avvio automatico. QTTabBar gia installato resta distinto: usare il nuovo collegamento per provare questa app.
 
 | Comando | Uso |
 | --- | --- |
-| Ctrl+T | Nuova scheda |
-| Ctrl+W | Chiudi scheda |
+| Ctrl+T / Ctrl+W | Apre / chiude una scheda |
 | Ctrl+Tab | Scheda successiva |
 | Ctrl+L | Scrivi il percorso |
 | Ctrl+D | Crea un segnalibro |
@@ -23,33 +22,38 @@ Non registra DLL in Explorer, non sostituisce associazioni o Win+E, non imposta 
 | F5 | Aggiorna |
 | Strumenti > Opzioni | Tema, caratteri e preferenze |
 
-Per disinstallare: chiudere l'app, rimuovere la cartella della versione e i relativi collegamenti. Conservare `config.xml` se si vogliono mantenere segnalibri e preferenze. Il file contiene percorsi in chiaro: trattarlo come dato personale e non pubblicarlo.
+Per disinstallare, chiudere l'app e rimuovere cartella della versione e collegamenti. Conservare `config.xml` per mantenere segnalibri e preferenze. Contiene percorsi in chiaro: non pubblicarlo.
 
-## Profilo rapido
+## Profilo rapido e isolamento
 
-Vista dettagli, estensioni visibili, icone Fluent e tema di Windows. Anteprime, suggerimenti automatici, miniature della barra applicazioni e calcolo ricorsivo delle dimensioni sono disabilitati. Anche l'albero laterale e la sua sincronizzazione sono inizialmente disattivati; si possono riattivare dalle opzioni. Le condivisioni non vengono riaperte automaticamente all'avvio. Le operazioni native e i menu contestuali restano disponibili.
+Vista dettagli, estensioni visibili, icone Fluent e tema di Windows. Anteprime, suggerimenti automatici, miniature della barra applicazioni e calcolo ricorsivo delle dimensioni disabilitati. Albero laterale e sincronizzazione inizialmente disattivati, riattivabili dalle opzioni. Le condivisioni non vengono riaperte automaticamente all'avvio.
 
-L'isolamento e tra **l'app e il desktop**. Le schede appartengono allo stesso processo: un provider lento puo far attendere l'app, ma il programma non viene caricato dentro `explorer.exe`. Non si promettono assenza di blocchi o prestazioni identiche su qualsiasi NAS o estensione.
+Le schede condividono il processo dell'app. Un provider lento puo ancora far attendere l'app; il programma non viene caricato dentro `explorer.exe`. Non e un sandbox di sicurezza e non garantisce prestazioni identiche su ogni NAS o estensione.
 
-## Versione e provenienza
+## Correzione e provenienza
 
-Core upstream **1.5.0.2844**, build di sviluppo pubblicata il 28 settembre 2026, commit `adf72c76b883271427ba16c39f9d6f5011488a42`. E una build preliminare upstream, non la release stabile 1.4.0. La 1.4.0 ha incontrato problemi nelle prove locali con percorsi accentati; la 1.5 ha aperto la cartella di 500 file e lo ZIP di 100 elementi.
+Base upstream: commit `adf72c76b883271427ba16c39f9d6f5011488a42`, build di sviluppo 1.5.0.2844. Gli eventi del pool COM vengono ora creati prima dei thread che li usano; WAIT_FAILED termina esplicitamente l'app anziche lasciare proseguire il ciclo. Questa e una correzione di inizializzazione, non una soluzione dimostrata all'anomalia del thread principale osservata nel collaudo automatico.
 
-Le attestazioni Sigstore dei due archivi ufficiali sono state verificate con GitHub CLI, imponendo repository, workflow, commit e runner GitHub. L'eseguibile e identico al core attestato. La DLL italiana parte dall'archivio ufficiale attestato ed e modificata solo nelle risorse testuali, con verifica del contenuto precedente e successivo: la DLL modificata non eredita l'attestazione dell'originale. I sorgenti e la mappa delle modifiche sono inclusi o pubblicati con la release.
+Il core viene compilato dalla pipeline di questo repository; la sua attestazione Sigstore viene verificata separatamente da quelle degli archivi ufficiali upstream. Versione base, hash del core, workflow, commit di build e test sono fissati in `ORIGINE.json`. La DLL italiana deriva dall'archivio ufficiale attestato ed e modificata solo nelle risorse testuali, con verifica prima e dopo la scrittura. La DLL modificata non eredita l'attestazione dell'originale.
 
-Il pacchetto e l'eseguibile non hanno firma Authenticode. Provenienza attestata non significa assenza di vulnerabilita o certificazione normativa. Leggere `SICUREZZA.md`, `RICERCA_OSINT.md`, `ORIGINE.json` e `SHA256SUMS.json`.
+Il pacchetto non ha firma Authenticode. Provenienza attestata non significa assenza di vulnerabilita o certificazione normativa. Sono inclusi sorgenti upstream, `CORE-FIXES.patch`, `TEST-NATIVI.xml`, codice del localizzatore e mappa italiana. Script della build nativa e relativi vincoli sono pubblicati nella cartella `native` del repository.
 
-Le prove hanno rilevato consumi di CPU variabili: una nuova istanza ha mostrato 0% di un core nel campione breve a riposo, altre hanno raggiunto circa un core anche prima delle interrogazioni esplicite di accessibilita. Gli stack campionati ricadono in App::Run/GetMessageW; questo localizza l'attesa ma non ne prova la causa. Il risultato non e un benchmark generale. Il collaudo interattivo e incompleto e il rilascio resta un'anteprima.
+Leggere `COLLAUDO.md`, `SICUREZZA.md`, `DIPENDENZE.md` e `RICERCA_OSINT.md`. La GUI ha elencato 500 file in una cartella accentata e 100 elementi in uno ZIP. La versione 0.1 con core ufficiale ha ricevuto un riscontro manuale di uso fluido. Le misure a riposo sono variabili: campioni a zero CPU e picchi nel collaudo automatico, con causa non accertata. Catture grafiche automatiche e intera estrazione ZIP non sono ancora collaudate completamente. Resta un'anteprima.
 
-## Build del pacchetto
+## Build
 
-Dalla radice del repository, con GitHub CLI autenticato e .NET Framework 4.8 disponibile:
+Con GitHub CLI autenticato e .NET Framework 4.8, dalla radice del repository:
 
 ```powershell
 .\EsploraItalia\scripts\Build-Package.ps1
 ```
 
-La procedura scarica soltanto input bloccati da hash, verifica le attestazioni, compila il piccolo localizzatore di risorse e controlla il pacchetto. Non ricompila il core C++: il suo sorgente corrispondente e incluso nello ZIP; la build C++ upstream richiede Visual Studio e vcpkg, come descritto nel suo BUILDING.md. La release contiene anche la sorgente del localizzatore e la mappa italiana.
+La procedura verifica input bloccati da hash, tre attestazioni, localizzazione e pacchetto. Recupera il core corretto dalla build fissata; non lo ricompila localmente. Per ricompilarlo con Visual Studio e vcpkg:
 
-Licenza GPL-3.0-only per il core e gli strumenti di questa edizione. Autori e licenze originali sono conservati. Non e un prodotto Microsoft e non e la versione ufficiale italiana del progetto Explorer++.
-Il manifest descrive i file iniziali. `config.xml` cambia durante l'uso; l'installatore usa il modello immutabile `PROFILO-RAPIDO.xml` e conserva il file personale gia installato.
+```powershell
+.\EsploraItalia\native\Build-Core.ps1 -SourceDirectory C:\Build\explorer-source -OutputDirectory C:\Build\native-output
+```
+
+La directory sorgente deve essere nuova. Una ricompilazione non e garantita identica byte per byte alla pipeline; non sostituire arbitrariamente gli hash nel lock file.
+
+Licenza GPL-3.0-only per core e strumenti di questa edizione. Non e un prodotto Microsoft o una release ufficiale del progetto Explorer++. Il manifest descrive i file iniziali; `config.xml` cambia durante l'uso. L'installatore usa il modello immutabile `PROFILO-RAPIDO.xml` per una nuova installazione e conserva il file personale gia presente.

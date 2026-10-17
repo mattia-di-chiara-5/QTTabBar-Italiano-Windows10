@@ -45,7 +45,7 @@ L'utente ha scelto un'app separata, dando priorita alla stabilita. Il prototipo 
 
 Il comportamento e coerente con il rischio di accoppiamento delle code di input delle finestre tra processi. Anche SWP_ASYNCWINDOWPOS e asincrono soltanto tra code diverse: https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos. Non viene attribuita alla sola separazione dei processi una garanzia di reattivita della UI incorporata.
 
-La base scelta per l'anteprima e Explorer++ 1.5.0.2844, senza modifiche al core. La sua pipeline ufficiale riuscita numero 35 corrisponde al commit `adf72c76b883271427ba16c39f9d6f5011488a42`; il calcolo del numero di build aggiunge 2809. Le attestazioni del binario e delle traduzioni sono state verificate imponendo quel commit. La build ufficiale e qui: https://github.com/derceg/explorerplusplus/actions/runs/36395179975.
+La base scelta per l'anteprima e Explorer++ 1.5.0.2844, con una correzione al pool COM compilata separatamente e attestata. La sua pipeline ufficiale riuscita numero 35 corrisponde al commit `adf72c76b883271427ba16c39f9d6f5011488a42`; il calcolo del numero di build aggiunge 2809. Le attestazioni del binario e delle traduzioni sono state verificate imponendo quel commit. La build ufficiale e qui: https://github.com/derceg/explorerplusplus/actions/runs/36395179975.
 
 La release stabile 1.4.0, confrontata anche attraverso i download del sito ufficiale e GitHub, ha incontrato problemi nelle prove locali. La 1.5 ha aperto la cartella accentata di 500 file e lo ZIP di 100 elementi. Essendo upstream una build di sviluppo, la confezione italiana resta esplicitamente un'anteprima. Nessuna conclusione di superiorita assoluta rispetto agli altri progetti.
 

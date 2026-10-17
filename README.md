@@ -1,12 +1,14 @@
 # Esplora Italia e QTTabBar Italiano
 
-**Esplora Italia 0.1.0 — anteprima** offre un'app separata a schede per Windows 10 x64, basata su Explorer++ 1.5.0.2844. Completa 81 stringhe italiane dei menu e aggiunge icone Fluent, tema di sistema, profilo rapido e installazione per utente.
+**Esplora Italia 0.2.0 — anteprima** offre un'app separata a schede per Windows 10 x64, basata su Explorer++ 1.5.0.2844. Completa 81 stringhe italiane dei menu e aggiunge icone Fluent, tema di sistema, profilo rapido e installazione per utente.
 
-Il core e quello del progetto Explorer++, con autori e licenze conservati. Gli archivi originali hanno attestazioni di provenienza verificate; l'eseguibile rimane immutato. La traduzione locale e riproducibile dalla mappa e dal codice inclusi. Non e un nuovo motore scritto da zero e non viene dichiarato privo di bug o pronto per il mercato.
+Il core e quello del progetto Explorer++, con autori e licenze conservati. Gli archivi originali e il core corretto hanno attestazioni di provenienza verificate separatamente. La correzione all'avvio del pool COM ha superato 864 test nativi. La traduzione locale e riproducibile dalla mappa e dal codice inclusi. Non e un nuovo motore scritto da zero e non viene dichiarato privo di bug o pronto per il mercato.
 
 - [Uso, installazione e limiti](EsploraItalia/README.md)
 - [Confronto di 16 progetti e scelta della base](EsploraItalia/docs/RICERCA_OSINT.md)
 - [Sicurezza, privacy e provenienza](EsploraItalia/docs/SICUREZZA.md)
+- [Collaudo e prove ancora aperte](EsploraItalia/docs/COLLAUDO.md)
+- [Dipendenze dichiarate e aggiornamenti individuati](EsploraItalia/docs/DIPENDENZE.md)
 - [Origine bloccata per versione, commit e hash](EsploraItalia/origine.lock.json)
 - [Edizione precedente QTTabBar Italiano 0.6.1](README_IT.md)
 - [Documentazione originale QTTabBar e attribuzioni](README_UPSTREAM.md)

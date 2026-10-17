@@ -23,5 +23,5 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: EsploraItalia-preview
-          path: EsploraItalia/dist/EsploraItalia-Windows10-x64-v0.1.0-preview.zip
+          path: EsploraItalia/dist/EsploraItalia-Windows10-x64-v0.2.0-preview.zip
           if-no-files-found: error
