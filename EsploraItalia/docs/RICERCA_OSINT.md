@@ -51,4 +51,4 @@ La release stabile 1.4.0, confrontata anche attraverso i download del sito uffic
 
 Esplora Italia aggiunge 81 traduzioni dei menu, profilo rapido con icone Fluent e tema di sistema, installazione per utente e verifiche di provenienza/integrita. La DLL di risorse viene modificata tramite una mappa pubblica; il core mantiene il proprio nome, gli autori e la licenza GPL-3.0-only. Non viene presentato come software originale scritto interamente da zero.
 
-Restano da approfondire un'anomalia di carico dopo interrogazioni UI Automation, il collaudo visivo, le operazioni reali di estrazione/copia, DPI misti e cartelle NAS. I test non certificano assenza di bug o sicurezza di tutti i progetti censiti.
+Restano da approfondire un'anomalia di carico osservata anche prima delle interrogazioni esplicite UI Automation, il collaudo visivo, le operazioni reali di estrazione/copia, DPI misti e cartelle NAS. I test non certificano assenza di bug o sicurezza di tutti i progetti censiti.

@@ -39,7 +39,7 @@ Le attestazioni Sigstore dei due archivi ufficiali sono state verificate con Git
 
 Il pacchetto e l'eseguibile non hanno firma Authenticode. Provenienza attestata non significa assenza di vulnerabilita o certificazione normativa. Leggere `SICUREZZA.md`, `RICERCA_OSINT.md`, `ORIGINE.json` e `SHA256SUMS.json`.
 
-Il collaudo con UI Automation ha prodotto un'anomalia di CPU in un'istanza; una nuova istanza senza interrogazioni di accessibilita ha mostrato 0% di un core nel campione breve a riposo. Il risultato non e un benchmark generale e la causa dell'anomalia non e stata accertata. Il rilascio resta un'anteprima da collaudare sul proprio sistema.
+Le prove hanno rilevato consumi di CPU variabili: una nuova istanza ha mostrato 0% di un core nel campione breve a riposo, altre hanno raggiunto circa un core anche prima delle interrogazioni esplicite di accessibilita. Gli stack campionati ricadono in App::Run/GetMessageW; questo localizza l'attesa ma non ne prova la causa. Il risultato non e un benchmark generale. Il collaudo interattivo e incompleto e il rilascio resta un'anteprima.
 
 ## Build del pacchetto
 

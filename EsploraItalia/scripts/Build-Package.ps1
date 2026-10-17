@@ -59,6 +59,7 @@ $files=@('Explorer++.exe','Explorer++IT.dll','config.xml','PROFILO-RAPIDO.xml','
 $manifest=@(foreach($name in $files){[pscustomobject]@{Name=$name;SHA256=(Get-FileHash -LiteralPath (Join-Path $out $name)).Hash}})
 $manifest|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $out 'SHA256SUMS.json') -Encoding UTF8
 & (Join-Path $root 'tests\Test-Package.ps1') -PackageDirectory $out -Localizer $localizer
+& (Join-Path $root 'tests\Test-Localizer.ps1') -Localizer $localizer -OriginalDll $original
 $zip=Join-Path $out 'EsploraItalia-Windows10-x64-v0.1.0-preview.zip'
 $paths=@($files|ForEach-Object {Join-Path $out $_})+@((Join-Path $out 'SHA256SUMS.json'))
 Compress-Archive -LiteralPath $paths -DestinationPath $zip -Force
