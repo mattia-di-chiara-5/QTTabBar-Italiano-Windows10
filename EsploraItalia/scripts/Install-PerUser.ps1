@@ -13,6 +13,17 @@ foreach($name in $allowed){
 }
 if((Get-FileHash -LiteralPath (Join-Path $package 'Explorer++.exe')).Hash -ne 'BB1FD439010C97FEFA78A121524A1828765B9B7050181A567A80603CC785A967'){throw 'Core ufficiale non corrispondente.'}
 $destination=Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'Programs\EsploraItalia\0.1.0-preview'
+# Refuse redirected installation directories, particularly when called from an elevated shell.
+$ancestor=$destination
+while($ancestor){
+ if(Test-Path -LiteralPath $ancestor){
+  $item=Get-Item -LiteralPath $ancestor -Force
+  if(!$item.PSIsContainer -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)){throw 'Destinazione non sicura: cartella reindirizzata o non valida.'}
+ }
+ $parent=Split-Path $ancestor -Parent
+ if($parent -eq $ancestor){break}
+ $ancestor=$parent
+}
 # Preflight all immutable destinations before copying anything.
 foreach($name in $allowed){
  $target=Join-Path $destination $name
@@ -37,6 +48,7 @@ foreach($name in $allowed){
 foreach($name in $allowed|Where-Object {$_ -ne 'config.xml'}){
  if((Get-FileHash -LiteralPath (Join-Path $destination $name)).Hash -ne ($manifest|Where-Object {$_.Name -ceq $name}).SHA256){throw 'Verifica dopo la copia fallita.'}
 }
+Copy-Item -LiteralPath (Join-Path $package 'SHA256SUMS.json') -Destination (Join-Path $destination 'SHA256SUMS.json') -Force
 $shell=New-Object -ComObject WScript.Shell
 $links=@((Join-Path ([Environment]::GetFolderPath('Programs')) 'Esplora Italia.lnk'))
 if($DesktopShortcut){$links+=(Join-Path ([Environment]::GetFolderPath('DesktopDirectory')) 'Esplora Italia.lnk')}
