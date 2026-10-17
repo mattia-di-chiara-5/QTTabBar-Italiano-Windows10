@@ -1,21 +1,9 @@
-# Security Policy
+# Security policy
 
-## Supported Versions
+Esplora Italia 0.2.x is a preview packaging/localization of Explorer++ 1.5.0.2844, with a COM pool startup fix, separately verified build provenance and a resource-only Italian DLL update. It is not an independently audited or certified product. Maintenance is best effort; no fixed response SLA or bug bounty is offered.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+Read the [assessment, privacy and known limitations](EsploraItalia/docs/SICUREZZA.md). Separate application processes are not a security sandbox. Windows, runtime components and Shell extensions must remain patched. Public computer diagnostics are not included in releases.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+QTTabBar Italiano 0.6.1 is the earlier in-process extension and retains legacy security debt, including BinaryFormatter deserialization. It is not represented as fully hardened. Earlier package editions are superseded. The unrelated 5.1/5.0/4.0 version table from the former placeholder policy has been removed.
 
-## Reporting a Vulnerability
-
-Use this section to tell people how to report a vulnerability.
-
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Use GitHub's **Report a vulnerability** facility if enabled. Otherwise open an issue requesting a private reporting channel without exploit details, credentials, personal paths or customer data. Do not upload sensitive dumps publicly. Include affected version, artificial reproduction data, expected/actual behavior and impact.

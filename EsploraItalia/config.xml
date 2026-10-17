@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExplorerPlusPlus>
+ <Settings>
+  <Setting name="Theme">2</Setting>
+  <Setting name="IconTheme">2</Setting>
+  <Setting name="Language">16</Setting>
+  <Setting name="StartupMode">2</Setting>
+  <Setting name="NewTabDirectory">::{20D04FE0-3AEA-1069-A2D8-08002B30309D}</Setting>
+  <Setting name="ShowFolderSizes">no</Setting>
+  <Setting name="DisableFolderSizesNetworkRemovable">yes</Setting>
+  <Setting name="ShowFilePreviews">no</Setting>
+  <Setting name="ShowDisplayWindow">no</Setting>
+  <Setting name="ShowInfoTips">no</Setting>
+  <Setting name="ShowTaskbarThumbnails">no</Setting>
+  <Setting name="TreeViewAutoExpandSelected">no</Setting>
+  <Setting name="TreeViewDelayEnabled">yes</Setting>
+  <Setting name="SynchronizeTreeview">no</Setting>
+  <Setting name="ShowFolders">no</Setting>
+  <Setting name="ViewModeGlobal">4</Setting>
+  <Setting name="ShowHiddenGlobal">no</Setting>
+  <Setting name="HideSystemFilesGlobal">yes</Setting>
+  <Setting name="ShowExtensions">yes</Setting>
+  <Setting name="ShowGridlinesGlobal">no</Setting>
+  <Setting name="UseFullRowSelect">yes</Setting>
+  <Setting name="HandleZipFiles">yes</Setting>
+  <Setting name="AlwaysShowTabBar">yes</Setting>
+  <Setting name="LargeToolbarIcons">yes</Setting>
+  <Setting name="ShowDrivesToolbar">no</Setting>
+  <Setting name="ShowBookmarksToolbar">no</Setting>
+  <Setting name="ShowApplicationToolbar">no</Setting>
+  <Setting name="PlayNavigationSound">no</Setting>
+  <Setting name="ReplaceExplorerMode">0</Setting>
+  <Setting name="CloseMainWindowOnTabClose">no</Setting>
+  <Setting name="ConfirmCloseTabs">yes</Setting>
+  <Setting name="AllowMultipleInstances">yes</Setting>
+ </Settings>
+</ExplorerPlusPlus>
