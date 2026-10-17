@@ -9,7 +9,7 @@
 [![Github Stars](https://img.shields.io/github/stars/indiff/qttabbar?logo=github)](https://github.com/indiff/qttabbar)
 [![Gitee Stars](https://gitee.com/qwop/qttabbar/badge/star.svg)](https://gitee.com/qwop/qttabbar)
 [![.Net Framework 3.5](https://img.shields.io/badge/.NET%3D3.5-red.svg)](https://www.microsoft.com/zh-CN/download/details.aspx?id=21)
- 
+
 # Introduction [中文版本](README_zh.md)
 ![qttabbar2](https://user-images.githubusercontent.com/501276/131287626-fe8f1fdd-a894-43f8-9620-b7145d70936d.gif)
 
@@ -48,7 +48,7 @@
 # Usage
 - Please install net framework 3.5 [Download](https://www.microsoft.com/zh-CN/download/details.aspx?id=21)
 - <img src="https://user-images.githubusercontent.com/501276/84343198-16aedc00-abda-11ea-8872-a654d011631f.png" />
-- Run the installation package file to install qttabbar 
+- Run the installation package file to install qttabbar
 - Explorer > View > Options - > (qttabbar & buttons)[win10]
 - In Explorer, organization > layout > menu bar  [xp,win7]
 - Right click the blank area on the right side of the menu bar - > check qttabbar and other toolbars - > Press Alt + m - > Restart Explorer or restart the computer
@@ -58,7 +58,7 @@
 
 # Build
 * Install [wix311.exe](https://github.com/wixtoolset/wix3/releases)
-* Install wix visual [Plugin](https://marketplace.visualstudio.com/items?itemName=WixToolset.WixToolsetVisualStudio2010Extension)  
+* Install wix visual [Plugin](https://marketplace.visualstudio.com/items?itemName=WixToolset.WixToolsetVisualStudio2010Extension)
 * Install visual studio 2010  [Baidu Pan](https://pan.baidu.com/s/1sldAQmD#list/path=%2FVS%E4%BE%BF%E6%90%BA%E7%B2%BE%E7%AE%80%E7%89%88%E5%90%88%E9%9B%86)
 * Git pull NotifyPropertyWeaverVsPackage.vsix
 * Qttabbar Project Add Referrence Ricciolo.Controls.TreeListView, Path QTTabBar\Resources\Ricciolo.Controls.TreeListView.dll
@@ -81,7 +81,7 @@
 * Group2: [963211351](https://jq.qq.com/?_wv=1027&k=VCPD2zLH)
 
 # Thanks
-* [Original author Quizo](https://twitter.com/QTTabBar) 
+* [Original author Quizo](https://twitter.com/QTTabBar)
 * [SF Version Author](https://sourceforge.net/u/masamunexgp/profile)
 * [Donation List](https://github.com/indiff/qttabbar/wiki/Thanks-%E9%B8%A3%E8%B0%A2%E6%8D%90%E5%8A%A9)
 * [Donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7YNCVL5P9ZDY8)
