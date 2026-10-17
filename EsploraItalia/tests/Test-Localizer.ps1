@@ -28,6 +28,8 @@ try{
  [IO.File]::WriteAllBytes($truncated,[byte[]]@(0x4D,0x5A))
  & $Localizer patch $truncated (Join-Path $temp 'truncated-out.dll') $mapping
  if($LASTEXITCODE -eq 0){throw 'Immagine troncata accettata.'}
+ # Expected native failures must not leak a failure exit code into the CI shell.
+ $global:LASTEXITCODE=0
  [pscustomobject]@{ValidRoundTrip=$true;WrongOriginalRejected=$true;DuplicateIdsRejected=$true;SourcePreserved=$true;TruncatedImageRejected=$true}
 }finally{
  # Only remove this test's freshly created, fixed-prefix temporary directory.
