@@ -1,0 +1,14 @@
+{
+  "Edition": "0.1.0-preview",
+  "CoreVersion": "1.5.0.2844",
+  "SourceCommit": "adf72c76b883271427ba16c39f9d6f5011488a42",
+  "BuildUrl": "https://github.com/derceg/explorerplusplus/actions/runs/36395179975",
+  "BinaryUrl": "https://download.explorerplusplus.com/dev/1.5.0.2844/explorerpp_x64.zip",
+  "BinarySHA256": "0E2A4A64CA9728F12593D5267AE86752AE912C834EDE6A6C0528ABAEF6201D88",
+  "TranslationUrl": "https://download.explorerplusplus.com/dev/1.5.0.2844/explorerpp_translations.zip",
+  "TranslationSHA256": "2D7AA47AE519F77770635757E80BD12ED8CCA47D572F379AF427C81B9735282F",
+  "ExecutableSHA256": "BB1FD439010C97FEFA78A121524A1828765B9B7050181A567A80603CC785A967",
+  "OriginalItalianSHA256": "7C7AD18F220B54B17AD9A0217774836C58A97EED4A7A9221DCA48E54E5A6D479",
+  "SourceUrl": "https://api.github.com/repos/derceg/explorerplusplus/zipball/adf72c76b883271427ba16c39f9d6f5011488a42",
+  "SourceSHA256": "F7BEE15D4B0F6B4D20E8AF75726B161B6B9C553F7A215AD0627A4F60D6C1F273"
+}

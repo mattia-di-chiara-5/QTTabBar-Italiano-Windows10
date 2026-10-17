@@ -1,0 +1,35 @@
+name: Esplora Italia native core candidate
+on:
+  push:
+    branches: ['feat/esplora-italia-preview']
+    paths: ['EsploraItalia/native/**', '.github/workflows/esplora-native.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57
+        with:
+          msbuild-architecture: x64
+      - name: Build pinned source with COM startup fix and run upstream tests
+        shell: pwsh
+        run: .\EsploraItalia\native\Build-Core.ps1 -SourceDirectory "$env:RUNNER_TEMP\explorer-source" -OutputDirectory "$pwd\native-output"
+      - uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6
+        with:
+          subject-path: native-output/Explorer++.exe
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: EsploraItalia-native-core-candidate
+          path: native-output
+          if-no-files-found: warn

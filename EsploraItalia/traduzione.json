@@ -1,0 +1,488 @@
+[
+  {
+    "Id": 502,
+    "Symbol": "IDS_FILE_NEWTAB",
+    "Original": "&New Tab",
+    "Italian": "&Nuova scheda"
+  },
+  {
+    "Id": 503,
+    "Symbol": "IDS_FILE_CLOSETAB",
+    "Original": "&Close Tab",
+    "Italian": "&Chiudi scheda"
+  },
+  {
+    "Id": 504,
+    "Symbol": "IDS_FILE_NEW_WINDOW",
+    "Original": "New W&indow",
+    "Italian": "Nuova &finestra"
+  },
+  {
+    "Id": 505,
+    "Symbol": "IDS_FILE_REOPEN_RECENT_TAB_POPUP",
+    "Original": "&Reopen Recent Tab",
+    "Italian": "&Riapri scheda recente"
+  },
+  {
+    "Id": 506,
+    "Symbol": "IDS_FILE_CLONEWINDOW",
+    "Original": "Clone &Window",
+    "Italian": "Duplica fi&nestra"
+  },
+  {
+    "Id": 507,
+    "Symbol": "IDS_FILE_SAVEDIRECTORYLISTING",
+    "Original": "Save Directory &Listing...",
+    "Italian": "Salva &elenco della cartella..."
+  },
+  {
+    "Id": 508,
+    "Symbol": "IDS_FILE_OPENCOMMANDPROMPT",
+    "Original": "&Open Command Prompt",
+    "Italian": "Apri &prompt dei comandi"
+  },
+  {
+    "Id": 509,
+    "Symbol": "IDS_FILE_OPENCOMMANDPROMPTADMINISTRATOR",
+    "Original": "Open Command Prompt as &Administrator",
+    "Italian": "Apri prompt dei comandi come &amministratore"
+  },
+  {
+    "Id": 510,
+    "Symbol": "IDS_FILE_COPYFOLDERPATH",
+    "Original": "Copy &Folder Path",
+    "Italian": "Copia percorso della &cartella"
+  },
+  {
+    "Id": 511,
+    "Symbol": "IDS_FILE_COPYITEMPATH",
+    "Original": "Copy File Pat&hs",
+    "Italian": "Copia percorsi dei &file"
+  },
+  {
+    "Id": 512,
+    "Symbol": "IDS_FILE_COPYUNIVERSALFILEPATHS",
+    "Original": "Copy &Universal File Paths",
+    "Italian": "Copia percorsi &UNC"
+  },
+  {
+    "Id": 513,
+    "Symbol": "IDS_FILE_COPYCOLUMNTEXT",
+    "Original": "Copy Column &Text",
+    "Italian": "Copia testo delle co&lonne"
+  },
+  {
+    "Id": 514,
+    "Symbol": "IDS_FILE_SETFILEATTRIBUTES",
+    "Original": "Set &File Attributes...",
+    "Italian": "Modifica &attributi..."
+  },
+  {
+    "Id": 516,
+    "Symbol": "IDS_FILE_DELETEPERMANENTLY",
+    "Original": "Delete &Permanently",
+    "Italian": "Elimina &definitivamente"
+  },
+  {
+    "Id": 517,
+    "Symbol": "IDS_FILE_RENAME",
+    "Original": "Rena&me",
+    "Italian": "Rino&mina"
+  },
+  {
+    "Id": 518,
+    "Symbol": "IDS_FILE_PROPERTIES",
+    "Original": "P&roperties",
+    "Italian": "P&roprietà"
+  },
+  {
+    "Id": 519,
+    "Symbol": "IDS_FILE_EXIT",
+    "Original": "&Exit",
+    "Italian": "&Esci"
+  },
+  {
+    "Id": 520,
+    "Symbol": "IDS_EDIT_POPUP",
+    "Original": "&Edit",
+    "Italian": "&Modifica"
+  },
+  {
+    "Id": 521,
+    "Symbol": "IDS_EDIT_UNDO",
+    "Original": "&Undo",
+    "Italian": "&Annulla"
+  },
+  {
+    "Id": 524,
+    "Symbol": "IDS_EDIT_PASTE",
+    "Original": "&Paste",
+    "Italian": "&Incolla"
+  },
+  {
+    "Id": 525,
+    "Symbol": "IDS_EDIT_PASTESHORTCUT",
+    "Original": "Paste &Shortcut",
+    "Italian": "Incolla &collegamento"
+  },
+  {
+    "Id": 526,
+    "Symbol": "IDS_EDIT_PASTEHARDLINK",
+    "Original": "Paste &Hard Link",
+    "Italian": "Incolla collegamento &fisico"
+  },
+  {
+    "Id": 527,
+    "Symbol": "IDS_EDIT_PASTE_SYMBOLIC_LINK",
+    "Original": "Paste S&ymbolic Link",
+    "Italian": "Incolla collegamento &simbolico"
+  },
+  {
+    "Id": 528,
+    "Symbol": "IDS_EDIT_COPYTOFOLDER",
+    "Original": "Copy To &Folder",
+    "Italian": "Copia nella &cartella..."
+  },
+  {
+    "Id": 529,
+    "Symbol": "IDS_EDIT_MOVETOFOLDER",
+    "Original": "Mo&ve To Folder",
+    "Italian": "S&posta nella cartella..."
+  },
+  {
+    "Id": 530,
+    "Symbol": "IDS_EDIT_RESOLVELINK",
+    "Original": "&Resolve Link",
+    "Italian": "Apri &destinazione del collegamento"
+  },
+  {
+    "Id": 531,
+    "Symbol": "IDS_SELECTION_POPUP",
+    "Original": "&Selection",
+    "Italian": "&Selezione"
+  },
+  {
+    "Id": 532,
+    "Symbol": "IDS_EDIT_SELECTALL",
+    "Original": "Select &All",
+    "Italian": "Seleziona &tutto"
+  },
+  {
+    "Id": 533,
+    "Symbol": "IDS_EDIT_INVERTSELECTION",
+    "Original": "&Invert Selection",
+    "Italian": "&Inverti selezione"
+  },
+  {
+    "Id": 534,
+    "Symbol": "IDS_EDIT_SELECTALLOFSAMETYPE",
+    "Original": "Select All Of Same &Type",
+    "Italian": "Seleziona tutti dello stesso &tipo"
+  },
+  {
+    "Id": 535,
+    "Symbol": "IDS_EDIT_SELECTNONE",
+    "Original": "Select &None",
+    "Italian": "&Deseleziona tutto"
+  },
+  {
+    "Id": 536,
+    "Symbol": "IDS_EDIT_WILDCARDSELECTION",
+    "Original": "Wildcard &Select...",
+    "Italian": "Seleziona con &caratteri jolly..."
+  },
+  {
+    "Id": 537,
+    "Symbol": "IDS_EDIT_WILDCARDDESELECT",
+    "Original": "Wildcard &Deselect...",
+    "Italian": "Deseleziona con caratteri &jolly..."
+  },
+  {
+    "Id": 538,
+    "Symbol": "IDS_VIEW_POPUP",
+    "Original": "&View",
+    "Italian": "&Visualizza"
+  },
+  {
+    "Id": 539,
+    "Symbol": "IDS_VIEW_DUAL_PANE",
+    "Original": "D&ual pane",
+    "Italian": "Doppio &pannello"
+  },
+  {
+    "Id": 540,
+    "Symbol": "IDS_VIEW_STATUSBAR",
+    "Original": "Status &Bar",
+    "Italian": "Barra di &stato"
+  },
+  {
+    "Id": 541,
+    "Symbol": "IDS_VIEW_FOLDERS",
+    "Original": "Fol&ders",
+    "Italian": "&Cartelle"
+  },
+  {
+    "Id": 542,
+    "Symbol": "IDS_VIEW_DISPLAYWINDOW",
+    "Original": "Display &Window",
+    "Italian": "Riquadro &informazioni"
+  },
+  {
+    "Id": 543,
+    "Symbol": "IDS_VIEW_TOOLBARS_POPUP",
+    "Original": "&Toolbars",
+    "Italian": "&Barre degli strumenti"
+  },
+  {
+    "Id": 544,
+    "Symbol": "IDS_VIEW_TOOLBARS_ADDRESS_BAR",
+    "Original": "&Address Bar",
+    "Italian": "Barra degli &indirizzi"
+  },
+  {
+    "Id": 545,
+    "Symbol": "IDS_VIEW_TOOLBARS_MAIN_TOOLBAR",
+    "Original": "&Main Toolbar",
+    "Italian": "Barra &principale"
+  },
+  {
+    "Id": 546,
+    "Symbol": "IDS_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR",
+    "Original": "&Bookmarks",
+    "Italian": "&Segnalibri"
+  },
+  {
+    "Id": 547,
+    "Symbol": "IDS_VIEW_TOOLBARS_DRIVES_TOOLBAR",
+    "Original": "&Drives",
+    "Italian": "&Unità"
+  },
+  {
+    "Id": 548,
+    "Symbol": "IDS_VIEW_TOOLBARS_APPLICATION_TOOLBAR",
+    "Original": "Application &Toolbar",
+    "Italian": "Barra delle &applicazioni"
+  },
+  {
+    "Id": 549,
+    "Symbol": "IDS_VIEW_TOOLBARS_LOCK_TOOLBARS",
+    "Original": "&Lock Toolbars",
+    "Italian": "&Blocca barre degli strumenti"
+  },
+  {
+    "Id": 550,
+    "Symbol": "IDS_VIEW_TOOLBARS_CUSTOMIZE",
+    "Original": "&Customize...",
+    "Italian": "&Personalizza..."
+  },
+  {
+    "Id": 551,
+    "Symbol": "IDS_VIEW_DECREASE_TEXT_SIZE",
+    "Original": "Decrease text size",
+    "Italian": "Riduci dimensione del testo"
+  },
+  {
+    "Id": 552,
+    "Symbol": "IDS_VIEW_INCREASE_TEXT_SIZE",
+    "Original": "Increase text size",
+    "Italian": "Aumenta dimensione del testo"
+  },
+  {
+    "Id": 554,
+    "Symbol": "IDS_VIEW_AUTOARRANGE",
+    "Original": "&Auto Arrange",
+    "Italian": "Disponi &automaticamente"
+  },
+  {
+    "Id": 555,
+    "Symbol": "IDS_VIEW_SORTBY",
+    "Original": "S&ort By",
+    "Italian": "&Ordina per"
+  },
+  {
+    "Id": 556,
+    "Symbol": "IDS_VIEW_GROUPBY",
+    "Original": "&Group By",
+    "Italian": "&Raggruppa per"
+  },
+  {
+    "Id": 557,
+    "Symbol": "IDS_VIEW_SHOWHIDDENFILES",
+    "Original": "Show H&idden Files",
+    "Italian": "Mostra file &nascosti"
+  },
+  {
+    "Id": 559,
+    "Symbol": "IDS_VIEW_SELECTCOLUMNS",
+    "Original": "Select &Columns...",
+    "Italian": "Scegli &colonne..."
+  },
+  {
+    "Id": 560,
+    "Symbol": "IDS_VIEW_AUTOSIZECOLUMNS",
+    "Original": "Auto&size Columns",
+    "Italian": "Adatta &larghezza colonne"
+  },
+  {
+    "Id": 561,
+    "Symbol": "IDS_VIEW_SAVECOLUMNLAYOUTASDEFAULT",
+    "Original": "Sa&ve Column Layout as Default",
+    "Italian": "Salva colonne come &predefinite"
+  },
+  {
+    "Id": 562,
+    "Symbol": "IDS_VIEW_CHANGEDISPLAYCOLOURS",
+    "Original": "Change Dis&play Window Colors...",
+    "Italian": "Cambia colori del riquadro &informazioni..."
+  },
+  {
+    "Id": 563,
+    "Symbol": "IDS_VIEW_FILTER_POPUP",
+    "Original": "&Filter",
+    "Italian": "&Filtro"
+  },
+  {
+    "Id": 564,
+    "Symbol": "IDS_FILTER_FILTERRESULTS",
+    "Original": "&Set Filter...",
+    "Italian": "&Imposta filtro..."
+  },
+  {
+    "Id": 565,
+    "Symbol": "IDS_FILTER_ENABLE_FILTER",
+    "Original": "&Enable Filter",
+    "Italian": "&Attiva filtro"
+  },
+  {
+    "Id": 566,
+    "Symbol": "IDS_ACTIONS_POPUP",
+    "Original": "&Actions",
+    "Italian": "&Azioni"
+  },
+  {
+    "Id": 568,
+    "Symbol": "IDS_ACTIONS_SPLITFILE",
+    "Original": "&Split File...",
+    "Italian": "&Dividi file..."
+  },
+  {
+    "Id": 569,
+    "Symbol": "IDS_ACTIONS_MERGEFILES",
+    "Original": "&Merge Files...",
+    "Italian": "&Unisci file..."
+  },
+  {
+    "Id": 570,
+    "Symbol": "IDS_ACTIONS_DESTROYFILES",
+    "Original": "&Destroy File(s)...",
+    "Italian": "&Distruggi file in modo irreversibile..."
+  },
+  {
+    "Id": 571,
+    "Symbol": "IDS_GO_POPUP",
+    "Original": "&Go",
+    "Italian": "Va&i"
+  },
+  {
+    "Id": 572,
+    "Symbol": "IDS_GO_BACK",
+    "Original": "&Back",
+    "Italian": "&Indietro"
+  },
+  {
+    "Id": 573,
+    "Symbol": "IDS_GO_FORWARD",
+    "Original": "&Forward",
+    "Italian": "&Avanti"
+  },
+  {
+    "Id": 574,
+    "Symbol": "IDS_GO_UP",
+    "Original": "&Up",
+    "Italian": "Cartella &superiore"
+  },
+  {
+    "Id": 575,
+    "Symbol": "IDS_GO_HISTORY_POPUP",
+    "Original": "&History",
+    "Italian": "&Cronologia"
+  },
+  {
+    "Id": 576,
+    "Symbol": "IDS_GO_FREQUENT_LOCATIONS_POPUP",
+    "Original": "F&requent Locations",
+    "Italian": "Posizioni &frequenti"
+  },
+  {
+    "Id": 577,
+    "Symbol": "IDS_BOOKMARKS_POPUP",
+    "Original": "&Bookmarks",
+    "Italian": "Segnali&bri"
+  },
+  {
+    "Id": 578,
+    "Symbol": "IDS_TOOLS_POPUP",
+    "Original": "&Tools",
+    "Italian": "S&trumenti"
+  },
+  {
+    "Id": 579,
+    "Symbol": "IDS_TOOLS_SEARCH",
+    "Original": "&Search...",
+    "Italian": "&Cerca..."
+  },
+  {
+    "Id": 580,
+    "Symbol": "IDS_TOOLS_CUSTOMIZECOLORS",
+    "Original": "&Customize Colors...",
+    "Italian": "Personalizza &colori..."
+  },
+  {
+    "Id": 581,
+    "Symbol": "IDS_TOOLS_RUNSCRIPT",
+    "Original": "Run Script...",
+    "Italian": "Esegui &script..."
+  },
+  {
+    "Id": 582,
+    "Symbol": "IDS_TOOLS_OPTIONS",
+    "Original": "&Options...",
+    "Italian": "&Opzioni..."
+  },
+  {
+    "Id": 583,
+    "Symbol": "IDS_WINDOW_POPUP",
+    "Original": "&Window",
+    "Italian": "Fi&nestra"
+  },
+  {
+    "Id": 584,
+    "Symbol": "IDS_WINDOW_SEARCH_TABS",
+    "Original": "&Search Tabs...",
+    "Italian": "&Cerca nelle schede..."
+  },
+  {
+    "Id": 585,
+    "Symbol": "IDS_HELP_POPUP",
+    "Original": "&Help",
+    "Italian": "&Guida"
+  },
+  {
+    "Id": 586,
+    "Symbol": "IDS_HELP_ONLINE_DOCUMENTATION",
+    "Original": "&Online Documentation",
+    "Italian": "&Documentazione online"
+  },
+  {
+    "Id": 587,
+    "Symbol": "IDS_HELP_CHECKFORUPDATES",
+    "Original": "Check for Updates...",
+    "Italian": "Cerca aggiornamenti..."
+  },
+  {
+    "Id": 588,
+    "Symbol": "IDS_HELP_ABOUT",
+    "Original": "&About Explorer++",
+    "Italian": "&Informazioni su Explorer++"
+  }
+]

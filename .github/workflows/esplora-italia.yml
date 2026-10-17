@@ -1,0 +1,27 @@
+name: Esplora Italia verified package
+on:
+  push:
+    branches: [master, 'feat/esplora-italia-preview']
+    paths: ['EsploraItalia/**', '.github/workflows/esplora-italia.yml']
+  pull_request:
+    branches: [master]
+    paths: ['EsploraItalia/**', '.github/workflows/esplora-italia.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Verify upstream attestations, localize resources and check package
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .\EsploraItalia\scripts\Build-Package.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: EsploraItalia-preview
+          path: EsploraItalia/dist/EsploraItalia-Windows10-x64-v0.1.0-preview.zip
+          if-no-files-found: error
