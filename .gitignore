@@ -822,3 +822,5 @@ MigrationBackup/
 
 /Italiano/build/
 /Italiano/dist/
+/EsploraItalia/dist/
+/EsploraItalia/test-results/
