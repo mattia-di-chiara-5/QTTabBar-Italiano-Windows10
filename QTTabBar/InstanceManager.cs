@@ -466,7 +466,7 @@ namespace QTTabBarLib {
                             new Uri[] { new Uri(address) });
                     serviceHost.AddServiceEndpoint(
                             typeof(ICommService),
-                            new NetNamedPipeBinding(NetNamedPipeSecurityMode.None) {
+                            new NetNamedPipeBinding(NetNamedPipeSecurityMode.Transport) {
                                 ReceiveTimeout = TimeSpan.MaxValue,
                                 ReaderQuotas = {MaxArrayLength = int.MaxValue},
                                 MaxBufferSize = int.MaxValue,
@@ -478,7 +478,7 @@ namespace QTTabBarLib {
                 
 
                 commClient = new DuplexClient(new InstanceContext(new CommClient()),
-                        new NetNamedPipeBinding(NetNamedPipeSecurityMode.None) {
+                        new NetNamedPipeBinding(NetNamedPipeSecurityMode.Transport) {
                             ReceiveTimeout = TimeSpan.MaxValue,
                             ReaderQuotas = { MaxArrayLength = int.MaxValue },
                             MaxBufferSize = int.MaxValue,

@@ -465,6 +465,10 @@ namespace QTTabBarLib {
                         BinaryFormatter binaryFormatter = new BinaryFormatter();
                         binaryFormatter.Binder = new QTTabBarDeserializationBinder();
                         object obj = binaryFormatter.Deserialize(memStream);
+                        if (!(obj is SerializeDelegate))
+                        {
+                            throw new SerializationException("Unexpected root type during delegate deserialization.");
+                        }
                         /*QTUtility2.log("ByteArrayToObject:" + Encoding.Default.GetString(arrBytes));
                         if (obj != null)
                         {
