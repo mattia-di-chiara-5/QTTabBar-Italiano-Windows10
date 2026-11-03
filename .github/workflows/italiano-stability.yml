@@ -34,6 +34,13 @@ jobs:
       - name: Run stability regression
         shell: powershell
         run: .\Italiano\tests\Run-Regression.ps1
+      - name: Run existing managed unit tests
+        shell: powershell
+        run: |
+          dotnet restore QTTabBar.Tests/QTTabBar.Tests.csproj --source https://api.nuget.org/v3/index.json
+          if ($LASTEXITCODE) { throw 'Test restore failed' }
+          dotnet test QTTabBar.Tests/QTTabBar.Tests.csproj --configuration Release --no-restore /p:BuildProjectReferences=false --logger "console;verbosity=minimal"
+          if ($LASTEXITCODE) { throw 'Managed unit tests failed' }
       - name: Guard retired serialization and parse scripts
         shell: powershell
         run: .\Italiano\scripts\Test-SecuritySource.ps1

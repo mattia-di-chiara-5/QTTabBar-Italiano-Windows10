@@ -1,4 +1,4 @@
-# Revisione di sicurezza QTTabBar Italiano 0.7.0 — 2 novembre 2026
+# Revisione di sicurezza QTTabBar Italiano 0.7.0 — 2–3 novembre 2026
 
 Questa revisione riguarda QTTabBar, l'estensione caricata in Explorer, e i relativi sorgenti, plug-in, installer e workflow. Esplora Italia e un'app separata e non viene sostituita da questo aggiornamento. Non si dichiara una certificazione di sicurezza, conformita normativa o assenza di vulnerabilita.
 
@@ -26,7 +26,7 @@ System.Text.Encoding.CodePages 10.0.14 e UTF.Unknown 2.8.0 sostituiscono 10.0.12
 
 Il confronto upstream usa il commit 9b81f7222fc47356659c224855bdd799d044e93c, rilevato il 2 novembre. La differenza applicativa rispetto al punto comune e principalmente il ripristino dello scorrimento di 8d6e08028c603d793aa75e95b19e3503e05e47a1: non viene fuso automaticamente, perche introduce interrogazioni UI Automation sincrone sul cambio scheda e richiede un collaudo dedicato rispetto al profilo prestazioni italiano. I cambiamenti di documentazione upstream non sostituiscono le correzioni di questo ramo.
 
-Le verifiche delle dipendenze interrogano OSV per le versioni dichiarate. Nessuna corrispondenza in un database non equivale a dimostrare l'assenza di vulnerabilita, ne include automaticamente tutti i binari incorporati, le dipendenze transitive e il sistema operativo.
+Il 3 novembre OSV e stato interrogato per le sei versioni runtime in packages.config e le tre PackageReference della suite MSTest: tutte le nove risposte sono state ricevute, senza advisory corrispondenti. Nessuna corrispondenza in un database non equivale a dimostrare l'assenza di vulnerabilita, ne include automaticamente tutti i binari incorporati, le dipendenze transitive e il sistema operativo.
 
 ## Prove
 
