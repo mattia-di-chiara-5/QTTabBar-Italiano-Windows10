@@ -1,4 +1,4 @@
-﻿name: Italian stability build and regression
+name: Italian stability build and regression
 on:
   push:
     branches: [master, 'fix/**']
@@ -9,7 +9,12 @@ permissions:
   contents: read
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      attestations: write
+      id-token: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
@@ -17,13 +22,21 @@ jobs:
       - name: Restore and build managed shell extension
         shell: powershell
         run: |
-          nuget restore QTTabBar/packages.config -PackagesDirectory packages -NonInteractive
+          nuget restore QTTabBar/packages.config -PackagesDirectory packages -Source https://api.nuget.org/v3/index.json -NonInteractive
           if ($LASTEXITCODE) { throw 'NuGet restore failed' }
           msbuild QTTabBar/QTTabBar.csproj /p:Configuration=Release /p:Platform=AnyCPU "/p:SolutionDir=$env:GITHUB_WORKSPACE\" /nologo /v:minimal
           if ($LASTEXITCODE) { throw 'Build failed' }
+          msbuild Plugins/Memo/Memo.csproj /p:Configuration=Release /p:Platform=AnyCPU /p:BuildProjectReferences=false /nologo /v:minimal
+          if ($LASTEXITCODE) { throw 'Memo build failed' }
+      - name: Build and smoke-test both native architectures
+        shell: powershell
+        run: .\Italiano\scripts\Build-Native.ps1
       - name: Run stability regression
         shell: powershell
         run: .\Italiano\tests\Run-Regression.ps1
+      - name: Guard retired serialization and parse scripts
+        shell: powershell
+        run: .\Italiano\scripts\Test-SecuritySource.ps1
       - name: Parse every Italian PowerShell script
         shell: powershell
         run: |
@@ -45,8 +58,17 @@ jobs:
           Expand-Archive inputs/previous.zip inputs/previous
           $rollback = Get-ChildItem inputs/previous -Recurse -Filter QTTabBar-Italiano-v0.6.0.msi | Select-Object -First 1
           .\Italiano\scripts\Build-StabilityPackage.ps1 -UpstreamInstaller "$pwd\inputs\upstream.exe" -WixDirectory "$pwd\inputs\wix" -RollbackMsi $rollback.FullName
-          .\Italiano\tests\Test-OfflinePackage.ps1 -PackageDirectory "$pwd\Italiano\dist\QTTabBar-Italiano-v0.6.1"
+          .\Italiano\tests\Test-OfflinePackage.ps1 -PackageDirectory "$pwd\Italiano\dist\QTTabBar-Italiano-v0.7.0"
+      - uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6
+        if: github.event_name != 'pull_request'
+        with:
+          subject-path: |
+            QTTabBar/bin/Release/QTTabBar.dll
+            Plugins/Memo/bin/Release/Memo.dll
+            QTHookLib/bin/Release/QTHookLib32.dll
+            QTHookLib/bin/Release/QTHookLib64.dll
+            Italiano/dist/QTTabBar-Italiano-Windows10-v0.7.0.zip
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: QTTabBar-Italiano-v0.6.1
-          path: Italiano/dist/QTTabBar-Italiano-Windows10-v0.6.1.zip
+          name: QTTabBar-Italiano-v0.7.0
+          path: Italiano/dist/QTTabBar-Italiano-Windows10-v0.7.0.zip

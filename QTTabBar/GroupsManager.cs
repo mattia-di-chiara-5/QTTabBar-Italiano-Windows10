@@ -1,4 +1,4 @@
-﻿//    This file is part of QTTabBar, a shell extension for Microsoft
+//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -107,10 +107,7 @@ namespace QTTabBarLib {
                 }
             }
             InstanceManager.LocalBBarBroadcast(bbar => bbar.RefreshButtons());
-            InstanceManager.StaticBroadcast(() => {
-                LoadGroups();
-                InstanceManager.LocalBBarBroadcast(bbar => bbar.RefreshButtons());
-            });
+            InstanceManager.BroadcastCommand(new IpcCommand { Kind = IpcCommandKind.ReloadGroups });
             // todo: desktop
         }
 

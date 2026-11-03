@@ -1,4 +1,4 @@
-﻿//    This file is part of QTTabBar, a shell extension for Microsoft
+//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2022  Quizo, Paul Accisano, indiff
 //
@@ -1395,8 +1395,14 @@ namespace QTTabBarLib {
             }
         }
 
+        internal static void ApplySearchBoxWidth(int width) {
+            InstanceManager.LocalBBarBroadcast(bbar => {
+                if(bbar.searchBox != null) { bbar.searchBox.Width = width; bbar.toolStrip.RaiseOnResize(); }
+            });
+        }
         private void searchBox_ResizeComplete(object sender, EventArgs e) {
             int width = SearchBoxWidth = searchBox.Width;
+            if(width >= 16 && width <= 4096) InstanceManager.BroadcastCommand(new IpcCommand { Kind = IpcCommandKind.SearchWidth, Value = width });
             toolStrip.RaiseOnResize();
             InstanceManager.ButtonBarBroadcast(bbar => {
                 if(bbar.searchBox != null) {

@@ -1,4 +1,4 @@
-﻿//    This file is part of QTTabBar, a shell extension for Microsoft
+//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -2378,7 +2378,7 @@ namespace QTTabBarLib {
             bool fForceNewWindow = (ModifierKeys == Keys.Control);
             if(!fForceNewWindow && Config.Window.CaptureNewWindows && InstanceManager.GetTotalInstanceCount() > 0) {
                 QTUtility2.log("BeginInvokeMain OpenGroup");
-                InstanceManager.BeginInvokeMain(tabbar => tabbar.OpenGroup(@group, false));
+                InstanceManager.SendMainCommand(new IpcCommand { Kind = IpcCommandKind.OpenGroup, Text = @group });
             }
             else {
                 Group g = GroupsManager.GetGroup(group);
@@ -2410,16 +2410,7 @@ namespace QTTabBarLib {
         private static void OpenFolders(List<byte[]> lstIDLs, bool fForceTab = false) {
             if(lstIDLs.Count == 0) return;
             if((fForceTab || Config.Window.CaptureNewWindows) && InstanceManager.GetTotalInstanceCount() > 0) {
-                InstanceManager.BeginInvokeMain(tabbar => {
-                    bool first = true;
-                    foreach(byte[] idl in lstIDLs) {
-                        using(var idlw = new IDLWrapper(idl)) {
-                            tabbar.OpenNewTab(idlw, !first);    
-                        }
-                        first = false;
-                        // todo: bring to front
-                    }
-                });
+                InstanceManager.OpenPathsFromIdls(lstIDLs, true);
             }
             else {
                 StaticReg.CreateWindowIDLs.Assign(lstIDLs.Skip(1));

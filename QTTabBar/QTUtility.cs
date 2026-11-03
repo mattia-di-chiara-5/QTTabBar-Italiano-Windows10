@@ -1,4 +1,4 @@
-﻿//    This file is part of QTTabBar, a shell extension for Microsoft
+//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -33,7 +33,7 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
+
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -453,35 +453,6 @@ namespace QTTabBarLib {
         }
 
 
-        public static object ByteArrayToObject(byte[] arrBytes) {
-            if (arrBytes != null && arrBytes.Length > 0)
-            {
-                try
-                {
-                    using (MemoryStream memStream = new MemoryStream())
-                    {
-                        memStream.Write(arrBytes, 0, arrBytes.Length);
-                        memStream.Seek(0, SeekOrigin.Begin);
-                        BinaryFormatter binaryFormatter = new BinaryFormatter();
-                        binaryFormatter.Binder = new QTTabBarDeserializationBinder();
-                        object obj = binaryFormatter.Deserialize(memStream);
-                        /*QTUtility2.log("ByteArrayToObject:" + Encoding.Default.GetString(arrBytes));
-                        if (obj != null)
-                        {
-                            QTUtility2.log("obj:" + obj.GetType());
-                        }*/
-                        // object obj = ser.Deserialize(memStream);
-                        return obj;
-                    }
-                }
-                catch (Exception exception)
-                {
-                    QTUtility2.MakeErrorLog(exception, "ByteArrayToObject:" + Encoding.Default.GetString(arrBytes));
-                }
-            }
-            return null;
-        }
-
         private readonly static string[] strIconExt = new string[] { ".exe", ".lnk", ".ico", ".url", ".sln" };
         public static bool ExtHasIcon(string ext) {
             return strIconExt.Contains(ext);
@@ -825,29 +796,6 @@ namespace QTTabBarLib {
         public static IEnumerable<Type> GetSubclasses(Type type)
         {
             return type.Assembly.GetTypes().Where(t => t.IsSubclassOf(type));
-        }
-
-        public static byte[] ObjectToByteArray(SerializeDelegate obj) {
-
-            /*var settings = new Settings()
-            {
-                CustomTypeSerializers = new NS.ITypeSerializer[] { new TriDimArrayCustomSerializer() },
-            };*/
-            /*if (ser == null)
-            {
-                var types = new[] { typeof(SerializeDelegate) };
-                ser = new Serializer(types);
-                // ser = new Serializer(GetSubclasses(typeof(SerializeDelegate)));
-            }*/
-            
-
-            if(obj == null) return null;
-            using(MemoryStream ms = new MemoryStream()) {
-                // ser.Serialize(ms, obj);
-                new BinaryFormatter().Serialize(ms, obj);
-                return ms.ToArray();
-            }
-            // return BinaryPack.BinaryConverter.Serialize(obj);
         }
 
         private static Regex singleLinebreakAtStart = new Regex(@"^(\r\n)?");
@@ -1511,41 +1459,4 @@ namespace QTTabBarLib {
         }*/
     }
 
-    /// <summary>
-    /// Restricts BinaryFormatter deserialization to types from the QTTabBar assembly,
-    /// preventing arbitrary class instantiation from untrusted input.
-    /// </summary>
-    internal sealed class QTTabBarDeserializationBinder : SerializationBinder {
-        private static readonly Assembly QTTabBarAssembly = typeof(QTTabBarDeserializationBinder).Assembly;
-        private static readonly string QTTabBarAssemblyName = QTTabBarAssembly.GetName().Name;
-        // Allowed assembly names in addition to the QTTabBar assembly itself.
-        // mscorlib is required for core types; System.Core is required for delegate serialization holders.
-        private static readonly HashSet<string> AllowedAssemblyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-            "mscorlib",
-            "System.Core",
-        };
-
-        public override Type BindToType(string assemblyName, string typeName) {
-            AssemblyName an = new AssemblyName(assemblyName);
-            if(an.Name == QTTabBarAssemblyName) {
-                Type t = QTTabBarAssembly.GetType(typeName, throwOnError: false);
-                if(t == null) throw new SerializationException("Unknown type during deserialization: " + typeName);
-                return t;
-            }
-            if(!AllowedAssemblyNames.Contains(an.Name)) {
-                throw new SerializationException("Untrusted assembly during deserialization: " + assemblyName);
-            }
-            // Only load an assembly whose simple name is in the explicit allowlist
-            Assembly resolved;
-            try {
-                resolved = Assembly.Load(assemblyName);
-            }
-            catch(Exception ex) {
-                throw new SerializationException("Unable to load assembly during deserialization: " + assemblyName, ex);
-            }
-            Type type = resolved.GetType(typeName, throwOnError: false);
-            if(type == null) throw new SerializationException("Unknown type during deserialization: " + typeName);
-            return type;
-        }
-    }
 }

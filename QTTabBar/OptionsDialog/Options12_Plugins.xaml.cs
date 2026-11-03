@@ -1,4 +1,4 @@
-﻿//    This file is part of QTTabBar, a shell extension for Microsoft
+//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -116,18 +116,7 @@ namespace QTTabBarLib {
             string pid = entry.PluginID;
             // Unfortunately, we can't call Plugin.OnOption on plugins that are
             // loaded in a non-static context.
-            InstanceManager.InvokeMain(tabbar => {
-                Plugin p;
-                if(!tabbar.pluginServer.TryGetPlugin(pid, out p) || p.Instance == null) return;
-                try {
-                    p.Instance.OnOption();
-                }
-                catch(Exception ex) {
-                    QTUtility2.MakeErrorLog(ex, "btnPluginOptions_Click");
-                    PluginManager.HandlePluginException(ex, new WindowInteropHelper(Window.GetWindow(this)).Handle,
-                            entry.Name, "Open plugin option.");
-                }
-            });
+            InstanceManager.SendMainCommand(new IpcCommand { Kind = IpcCommandKind.PluginOptions, Text = pid });
         }
         /// <summary>
         ///  启用禁用插件

@@ -38,6 +38,14 @@ if ([Reflection.AssemblyName]::GetAssemblyName($candidate).Version.ToString() -n
     throw 'Identita assembly inattesa: compilare il ramo italiano senza modificare AssemblyVersion.'
 }
 Copy-Item -LiteralPath $candidate -Destination (Join-Path $payload 'QTTabBar.dll') -Force
+$memo = Join-Path $root 'Plugins\Memo\bin\Release\Memo.dll'
+if (!(Test-Path -LiteralPath $memo)) { throw 'Compilare il plugin Memo corretto prima di creare il pacchetto.' }
+Copy-Item -LiteralPath $memo -Destination (Join-Path $payload 'Memo.dll') -Force
+foreach ($bits in @('32','64')) {
+    $native = Join-Path $root ('QTHookLib\bin\Release\QTHookLib'+$bits+'.dll')
+    if (!(Test-Path -LiteralPath $native)) { throw 'Compilare le DLL native corrette prima di creare il pacchetto.' }
+    Copy-Item -LiteralPath $native -Destination (Join-Path $payload ('QTHookLib'+$bits+'.dll')) -Force
+}
 
 # Reuse upstream's COM registration and component GUIDs, but use a standard
 # transactional major upgrade and do not delete shared Explorer registry keys.
@@ -68,13 +76,13 @@ $wxs = @'
  <?define SkuName="QTTabBar"?>
  <?define ProductVersion="1.6.3.0"?>
  <?define StrongName="QTTabBar, Version=1.6.3.0, Culture=neutral, PublicKeyToken=973461f1cd23d8eb"?>
- <Product Id="{F70E079A-2E71-4B23-B8F2-854D700B7DAF}" Name="QTTabBar Italiano 0.6.1 (base 1.6.3)" Language="1040" Version="1.6.6" Manufacturer="QTTabBar - edizione italiana" UpgradeCode="{EC9BAFF7-58FB-40CB-9F67-1C438A7524A5}">
+ <Product Id="{3EB8D8B3-A96E-49B0-824A-707E6CF60273}" Name="QTTabBar Italiano 0.7.0 (base 1.6.3)" Language="1040" Version="1.6.7" Manufacturer="QTTabBar - edizione italiana" UpgradeCode="{EC9BAFF7-58FB-40CB-9F67-1C438A7524A5}">
   <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="x64" />
   <MediaTemplate EmbedCab="yes" />
   <!-- No Language filter: the previous MSI is English, this one is Italian. -->
   <Upgrade Id="{EC9BAFF7-58FB-40CB-9F67-1C438A7524A5}">
-   <UpgradeVersion Minimum="0.0.0" IncludeMinimum="yes" Maximum="1.6.6" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDQTTABBAR" />
-   <UpgradeVersion Minimum="1.6.6" IncludeMinimum="no" OnlyDetect="yes" Property="NEWQTTABBAR" />
+   <UpgradeVersion Minimum="0.0.0" IncludeMinimum="yes" Maximum="1.6.7" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDQTTABBAR" />
+   <UpgradeVersion Minimum="1.6.7" IncludeMinimum="no" OnlyDetect="yes" Property="NEWQTTABBAR" />
   </Upgrade>
   <Condition Message="E gia installata una versione piu recente di QTTabBar.">Installed OR NOT NEWQTTABBAR</Condition>
   <InstallExecuteSequence><RemoveExistingProducts After="InstallInitialize">OLDQTTABBAR</RemoveExistingProducts></InstallExecuteSequence>
@@ -94,9 +102,9 @@ $sourceFile = Join-Path $BuildDirectory 'Italiano.wxs'
 $object = Join-Path $BuildDirectory 'Italiano.wixobj'
 & (Join-Path $WixDirectory 'candle.exe') -nologo "-dPayloadRoot=$payload" -out $object $sourceFile
 if ($LASTEXITCODE -ne 0) { throw 'Compilazione WiX non riuscita.' }
-$package = Join-Path $OutputDirectory 'QTTabBar-Italiano-v0.6.1'
+$package = Join-Path $OutputDirectory 'QTTabBar-Italiano-v0.7.0'
 New-Item -ItemType Directory -Path $package -Force | Out-Null
-$msi = Join-Path $package 'QTTabBar-Italiano-v0.6.1.msi'
+$msi = Join-Path $package 'QTTabBar-Italiano-v0.7.0.msi'
 & (Join-Path $WixDirectory 'light.exe') -nologo -sice:ICE03 -out $msi $object
 if ($LASTEXITCODE -ne 0) { throw 'Creazione MSI non riuscita.' }
 foreach ($name in @('Installa-Stabilita.ps1','Ripristina-VersionePrecedente.ps1')) {
@@ -113,11 +121,12 @@ Copy-Item -LiteralPath (Join-Path $root 'README_IT.md') -Destination $package -F
 $auditDirectory = Join-Path $package 'Italiano\docs'
 New-Item -ItemType Directory -Path $auditDirectory -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $root 'Italiano\docs\AUDIT_PRESTAZIONI_0.6.0.md') -Destination $auditDirectory -Force
+Copy-Item -LiteralPath (Join-Path $root 'Italiano\docs\SICUREZZA_0.7.0.md') -Destination $auditDirectory -Force
 $msiHash = (Get-FileHash $msi -Algorithm SHA256).Hash
 $scriptPath = Join-Path $package 'Installa-Stabilita.ps1'
 $scriptText = [IO.File]::ReadAllText($scriptPath).Replace('__MSI_SHA256__',$msiHash).Replace('__DLL_SHA256__',(Get-FileHash $candidate).Hash)
 [IO.File]::WriteAllText($scriptPath,$scriptText,[Text.UTF8Encoding]::new($true))
 [IO.File]::WriteAllText((Join-Path $package 'MSI_SHA256.txt'),$msiHash,[Text.UTF8Encoding]::new($false))
-$zip = Join-Path $OutputDirectory 'QTTabBar-Italiano-Windows10-v0.6.1.zip'
+$zip = Join-Path $OutputDirectory 'QTTabBar-Italiano-Windows10-v0.7.0.zip'
 Compress-Archive -Path (Join-Path $package '*') -DestinationPath $zip -Force
 Get-FileHash -LiteralPath $zip,$msi -Algorithm SHA256

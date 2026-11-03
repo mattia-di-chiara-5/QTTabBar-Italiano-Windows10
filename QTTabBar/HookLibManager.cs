@@ -1,4 +1,4 @@
-﻿//    This file is part of QTTabBar, a shell extension for Microsoft
+//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -293,13 +293,7 @@ namespace QTTabBarLib {
                 }
                 IDL = wrapper.IDL;
             }
-            InstanceManager.BeginInvokeMain(tabbar => {
-                QTUtility2.log("BeginInvokeMain OpenNewTabOrWindow");
-                using (IDLWrapper wrapper = new IDLWrapper(IDL)) {
-                    tabbar.OpenNewTabOrWindow(wrapper, true);
-                }
-            });
-            return true;
+            return InstanceManager.OpenPathsFromIdls(new[] { IDL }, false, true);
         }
         /** do not init shell brownser hook. */
         public static void InitShellBrowserHook_old(IShellBrowser shellBrowser) { }

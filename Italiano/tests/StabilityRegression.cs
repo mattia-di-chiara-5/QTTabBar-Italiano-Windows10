@@ -77,12 +77,12 @@ internal static class StabilityRegression {
             Require(detected != null, "Encoding detection failed");
             Console.WriteLine("PASS: embedded encoding detector and its dependencies load without sidecar DLLs");
             var codePages = Assembly.Load("System.Text.Encoding.CodePages, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
-            Require(codePages.GetName().Version.ToString() == "10.0.0.12" && string.IsNullOrEmpty(codePages.Location), "Updated CodePages did not load from embedded resources");
+            Require(codePages.GetName().Version.ToString() == "10.0.0.14" && string.IsNullOrEmpty(codePages.Location), "Updated CodePages did not load from embedded resources");
             var providerType = codePages.GetType("System.Text.CodePagesEncodingProvider", true);
             var provider = providerType.GetProperty("Instance").GetValue(null, null);
             var legacyEncoding = (System.Text.Encoding)providerType.GetMethod("GetEncoding", new Type[] { typeof(int) }).Invoke(provider, new object[] { 1252 });
             Require(legacyEncoding.GetString(new byte[] { 99, 105, 116, 116, 224 }) == "città", "Legacy Italian encoding failed");
-            Console.WriteLine("PASS: embedded Microsoft CodePages 10.0.12 decodes Windows-1252; old dependency identity resolves correctly");
+            Console.WriteLine("PASS: embedded Microsoft CodePages 10.0.14 decodes Windows-1252; old dependency identity resolves correctly");
 
             var controlType = assembly.GetType("QTTabBarLib.QTabControl", true);
             string errorLog = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "QTTabBar\\QTTabBarException.log");

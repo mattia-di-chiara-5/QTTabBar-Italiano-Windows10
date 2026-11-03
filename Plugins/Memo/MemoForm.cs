@@ -21,7 +21,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+
 using System.Windows.Forms;
 
 namespace QuizoPlugins {
@@ -39,13 +39,14 @@ namespace QuizoPlugins {
         private ToolStripMenuItem defaultToolStripMenuItem;
         private ToolStripMenuItem deleteToolStripMenuItem;
         private bool fFirstLoadComplete;
+        private bool persistenceLoadFailed;
         private bool fNowShown;
         private List<Font> fontList = new List<Font>();
         private ListView listView1;
         private static int NUM_LVTEXTWIDTH = 100;
         private Memo owner;
         private ToolStripMenuItem pasteToolStripMenuItem;
-        private static string PATH_DAT = (Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Quizo\QTTabBar\1.0.9\memo.dat");
+        private static string PATH_DAT = (Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Quizo\QTTabBar\1.0.9\memo-v2.xml");
         private RichTextBox richTextBox1;
         private Dictionary<string, string> rtfDic;
         private ToolStripMenuItem searchToolStripMenuItem;
@@ -54,50 +55,6 @@ namespace QuizoPlugins {
         private ToolStripTrackBar toolStripTrackBar;
         private Dictionary<string, string> txtDic;
         
-        [Serializable]
-        public sealed class MemoStore {
-            private Rectangle _bounds;
-            private Dictionary<string, string> _dic;
-            private double _opacity;
-            private Dictionary<string, string> _txtDic;
-
-            public Rectangle Bounds {
-                get {
-                    return _bounds;
-                }
-                set {
-                    _bounds = value;
-                }
-            }
-
-            public Dictionary<string, string> Dictionary {
-                get {
-                    return _dic;
-                }
-                set {
-                    _dic = value;
-                }
-            }
-
-            public double Opacity {
-                get {
-                    return _opacity;
-                }
-                set {
-                    _opacity = value;
-                }
-            }
-
-            public Dictionary<string, string> TxtDictionary {
-                get {
-                    return _txtDic;
-                }
-                set {
-                    _txtDic = value;
-                }
-            }
-        }
-    
         public MemoForm(Memo memo) {
             owner = memo;
             InitializeComponent();
@@ -367,34 +324,24 @@ namespace QuizoPlugins {
         }
 
         private void LoadDB() {
-            if(File.Exists(PATH_DAT)) {
-                try {
-                    using(FileStream stream = new FileStream(PATH_DAT, FileMode.Open)) {
-                        BinaryFormatter formatter = new BinaryFormatter();
-                        MemoStore store = (MemoStore)formatter.Deserialize(stream);
-
-                        rtfDic = store.Dictionary;
-                        Bounds = store.Bounds;
-                        if(store.Opacity > 0.2) {
-                            Opacity = store.Opacity;
-                        }
-                        txtDic = store.TxtDictionary;
-                        stream.Close();
-                    }
-                }
-                catch(Exception) {
-                }
+            rtfDic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            txtDic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            Bounds = new Rectangle(Point.Empty, Size);
+            if(!File.Exists(PATH_DAT)) {
+                if(File.Exists(Path.Combine(Path.GetDirectoryName(PATH_DAT), "memo.dat"))) MessageBox.Show("Il vecchio archivio memo.dat e conservato ma non viene deserializzato. Le nuove note saranno salvate nel formato XML sicuro. Consultare la documentazione per il recupero dei dati precedenti.", "Memo");
+                return;
             }
-            else {
-                Bounds = new Rectangle(Point.Empty, Size);
-            }
-            if(rtfDic == null) {
-                StringComparer currentCultureIgnoreCase = StringComparer.CurrentCultureIgnoreCase;
-                rtfDic = new Dictionary<string, string>(currentCultureIgnoreCase);
-                txtDic = new Dictionary<string, string>(currentCultureIgnoreCase);
+            try {
+                MemoDocument document = MemoPersistence.Load(PATH_DAT);
+                Bounds = new Rectangle(document.X, document.Y, document.Width, document.Height);
+                Opacity = Math.Max(0.2, document.Opacity);
+                foreach(MemoEntry entry in document.Entries) { rtfDic.Add(entry.Path, entry.Rtf); txtDic.Add(entry.Path, entry.Text); }
+            } catch(Exception ex) {
+                // Never replace an unreadable database with an empty one.
+                persistenceLoadFailed = true;
+                Trace.TraceError("Memo database could not be read: {0}", ex.GetType().Name);
             }
         }
-
         private void MemoForm_FormClosing(object sender, FormClosingEventArgs e) {
             if(e.CloseReason != CloseReason.WindowsShutDown) {
                 e.Cancel = true;
@@ -441,34 +388,29 @@ namespace QuizoPlugins {
         }
 
         private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e) {
-            Process.Start(e.LinkText);
+            Uri link;
+            if(!Uri.TryCreate(e.LinkText, UriKind.Absolute, out link) ||
+                (link.Scheme != Uri.UriSchemeHttps && link.Scheme != Uri.UriSchemeHttp && link.Scheme != Uri.UriSchemeMailto)) return;
+            try { Process.Start(new ProcessStartInfo(link.AbsoluteUri) { UseShellExecute = true }); }
+            catch(Exception ex) { Trace.TraceError("Memo link failed: {0}", ex.GetType().Name); }
         }
 
         private void SaveDB() {
-            MemoStore graph = new MemoStore();
-            graph.Bounds = Bounds;
-            graph.Dictionary = rtfDic;
-            graph.TxtDictionary = txtDic;
-            graph.Opacity = Opacity;
-            if(!Directory.Exists(Path.GetDirectoryName(PATH_DAT))) {
-                Directory.CreateDirectory(Path.GetDirectoryName(PATH_DAT));
-            }
-            BinaryFormatter formatter = new BinaryFormatter();
-            using(FileStream stream = new FileStream(PATH_DAT, FileMode.Create)) {
-                formatter.Serialize(stream, graph);
-               
-                if (stream != null)
-                {
-                    stream.Close();
-                    stream.Dispose();
+            if(persistenceLoadFailed) return;
+            try {
+                var document = new MemoDocument { X = Bounds.X, Y = Bounds.Y, Width = Math.Max(100, Bounds.Width), Height = Math.Max(100, Bounds.Height), Opacity = Opacity };
+                foreach(var pair in rtfDic) {
+                    string text; txtDic.TryGetValue(pair.Key, out text);
+                    document.Entries.Add(new MemoEntry { Path = pair.Key, Rtf = pair.Value, Text = text ?? string.Empty });
                 }
-            }
+                MemoPersistence.Save(PATH_DAT, document);
+            } catch(Exception ex) { Trace.TraceError("Memo save failed: {0}", ex.GetType().Name); }
         }
-
         public void ShowMemoForm(string path) {
             try {
                 if(!fFirstLoadComplete) {
                     LoadDB();
+                    if(persistenceLoadFailed) { MessageBox.Show("Archivio Memo non leggibile. Il file originale e stato conservato; correggerlo o ripristinare la copia .bak prima di aggiungere note.", "Memo"); return; }
                     toolStripTrackBar.Value = (int)(Opacity * 255.0);
                     toolStripTrackBar.BackColor = ProfessionalColors.MenuItemPressedGradientBegin;
                     fFirstLoadComplete = true;
