@@ -10,7 +10,7 @@ if (!$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
     if ($Elevated) { throw 'Elevazione non riuscita.' }
     $arguments = '-NoProfile -ExecutionPolicy Bypass -File "{0}" -Elevated -UserSid "{1}"' -f $PSCommandPath,$UserSid
     if ($StateDirectory) { $arguments += ' -StateDirectory "{0}"' -f $StateDirectory }
-    $p = Start-Process (Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe') -Verb RunAs -ArgumentList $arguments -Wait -PassThru
+    $p = Start-Process (Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe') -Verb RunAs -WindowStyle Hidden -ArgumentList $arguments -Wait -PassThru
     exit $p.ExitCode
 }
 $mutex = New-Object Threading.Mutex($false,'Global\QTTabBarItaliano_Maintenance')
@@ -18,17 +18,21 @@ $locked = $false
 try {
 try { $locked = $mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $locked = $true }
 if (!$locked) { throw 'Un altra manutenzione di QTTabBar e gia in corso.' }
-$root = Join-Path $env:ProgramData 'QTTabBar-Italiano\v0.7.0'
+$root = Join-Path $env:ProgramData 'QTTabBar-Italiano\v0.7.1'
 if (!$StateDirectory) { $StateDirectory = (Get-Content (Join-Path $root 'latest-state.txt') -Raw).Trim() }
 $StateDirectory = (Resolve-Path -LiteralPath $StateDirectory).Path
 if (!(($StateDirectory + '\').StartsWith($root.TrimEnd('\') + '\',[StringComparison]::OrdinalIgnoreCase))) { throw 'Percorso di ripristino non consentito.' }
 if ((Get-Item $StateDirectory).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Directory di ripristino non valida.' }
 $state = Get-Content (Join-Path $StateDirectory 'state.json') -Raw | ConvertFrom-Json
-if ($state.UserSid -ne $UserSid -or $state.Version -ne '0.7.0') { throw 'Stato di ripristino non compatibile.' }
+if ($state.UserSid -ne $UserSid -or $state.Version -ne '0.7.1') { throw 'Stato di ripristino non compatibile.' }
 if ($state.PreviousInstalled) {
-    $oldMsi = Join-Path $StateDirectory 'QTTabBar-Italiano-v0.6.0.msi'
+    . (Join-Path $PSScriptRoot 'MigrationTargets.ps1')
+    $previousRelease = Get-PreviousQtRelease $state.PreviousProductCode
+    $expectedName = 'QTTabBar-Italiano-v' + $previousRelease.Version + '.msi'
+    if ($state.PreviousMsiName -ne $expectedName -or $state.PreviousDllHash -ne $previousRelease.DllHash) { throw 'Stato versione precedente non valido.' }
+    $oldMsi = Join-Path $StateDirectory $expectedName
     $oldDll = Join-Path $StateDirectory 'QTTabBar.before.dll'
-    if ((Get-FileHash $oldMsi).Hash -ne '7773086005FF2675E4994C895C7A828EC20966D83A0268C9AD61EE11DC837767' -or (Get-FileHash $oldDll).Hash -ne $state.PreviousDllHash) { throw 'Backup binari non valido.' }
+    if ((Get-FileHash $oldMsi).Hash -ne $previousRelease.MsiHash -or (Get-FileHash $oldDll).Hash -ne $previousRelease.DllHash) { throw 'Backup binari non valido.' }
 }
 if ($state.ConfigExisted) {
     $config = Join-Path $StateDirectory 'config.reg'
@@ -40,7 +44,7 @@ if ($state.ConfigExisted) {
 $session = (Get-Process -Id $PID).SessionId
 Get-Process explorer -ErrorAction SilentlyContinue | Where-Object SessionId -eq $session | Stop-Process -Force -ErrorAction Stop
 try {
-    $p = Start-Process msiexec.exe -ArgumentList '/x {3EB8D8B3-A96E-49B0-824A-707E6CF60273} /qn /norestart REBOOT=ReallySuppress' -Wait -PassThru -WindowStyle Hidden
+    $p = Start-Process msiexec.exe -ArgumentList '/x {B70D05FD-DC26-4C3C-9E21-C926E5BBD5BE} /qn /norestart REBOOT=ReallySuppress' -Wait -PassThru -WindowStyle Hidden
     if ($p.ExitCode -notin @(0,1605,3010)) { throw "Disinstallazione nuova versione non riuscita: $($p.ExitCode)" }
     if ($state.PreviousInstalled) {
         $p = Start-Process msiexec.exe -ArgumentList ('/i "{0}" /qn /norestart REBOOT=ReallySuppress' -f $oldMsi) -Wait -PassThru -WindowStyle Hidden
@@ -65,7 +69,8 @@ try {
 } finally {
     Get-Process explorer -ErrorAction SilentlyContinue | Where-Object SessionId -eq $session | Stop-Process -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 2
-    if (!(Get-Process explorer -ErrorAction SilentlyContinue | Where-Object SessionId -eq $session)) { Start-Process (Join-Path $env:WINDIR 'explorer.exe') }
+    . (Join-Path $PSScriptRoot 'ExplorerSession.ps1')
+    Start-ExplorerAsInteractiveUser $UserSid
 }
 } finally {
     if ($locked) { $mutex.ReleaseMutex() }
