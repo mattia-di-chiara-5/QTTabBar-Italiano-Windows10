@@ -1102,10 +1102,7 @@ namespace QTTabBarLib {
             InstanceManager.LocalTabBroadcast(tabbar => tabbar.RefreshOptions());
             if(fBroadcast) {
                 // SyncTaskBarMenu(); todo
-                InstanceManager.StaticBroadcast(() => {
-                    ReadConfig();
-                    UpdateConfig(false);
-                });
+                InstanceManager.BroadcastCommand(new IpcCommand { Kind = IpcCommandKind.ReloadConfig });
             }
         }
 

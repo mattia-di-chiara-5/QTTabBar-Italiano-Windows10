@@ -168,7 +168,7 @@ namespace QTTabBarLib {
                     }
                 }
             }
-            InstanceManager.StaticBroadcast(LoadApps);
+            InstanceManager.BroadcastCommand(new IpcCommand { Kind = IpcCommandKind.ReloadApps });
         }
 
         public static void Execute(UserApp app, ShellBrowserEx shellBrowser) {

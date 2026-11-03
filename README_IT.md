@@ -1,4 +1,13 @@
-﻿# QTTabBar Italiano — Windows 10 Edition 0.6.1
+# QTTabBar Italiano 0.7.0 — prerelease di sicurezza
+
+Aggiornamento dell'estensione per Windows 10: protocollo IPC tipizzato e autenticato, eliminazione delle invocazioni BinaryFormatter, stato delle schede e Memo in formati di soli dati, dipendenze aggiornate e nuovi controlli automatici.
+
+Leggere [revisione, compatibilita e limiti](Italiano/docs/SICUREZZA_0.7.0.md) prima dell'installazione. Il protocollo e incompatibile con le vecchie istanze: occorre riavviare tutti i processi Explorer interessati. Le note memo.dat sono conservate ma non importate automaticamente. L'unione tra processi e disabilitata. Il rollback offline contiene la vecchia 0.6.0, con i relativi rischi.
+
+Scaricare esclusivamente il pacchetto della release it-v0.7.0 e verificarne gli hash. Questa e una prerelease, senza certificazione di sicurezza o firma Authenticode. Esplora Italia rimane la distinta app separata gia pubblicata.
+
+## Archivio della precedente edizione
+# QTTabBar Italiano — Windows 10 Edition 0.6.1
 
 Edizione italiana basata sui sorgenti upstream **QTTabBar 1.6.3** (tag `v1.6.3`, commit `8e5434b`). La 0.6.1 corregge il lavoro ripetuto sul percorso mouse/disegno di Explorer. Resta una release preliminare: i test non garantiscono la risoluzione di ogni rallentamento.
 

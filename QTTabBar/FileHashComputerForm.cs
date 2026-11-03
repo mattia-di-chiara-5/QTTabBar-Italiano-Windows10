@@ -262,13 +262,7 @@ namespace QTTabBarLib {
         private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e) {
             if(e.RowIndex >= 0 && e.ColumnIndex > 0) {
                 string path = dgvHash.Rows[e.RowIndex].Cells[1].ToolTipText;
-                InstanceManager.InvokeMain(tabBar => {
-                    using(IDLWrapper idlw = new IDLWrapper(Path.GetDirectoryName(path))) {
-                        if(idlw.Available) {
-                            tabBar.OpenNewTabOrWindow(idlw);
-                        }
-                    }
-                });
+                InstanceManager.SendMainCommand(new IpcCommand { Kind = IpcCommandKind.OpenPaths, Paths = new[] { Path.GetDirectoryName(path) } });
             }
         }
 
@@ -380,7 +374,7 @@ namespace QTTabBarLib {
             dgvHash.ReadOnly = true;
             dgvHash.RowHeadersVisible = false;
             dgvHash.RowTemplate.Height = 0x15;
-            // 355 * 162  0x133 0x73  ¿í¶ÈÉèÖÃÎªÆÁÄ» 1/3 ¸ß¶ÈÎªÆÁÄ» 1/6
+            // 355 * 162  0x133 0x73  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Ä» 1/3 ï¿½ß¶ï¿½Îªï¿½ï¿½Ä» 1/6
             int width = Screen.PrimaryScreen.WorkingArea.Size.Width / 2;
             int height = Screen.PrimaryScreen.WorkingArea.Size.Height / 5;
             // ClientSize = new Size(0x1bf, 0xab);

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -117,14 +117,14 @@
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Text.Encoding.CodePages, Version=10.0.0.12, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encoding.CodePages.10.0.12\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
+      <HintPath>..\packages\System.Text.Encoding.CodePages.10.0.14\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UtfUnknown, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90217ce7a23260d4, processorArchitecture=MSIL">
-      <HintPath>..\packages\UTF.Unknown.2.7.0\lib\netstandard2.0\UtfUnknown.dll</HintPath>
+      <HintPath>..\packages\UTF.Unknown.2.8.0\lib\netstandard2.0\UtfUnknown.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
@@ -400,6 +400,10 @@
     <Compile Include="RebarController.cs" />
     <Compile Include="MiscClasses.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="ConfigCloner.cs" />
+    <Compile Include="IpcCommand.cs" />
+    <Compile Include="IpcAuthorization.cs" />
+    <Compile Include="IpcTransport.cs" />
     <Compile Include="Spinner.xaml.cs">
       <DependentUpon>Spinner.xaml</DependentUpon>
     </Compile>
@@ -1017,10 +1021,10 @@
     <EmbeddedResource Include="..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll">
       <LogicalName>QTTabBarLib.Resources.System.Runtime.CompilerServices.Unsafe.dll</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\System.Text.Encoding.CodePages.10.0.12\lib\net462\System.Text.Encoding.CodePages.dll">
+    <EmbeddedResource Include="..\packages\System.Text.Encoding.CodePages.10.0.14\lib\net462\System.Text.Encoding.CodePages.dll">
       <LogicalName>QTTabBarLib.Resources.System.Text.Encoding.CodePages.dll</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\UTF.Unknown.2.7.0\lib\netstandard2.0\UtfUnknown.dll">
+    <EmbeddedResource Include="..\packages\UTF.Unknown.2.8.0\lib\netstandard2.0\UtfUnknown.dll">
       <LogicalName>QTTabBarLib.Resources.UtfUnknown.dll</LogicalName>
     </EmbeddedResource>
   </ItemGroup>

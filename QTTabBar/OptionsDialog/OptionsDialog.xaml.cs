@@ -1,4 +1,4 @@
-﻿//    This file is part of QTTabBar, a shell extension for Microsoft
+//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -61,9 +61,10 @@ namespace QTTabBarLib {
         #region ---------- Static Methods ----------
 
         public static void Open() {
-            InstanceManager.ExecuteOnServerProcess(OpenInternal, false);
+            InstanceManager.SendServerCommand(new IpcCommand { Kind = IpcCommandKind.OpenOptions });
         }
 
+        internal static void OpenLocal() { OpenInternal(); }
         private static void OpenInternal() {
             lock(typeof(OptionsDialog)) {
                 // Prevent reentrant calls that might happen during the Wait call below.

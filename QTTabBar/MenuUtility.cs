@@ -272,7 +272,7 @@ namespace QTTabBarLib {
                     open(threadBar);
                 }
                 else {
-                    InstanceManager.InvokeMain(open);
+                    InstanceManager.SendMainCommand(new IpcCommand { Kind = IpcCommandKind.OpenPaths, Paths = new[] { path } });
                 }
             }
             else {
@@ -362,7 +362,7 @@ namespace QTTabBarLib {
                 }
             }
             else {
-                // Ìí¼Ó·Ö×éµÄµÄÂ·¾¶ÁÐ±í
+                // ï¿½ï¿½ï¿½Ó·ï¿½ï¿½ï¿½Äµï¿½Â·ï¿½ï¿½ï¿½Ð±ï¿½
                 foreach(string path in g.Paths) {
                     string displayName;
                     if(path.StartsWith(@"\\")) {

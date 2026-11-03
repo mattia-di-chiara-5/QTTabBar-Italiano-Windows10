@@ -1,4 +1,4 @@
-//    This file is part of QTTabBar, a shell extension for Microsoft
+ï»¿//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -26,45 +26,46 @@ using QTTabBarLib.Interop;
 
 namespace QTTabBarLib {
     internal static class InstanceManager {
-        // Ñ¡ÖĞÏî×Öµä£¬keyÎªÂ·¾¶£¬valueÎªÑ¡ÖĞµÄÏîÁĞ±í
+        // é€‰ä¸­é¡¹å­—å…¸ï¼Œkeyä¸ºè·¯å¾„ï¼Œvalueä¸ºé€‰ä¸­çš„é¡¹åˆ—è¡¨
         private static Dictionary<string, List<string>> selectDict = new Dictionary<string, List<string>>();
-        // Ïß³ÌÓëQTTabBarÊµÀıµÄÓ³Éä£¬Ã¿¸öÏß³Ì¶ÔÓ¦Ò»¸öQTTabBarClassÊµÀı
+        // çº¿ç¨‹ä¸QTTabBarå®ä¾‹çš„æ˜ å°„ï¼Œæ¯ä¸ªçº¿ç¨‹å¯¹åº”ä¸€ä¸ªQTTabBarClasså®ä¾‹
         private static Dictionary<Thread, QTTabBarClass> dictTabInstances = new Dictionary<Thread, QTTabBarClass>();
-        // Ïß³ÌÓëQTButtonBarÊµÀıµÄÓ³Éä£¬Ã¿¸öÏß³Ì¶ÔÓ¦Ò»¸öQTButtonBarÊµÀı
+        // çº¿ç¨‹ä¸QTButtonBarå®ä¾‹çš„æ˜ å°„ï¼Œæ¯ä¸ªçº¿ç¨‹å¯¹åº”ä¸€ä¸ªQTButtonBarå®ä¾‹
         private static Dictionary<Thread, QTButtonBar> dictBBarInstances = new Dictionary<Thread, QTButtonBar>();
-        // ¾ä±úÓëQTTabBarÊµÀıµÄÓ³Éä£¬Ö§³Ö¾ä±ú¿ìËÙ²éÕÒQTTabBarClass
+        // å¥æŸ„ä¸QTTabBarå®ä¾‹çš„æ˜ å°„ï¼Œæ”¯æŒå¥æŸ„å¿«é€ŸæŸ¥æ‰¾QTTabBarClass
         private static StackDictionary<IntPtr, QTTabBarClass> sdTabHandles = new StackDictionary<IntPtr, QTTabBarClass>();
-        // °´Å¥À¸µÄ¶ÁĞ´Ëø£¬±£Ö¤¶àÏß³Ì°²È«
+        // æŒ‰é’®æ çš„è¯»å†™é”ï¼Œä¿è¯å¤šçº¿ç¨‹å®‰å…¨
         private static ReaderWriterLock rwLockBtnBar = new ReaderWriterLock();
-        // ±êÇ©À¸µÄ¶ÁĞ´Ëø£¬±£Ö¤¶àÏß³Ì°²È«
+        // æ ‡ç­¾æ çš„è¯»å†™é”ï¼Œä¿è¯å¤šçº¿ç¨‹å®‰å…¨
         private static ReaderWriterLock rwLockTabBar = new ReaderWriterLock();
-        // Ñ¡ÖĞÏî×ÖµäµÄ¶ÁĞ´Ëø£¬±£Ö¤¶àÏß³Ì°²È«
+        // é€‰ä¸­é¡¹å­—å…¸çš„è¯»å†™é”ï¼Œä¿è¯å¤šçº¿ç¨‹å®‰å…¨
         private static ReaderWriterLock rwLockSelectDict = new ReaderWriterLock();
 
-        // WCFË«¹¤Í¨ĞÅ¿Í»§¶Ë£¬ÓÃÓÚ½ø³Ì¼äÍ¨ĞÅ
+        // WCFåŒå·¥é€šä¿¡å®¢æˆ·ç«¯ï¼Œç”¨äºè¿›ç¨‹é—´é€šä¿¡
         private static DuplexClient commClient;
-        // ÊÇ·ñÎªÖ÷½ø³Ì±êÖ¾
+        // æ˜¯å¦ä¸ºä¸»è¿›ç¨‹æ ‡å¿—
         private static bool isServer;
+        private static int initializing;
 
-        // ½öÖ÷½ø³ÌÊ¹ÓÃµÄ±äÁ¿
-        // WCF·şÎñ¶Ë¶ÔÏó
+        // ä»…ä¸»è¿›ç¨‹ä½¿ç”¨çš„å˜é‡
+        // WCFæœåŠ¡ç«¯å¯¹è±¡
         // Server-only stuff
         private static ServiceHost serviceHost;
-        // ËùÓĞÒÑÁ¬½ÓµÄWCF¿Í»§¶Ë»Øµ÷½Ó¿ÚÁĞ±í
+        // æ‰€æœ‰å·²è¿æ¥çš„WCFå®¢æˆ·ç«¯å›è°ƒæ¥å£åˆ—è¡¨
         private static List<ICommClient> callbacks = new List<ICommClient>();
-        // ¾ä±úÓëWCF¿Í»§¶Ë»Øµ÷½Ó¿ÚµÄÓ³Éä
+        // å¥æŸ„ä¸WCFå®¢æˆ·ç«¯å›è°ƒæ¥å£çš„æ˜ å°„
         private static StackDictionary<IntPtr, ICommClient> sdInstances = new StackDictionary<IntPtr, ICommClient>();
 
-        // ÍĞÅÌÍ¼±ê¹ÜÀí¶ÔÏó
+        // æ‰˜ç›˜å›¾æ ‡ç®¡ç†å¯¹è±¡
         private static TrayIcon trayIcon;
         // add by indiff
-        // ¶ÁĞ´Ëø£¬¸¨Öú¶àÏß³ÌÍ¬²½£¨indiffÌí¼Ó£©
+        // è¯»å†™é”ï¼Œè¾…åŠ©å¤šçº¿ç¨‹åŒæ­¥ï¼ˆindiffæ·»åŠ ï¼‰
         private static ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim();
 
 
         #region Comm Classes and Interfaces
         /// <summary>
-        /// WCFË«¹¤Í¨ĞÅ¿Í»§¶ËÊµÏÖ
+        /// WCFåŒå·¥é€šä¿¡å®¢æˆ·ç«¯å®ç°
         /// </summary>
         private class DuplexClient : DuplexClientBase<ICommService> {
             public DuplexClient(InstanceContext callbackInstance, Binding binding, EndpointAddress remoteAddress)
@@ -74,7 +75,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// WCF·şÎñÆõÔ¼½Ó¿Ú£¬¶¨ÒåÁËËùÓĞ½ø³Ì¼ä¿ÉÒÔµ÷ÓÃµÄ·½·¨
+        /// WCFæœåŠ¡å¥‘çº¦æ¥å£ï¼Œå®šä¹‰äº†æ‰€æœ‰è¿›ç¨‹é—´å¯ä»¥è°ƒç”¨çš„æ–¹æ³•
         /// </summary>
         [ServiceContract(SessionMode = SessionMode.Required, CallbackContract = typeof(ICommClient))]
         private interface ICommService {
@@ -108,30 +109,30 @@ namespace QTTabBarLib {
             [OperationContract]
             void ExecuteOnServerProcess(byte[] encodedAction, bool doAsync);
 
-            [OperationContract]
-            object GetFromServerProcess(byte[] encodedAction);
+
 
             [OperationContract]
             void Broadcast(byte[] encodedAction);
         }
 
         /// <summary>
-        /// WCF·şÎñ¶ËÊµÏÖ£¬´¦ÀíËùÓĞ½ø³Ì¼äµÄÇëÇó
+        /// WCFæœåŠ¡ç«¯å®ç°ï¼Œå¤„ç†æ‰€æœ‰è¿›ç¨‹é—´çš„è¯·æ±‚
         /// </summary>
         [ServiceBehavior(
                 ConcurrencyMode = ConcurrencyMode.Reentrant,
-                InstanceContextMode = InstanceContextMode.PerSession)]
+                UseSynchronizationContext = false,
+                InstanceContextMode = InstanceContextMode.Single)]
         private class CommService : ICommService {
 
             /// <summary>
-            /// ÅĞ¶Ï¿Í»§¶ËÁ¬½ÓÊÇ·ñÒÑ¶Ï¿ª
+            /// åˆ¤æ–­å®¢æˆ·ç«¯è¿æ¥æ˜¯å¦å·²æ–­å¼€
             /// </summary>
             private static bool IsDead(ICommClient client) {
                 ICommunicationObject ico = client as ICommunicationObject;
-                return ico != null && ico.State != CommunicationState.Opened;                
+                return ico != null && ico.State != CommunicationState.Opened;
             }
             /// <summary>
-            /// ¼ì²é²¢ÒÆ³ıÒÑ¶Ï¿ªµÄ¿Í»§¶ËÁ¬½Ó
+            /// æ£€æŸ¥å¹¶ç§»é™¤å·²æ–­å¼€çš„å®¢æˆ·ç«¯è¿æ¥
             /// </summary>
             private static void CheckConnections() {
                 callbacks.RemoveAll(IsDead);
@@ -139,14 +140,14 @@ namespace QTTabBarLib {
             }
 
             /// <summary>
-            /// »ñÈ¡µ±Ç°²Ù×÷µÄ»Øµ÷Í¨µÀ
+            /// è·å–å½“å‰æ“ä½œçš„å›è°ƒé€šé“
             /// </summary>
             private static ICommClient GetCallback() {
                 return OperationContext.Current.GetCallbackChannel<ICommClient>();
             }
 
             /// <summary>
-            /// »ñÈ¡ËùÓĞÊµÀı×ÜÊı
+            /// è·å–æ‰€æœ‰å®ä¾‹æ€»æ•°
             /// </summary>
             public int GetTotalInstanceCount() {
                 CheckConnections();
@@ -154,7 +155,7 @@ namespace QTTabBarLib {
             }
 
             /// <summary>
-            /// Ìí¼ÓÍĞÅÌÍ¼±ê
+            /// æ·»åŠ æ‰˜ç›˜å›¾æ ‡
             /// </summary>
             public void AddToTrayIcon(IntPtr tabBarHandle, IntPtr explorerHandle, string currentPath, string[] tabNames, string[] tabPaths) {
                 if(trayIcon == null) trayIcon = new TrayIcon();
@@ -162,7 +163,7 @@ namespace QTTabBarLib {
             }
 
             /// <summary>
-            /// ÒÆ³ıÍĞÅÌÍ¼±ê
+            /// ç§»é™¤æ‰˜ç›˜å›¾æ ‡
             /// </summary>
             public void RemoveFromTrayIcon(IntPtr tabBarHandle) {
                 if(trayIcon == null) trayIcon = new TrayIcon();
@@ -170,69 +171,41 @@ namespace QTTabBarLib {
             }
 
             /// <summary>
-            /// Ñ¡ÖĞÆäËü±êÇ©À¸µÄÖ¸¶¨±êÇ©
+            /// é€‰ä¸­å…¶å®ƒæ ‡ç­¾æ çš„æŒ‡å®šæ ‡ç­¾
             /// </summary>
             public void SelectTabOnOtherTabBar(IntPtr tabBarHandle, int index) {
                 ICommClient comm;
                 if(sdInstances.TryGetValue(tabBarHandle, out comm)) {
                     QTUtility2.log("SelectTabOnOtherTabBar comm.Execute");
-                    comm.Execute(DelToByte(new Action(() => {
-                        using(new Keychain(rwLockTabBar, false)) {
-                            QTTabBarClass tabbar;
-                            if(sdTabHandles.TryGetValue(tabBarHandle, out tabbar)) {
-                                tabbar.SelectedTabIndex = index;
-                            }
-                        }
-                    })));
-                }
+                    comm.Execute(IpcCommand.Encode(new IpcCommand { Kind = IpcCommandKind.SelectTab, Handle = tabBarHandle.ToInt64(), Value = index }));                }
             }
 
 
             /// <summary>
-            /// ÔÚÖ÷½ø³ÌÉÏÖ´ĞĞÖ¸¶¨²Ù×÷
+            /// åœ¨ä¸»è¿›ç¨‹ä¸Šæ‰§è¡ŒæŒ‡å®šæ“ä½œ
             /// </summary>
             public bool ExecuteOnMainProcess(byte[] encodedAction, bool doAsync) {
+                IpcCommand request = IpcCommand.Decode(encodedAction);
+                if(request.Kind != IpcCommandKind.OpenPaths && request.Kind != IpcCommandKind.OpenGroup && request.Kind != IpcCommandKind.PluginOptions) throw new FaultException("Command not allowed for main-process dispatch.");
                 CheckConnections();
                 if(IsMainProcess()) {
                     return true;
                 }
                 else if(sdInstances.Count == 0) {
-                    return false;
+                    return true;
                 }
                 ICommClient callback = sdInstances.Peek();
-                if(doAsync) {
-                    QTUtility2.log("ExecuteOnMainProcess: dispatching async Task.Run");
-                    // if (!IsDead( callback ))
-                    // {
-                        Task.Run(() => {
-                            QTUtility2.log("ExecuteOnMainProcess: Task.Run executing");
-                            try {
-                                if (!IsDead(callback))
-                                {
-                                    callback.Execute(encodedAction);
-                                    QTUtility2.log("ExecuteOnMainProcess: Task.Run completed OK");
-                                }
-                                else {
-                                    QTUtility2.log("ExecuteOnMainProcess: Task.Run skipped (dead callback)");
-                                }
-                            }
-                            catch(Exception e) {
-                                QTUtility2.MakeErrorLog(e, "ExecuteOnMainProcess Task.Run");
-                            }
-                        });
-                    // }
-                }
-                else {
-                    QTUtility2.log("ExecuteOnMainProcess callback.Execute");
-                    callback.Execute(encodedAction);
-                }
+                // The callback only validates data and queues UI work; acknowledge that hand-off
+                // before the source window is allowed to close.
+                callback.Execute(encodedAction);
                 return false;
             }
 
             /// <summary>
-            /// ÔÚ·şÎñ½ø³ÌÉÏÖ´ĞĞÖ¸¶¨²Ù×÷
+            /// åœ¨æœåŠ¡è¿›ç¨‹ä¸Šæ‰§è¡ŒæŒ‡å®šæ“ä½œ
             /// </summary>
             public void ExecuteOnServerProcess(byte[] encodedAction, bool doAsync) {
+                if(IpcCommand.Decode(encodedAction).Kind != IpcCommandKind.OpenOptions) throw new FaultException("Command not allowed on server.");
                 try
                 {
                     Delegate action = ByteToDel(encodedAction);
@@ -260,25 +233,14 @@ namespace QTTabBarLib {
             }
 
             /// <summary>
-            /// ÔÚ·şÎñ½ø³ÌÉÏ»ñÈ¡·µ»ØÖµ
+            /// åœ¨æœåŠ¡è¿›ç¨‹ä¸Šè·å–è¿”å›å€¼
             /// </summary>
-            public object GetFromServerProcess(byte[] encodedAction) {
-                try {
-                    Delegate action = ByteToDel(encodedAction);
-                    if ( action != null)
-                    { return action.DynamicInvoke(); }
-                    return null;
-                }
-                catch(Exception ex) {
-                    QTUtility2.MakeErrorLog(ex);
-                    return null;
-                }
-            }
-
             /// <summary>
-            /// ¹ã²¥ÏûÏ¢µ½ËùÓĞ¿Í»§¶Ë
+            /// å¹¿æ’­æ¶ˆæ¯åˆ°æ‰€æœ‰å®¢æˆ·ç«¯
             /// </summary>
             public void Broadcast(byte[] encodedAction) {
+                IpcCommand command = IpcCommand.Decode(encodedAction);
+                if(command.Kind != IpcCommandKind.ReloadApps && command.Kind != IpcCommandKind.ReloadConfig && command.Kind != IpcCommandKind.ReloadGroups && command.Kind != IpcCommandKind.RefreshButtons && command.Kind != IpcCommandKind.SearchWidth) throw new FaultException("Command is not broadcastable.");
                 // TimeSpan start = new TimeSpan(DateTime.Now.Ticks);
                 ICommClient sender = GetCallback();
                 CheckConnections();
@@ -311,7 +273,7 @@ namespace QTTabBarLib {
             }
 
             /// <summary>
-            /// É¾³ıÊµÀı
+            /// åˆ é™¤å®ä¾‹
             /// </summary>
             public void DeleteInstance(IntPtr hwnd) {
                 CheckConnections();
@@ -319,7 +281,7 @@ namespace QTTabBarLib {
             }
 
             /// <summary>
-            /// ÅĞ¶ÏÊÇ·ñÎªÖ÷½ø³Ì
+            /// åˆ¤æ–­æ˜¯å¦ä¸ºä¸»è¿›ç¨‹
             /// </summary>
             public bool IsMainProcess() {
                 CheckConnections();
@@ -327,7 +289,7 @@ namespace QTTabBarLib {
             }
 
             /// <summary>
-            /// ¶©ÔÄ»Øµ÷
+            /// è®¢é˜…å›è°ƒ
             /// </summary>
             public void Subscribe() {
                 ICommClient callback = GetCallback();
@@ -337,7 +299,7 @@ namespace QTTabBarLib {
             }
 
             /// <summary>
-            /// ÍÆËÍÊµÀıµ½·şÎñ¶Ë
+            /// æ¨é€å®ä¾‹åˆ°æœåŠ¡ç«¯
             /// </summary>
             public void PushInstance(IntPtr hwnd) {
                 CheckConnections();
@@ -347,7 +309,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// WCF¿Í»§¶Ë»Øµ÷½Ó¿Ú
+        /// WCFå®¢æˆ·ç«¯å›è°ƒæ¥å£
         /// </summary>
         private interface ICommClient {
             [OperationContract]
@@ -355,19 +317,19 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// WCF¿Í»§¶Ë»Øµ÷ÊµÏÖ
+        /// WCFå®¢æˆ·ç«¯å›è°ƒå®ç°
         /// </summary>
         [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant, UseSynchronizationContext = false)]
         private class CommClient : ICommClient {
             public void Execute(byte[] encodedAction) {
-                
+
                 Delegate thedel = null;
                 bool isBeginInvokeMain = false;
                 try
                 {
                     QTUtility2.log("InstanceManager CommClient Execute : "
-                        // +  encodedAction + 
-                        // " Length: " + encodedAction.Length + 
+                        // +  encodedAction +
+                        // " Length: " + encodedAction.Length +
                         // " str " + Encoding.Default.GetString(encodedAction)
                                    );
 
@@ -392,28 +354,9 @@ namespace QTTabBarLib {
                         errStr += "method name:" + thedel.Method.Name + " daynamic invoke error";
                     }
                     QTUtility2.MakeErrorLog(ex, errStr);
-                    // re initialize 
+                    // re initialize
                     Initialize();
                 }
-                // remove close
-                finally
-                {
-                    if (!Config.Window.CaptureWeChatSelection) {
-
-                        if (commClient != null && commClient.State != CommunicationState.Closed)
-                        {
-                            try
-                            {
-                                commClient.Close();
-                            }
-                            catch (Exception closeEx)
-                            {
-                                QTUtility2.MakeErrorLog(closeEx, "commClient.Close() failed, try Abort()");
-                                commClient.Abort();
-                            }
-                        }
-                    }
-                } // end of finally
             }
         }
         #endregion
@@ -421,42 +364,105 @@ namespace QTTabBarLib {
         #region Utility Methods
 
         /// <summary>
-        /// Î¯ÍĞ¶ÔÏóĞòÁĞ»¯Îª×Ö½ÚÊı×é
+        /// å§”æ‰˜å¯¹è±¡åºåˆ—åŒ–ä¸ºå­—èŠ‚æ•°ç»„
         /// </summary>
-        private static byte[] DelToByte(Delegate del) {
-            return QTUtility.ObjectToByteArray(new SerializeDelegate(del));
+        private static Delegate ByteToDel(byte[] bytes) {
+            IpcCommand command = IpcCommand.Decode(bytes);
+            return new Action(() => DispatchCommand(command));
         }
 
-        /// <summary>
-        /// ×Ö½ÚÊı×é·´ĞòÁĞ»¯ÎªÎ¯ÍĞ¶ÔÏó
-        /// </summary>
-        private static Delegate ByteToDel(byte[] buf) {
-            if (buf == null || buf.Length == 0 ) { return null; }
-            object v = QTUtility.ByteArrayToObject(buf);
-            if (v == null) { return null; }
-            return ((SerializeDelegate)v).Delegate;
-            // return BinaryPack.BinaryConverter.Deserialize<SerializeDelegate>(buf);
+        private static void DispatchCommand(IpcCommand command) {
+            command.Validate();
+            switch(command.Kind) {
+                case IpcCommandKind.ReloadApps: AppsManager.LoadApps(); break;
+                case IpcCommandKind.ReloadConfig: ConfigManager.ReadConfig(); ConfigManager.UpdateConfig(false); break;
+                case IpcCommandKind.ReloadGroups: GroupsManager.LoadGroups(); LocalBBarBroadcast(b => b.RefreshButtons()); break;
+                case IpcCommandKind.RefreshButtons: LocalBBarBroadcast(b => b.RefreshButtons()); break;
+                case IpcCommandKind.SearchWidth: QTButtonBar.ApplySearchBoxWidth(command.Value); break;
+                case IpcCommandKind.OpenOptions: OptionsDialog.OpenLocal(); break;
+                case IpcCommandKind.OpenPaths:
+                case IpcCommandKind.OpenGroup:
+                case IpcCommandKind.PluginOptions:
+                    LocalInvokeMain(tabbar => {
+                        if(command.Kind == IpcCommandKind.OpenGroup) tabbar.OpenGroup(command.Text, false);
+                        else if(command.Kind == IpcCommandKind.PluginOptions) {
+                            Plugin plugin;
+                            if(tabbar.pluginServer.TryGetPlugin(command.Text, out plugin) && plugin.Instance != null) {
+                                try { plugin.Instance.OnOption(); } catch(Exception ex) { QTUtility2.MakeErrorLog(ex, "Plugin options"); }
+                            }
+                        } else {
+                            bool first = true;
+                            foreach(string path in command.Paths) using(var folder = new IDLWrapper(path)) {
+                                if(!folder.Available || !folder.IsFolder) continue;
+                                if(command.ForceTab) tabbar.OpenNewTab(folder, !first);
+                                else tabbar.OpenNewTabOrWindow(folder, command.Pulse);
+                                first = false;
+                            }
+                            tabbar.CompleteIpcNavigation(command.Selection, command.Restore, command.WaitForSelection);
+                        }
+                    }, true);
+                    break;
+                case IpcCommandKind.SelectTab:
+                    QTTabBarClass tab;
+                    using(new Keychain(rwLockTabBar, false)) sdTabHandles.TryGetValue(new IntPtr(command.Handle), out tab);
+                    if(tab != null && !tab.IsDisposed) tab.BeginInvoke(new Action(() => { if(command.Value < tab.TabCount) tab.SelectedTabIndex = command.Value; }));
+                    break;
+            }
         }
 
+        internal static void BroadcastCommand(IpcCommand command) {
+            byte[] bytes = IpcCommand.Encode(command);
+            ICommService service = GetChannel();
+            if(service != null) try { service.Broadcast(bytes); } catch(CommunicationException ex) { QTUtility2.MakeErrorLog(ex, "IPC broadcast"); } catch(TimeoutException ex) { QTUtility2.MakeErrorLog(ex, "IPC broadcast timeout"); }
+        }
+
+        internal static bool OpenPathsFromIdls(IEnumerable<byte[]> pidls, bool forceTab, bool pulse = false) {
+            var paths = new List<string>();
+            foreach(byte[] pidl in pidls) using(var folder = new IDLWrapper(pidl)) {
+                if(folder.Available && !string.IsNullOrEmpty(folder.Path)) paths.Add(folder.Path);
+            }
+            return paths.Count > 0 && SendMainCommand(new IpcCommand { Kind = IpcCommandKind.OpenPaths, Paths = paths.ToArray(), ForceTab = forceTab, Pulse = pulse });
+        }
+        internal static bool SendMainCommand(IpcCommand command) {
+            byte[] bytes = IpcCommand.Encode(command);
+            ICommService service = GetChannel();
+            try { if(service != null && !service.ExecuteOnMainProcess(bytes, true)) return true; }
+            catch(CommunicationException ex) { QTUtility2.MakeErrorLog(ex, "IPC command not delivered"); return false; }
+            catch(TimeoutException ex) { QTUtility2.MakeErrorLog(ex, "IPC command timed out"); return false; }
+            using(new Keychain(rwLockTabBar, false)) { if(sdTabHandles.Count == 0) return false; }
+            DispatchCommand(command);
+            return true;
+        }
+        internal static void SendServerCommand(IpcCommand command) {
+            byte[] bytes = IpcCommand.Encode(command);
+            ICommService service = GetChannel();
+            if(isServer || service == null) { DispatchCommand(command); return; }
+            try { service.ExecuteOnServerProcess(bytes, true); }
+            catch(CommunicationException ex) { QTUtility2.MakeErrorLog(ex, "IPC server command"); DispatchCommand(command); }
+            catch(TimeoutException ex) { QTUtility2.MakeErrorLog(ex, "IPC server timeout"); }
+        }
         #endregion
 
 
         /// <summary>
-        /// ³õÊ¼»¯½ø³Ì¼äÍ¨ĞÅºÍÊµÀıÍ¬²½
+        /// åˆå§‹åŒ–è¿›ç¨‹é—´é€šä¿¡å’Œå®ä¾‹åŒæ­¥
         /// </summary>
         public static void Initialize(bool skipServer = false) {
+            // Do not expose any command endpoint from an elevated shell.
+            if(new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent()).IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator)) return;
+            if(Interlocked.CompareExchange(ref initializing, 1, 0) != 0) return;
             uint desktopPID;
             PInvoke.GetWindowThreadProcessId(WindowUtils.GetShellTrayWnd(), out desktopPID);
             isServer = desktopPID == PInvoke.GetCurrentProcessId();
 
-            const string PipeName = "QTTabBarPipe";
+            string PipeName = "QTTabBarSafeV2-" + System.Security.Principal.WindowsIdentity.GetCurrent().User.Value + "-";
             string address = "net.pipe://localhost/" + PipeName + desktopPID;
-            ManualResetEventSlim ready = new ManualResetEventSlim(false);
+
 
             // WFC channels should never be opened on any thread that has a message loop!
             // Otherwise reentrant calls will deadlock, for some reason.
             // So, create a new thread and open the channels there.
-            // WCFÍ¨µÀ²»ÄÜÔÚÓĞÏûÏ¢Ñ­»·µÄÏß³ÌÉÏ´ò¿ª£¬·ñÔò»áËÀËø£¬ËùÒÔĞÂ½¨Ïß³Ì
+            // WCFé€šé“ä¸èƒ½åœ¨æœ‰æ¶ˆæ¯å¾ªç¯çš„çº¿ç¨‹ä¸Šæ‰“å¼€ï¼Œå¦åˆ™ä¼šæ­»é”ï¼Œæ‰€ä»¥æ–°å»ºçº¿ç¨‹
             Thread thread = new Thread(() => {
                 try
                 {
@@ -466,24 +472,15 @@ namespace QTTabBarLib {
                             new Uri[] { new Uri(address) });
                     serviceHost.AddServiceEndpoint(
                             typeof(ICommService),
-                            new NetNamedPipeBinding(NetNamedPipeSecurityMode.None) {
-                                ReceiveTimeout = TimeSpan.MaxValue,
-                                ReaderQuotas = {MaxArrayLength = int.MaxValue},
-                                MaxBufferSize = int.MaxValue,
-                                MaxReceivedMessageSize = int.MaxValue,
-                            },
+                            IpcTransport.CreateBinding(),
                             new Uri(address));
-                    serviceHost.Open();
+                    serviceHost.Authorization.ServiceAuthorizationManager = new IpcAuthorization();
+                    serviceHost.Open(TimeSpan.FromSeconds(2));
                 }
-                
+
 
                 commClient = new DuplexClient(new InstanceContext(new CommClient()),
-                        new NetNamedPipeBinding(NetNamedPipeSecurityMode.None) {
-                            ReceiveTimeout = TimeSpan.MaxValue,
-                            ReaderQuotas = { MaxArrayLength = int.MaxValue },
-                            MaxBufferSize = int.MaxValue,
-                            MaxReceivedMessageSize = int.MaxValue,
-                        },
+                        IpcTransport.CreateBinding(),
                         new EndpointAddress(address));
                 try {
                     commClient.Open();
@@ -515,20 +512,21 @@ namespace QTTabBarLib {
                     commClient = null;
                 }
                 // Yes, we can just let the thread die here.
-                // Ïß³Ì½áÊø
+                // çº¿ç¨‹ç»“æŸ
                     }
+                    catch(Exception ex) { QTUtility2.MakeErrorLog(ex, "IPC initialization failed"); }
                     finally
                     {
-                        ready.Set();
+                        Interlocked.Exchange(ref initializing, 0);
                     }
                 });
                 thread.IsBackground = true;
                 thread.Start();
-                ready.Wait(TimeSpan.FromSeconds(1));
+                // Initialization is asynchronous; never wait on the Explorer UI thread.
             }
 
         /// <summary>
-        /// »ñÈ¡WCFÍ¨ĞÅÍ¨µÀ
+        /// è·å–WCFé€šä¿¡é€šé“
         /// </summary>
         private static ICommService GetChannel() {
             if(commClient == null || commClient.State != CommunicationState.Opened) {
@@ -540,15 +538,10 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ¾²Ì¬¹ã²¥£¬½«²Ù×÷¹ã²¥µ½ËùÓĞÊµÀı
+        /// é™æ€å¹¿æ’­ï¼Œå°†æ“ä½œå¹¿æ’­åˆ°æ‰€æœ‰å®ä¾‹
         /// </summary>
-        public static void StaticBroadcast(Action action) {
-            ICommService service = GetChannel();
-            if(service != null) service.Broadcast(DelToByte(action));
-        }
-
         /// <summary>
-        /// ±êÇ©À¸¹ã²¥£¬½«²Ù×÷¹ã²¥µ½ËùÓĞ±êÇ©À¸ÊµÀı
+        /// æ ‡ç­¾æ å¹¿æ’­ï¼Œå°†æ“ä½œå¹¿æ’­åˆ°æ‰€æœ‰æ ‡ç­¾æ å®ä¾‹
         /// </summary>
         public static void TabBarBroadcast(Action<QTTabBarClass> action, bool includeCurrent) {
             LocalTabBroadcast(action, Thread.CurrentThread);
@@ -556,24 +549,24 @@ namespace QTTabBarLib {
                 var tabbar = GetThreadTabBar();
                 if(tabbar != null) action(tabbar);
             }
-            StaticBroadcast(() => LocalTabBroadcast(action));
+            // Cross-process window merging requires a future data-only tab snapshot protocol.
         }
 
         /// <summary>
-        /// ±¾µØ±êÇ©À¸¹ã²¥
+        /// æœ¬åœ°æ ‡ç­¾æ å¹¿æ’­
         /// </summary>
         public static void LocalTabBroadcast(Action<QTTabBarClass> action, Thread skip = null) {
             using(new Keychain(rwLockTabBar, false)) {
                 foreach(var pair in dictTabInstances) {
                     if(pair.Key != skip) {
-                        pair.Value.BeginInvoke(action, pair.Value);   
+                        pair.Value.BeginInvoke(action, pair.Value);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// °´Å¥À¸¹ã²¥£¬½«²Ù×÷¹ã²¥µ½ËùÓĞ°´Å¥À¸ÊµÀı
+        /// æŒ‰é’®æ å¹¿æ’­ï¼Œå°†æ“ä½œå¹¿æ’­åˆ°æ‰€æœ‰æŒ‰é’®æ å®ä¾‹
         /// </summary>
         public static void ButtonBarBroadcast(Action<QTButtonBar> action, bool includeCurrent) {
             LocalBBarBroadcast(action, Thread.CurrentThread);
@@ -581,11 +574,11 @@ namespace QTTabBarLib {
                 var bbar = GetThreadButtonBar();
                 if(bbar != null) action(bbar);
             }
-            StaticBroadcast(() => LocalBBarBroadcast(action));
+            BroadcastCommand(new IpcCommand { Kind = IpcCommandKind.RefreshButtons });
         }
 
         /// <summary>
-        /// ±¾µØ°´Å¥À¸¹ã²¥
+        /// æœ¬åœ°æŒ‰é’®æ å¹¿æ’­
         /// </summary>
         public static void LocalBBarBroadcast(Action<QTButtonBar> action, Thread skip = null) {
             using(new Keychain(rwLockBtnBar, false)) {
@@ -598,17 +591,11 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ÔÚÖ÷½ø³ÌÉÏÖ´ĞĞ²Ù×÷
+        /// åœ¨ä¸»è¿›ç¨‹ä¸Šæ‰§è¡Œæ“ä½œ
         /// </summary>
-        private static void ExecuteOnMainProcess(Action action, bool doAsync) {
-            ICommService service = GetChannel();
-            if(service == null || service.ExecuteOnMainProcess(DelToByte(action), doAsync)) {
-                action();
-            }
-        }
-
+        private static void ExecuteOnMainProcess(Action action, bool doAsync) { action(); }
         /// <summary>
-        /// È·±£²Ù×÷ÔÚÖ÷½ø³ÌÖ´ĞĞ
+        /// ç¡®ä¿æ“ä½œåœ¨ä¸»è¿›ç¨‹æ‰§è¡Œ
         /// </summary>
         public static bool EnsureMainProcess(Action action) {
             ICommService service = GetChannel();
@@ -619,7 +606,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ÔÚÖ÷½ø³ÌÍ¬²½µ÷ÓÃ±êÇ©À¸²Ù×÷
+        /// åœ¨ä¸»è¿›ç¨‹åŒæ­¥è°ƒç”¨æ ‡ç­¾æ æ“ä½œ
         /// </summary>
         public static void InvokeMain(Action<QTTabBarClass> action) {
             // QTUtility2.log("InstanceManager InvokeMain");
@@ -627,7 +614,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ÔÚÖ÷½ø³ÌÒì²½µ÷ÓÃ±êÇ©À¸²Ù×÷
+        /// åœ¨ä¸»è¿›ç¨‹å¼‚æ­¥è°ƒç”¨æ ‡ç­¾æ æ“ä½œ
         /// </summary>
         public static void BeginInvokeMain(Action<QTTabBarClass> action) {
             // QTUtility2.log("InstanceManager BeginInvokeMain");
@@ -635,11 +622,11 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ±¾µØµ÷ÓÃÖ÷±êÇ©À¸ÊµÀı
+        /// æœ¬åœ°è°ƒç”¨ä¸»æ ‡ç­¾æ å®ä¾‹
         /// </summary>
         public static void LocalInvokeMain(Action<QTTabBarClass> action, bool doAsync = false) {
             QTTabBarClass instance;
-            // »ñÈ¡Ö÷½ø³ÌµÄ QTTabBarµÄÊµÀı
+            // è·å–ä¸»è¿›ç¨‹çš„ QTTabBarçš„å®ä¾‹
             using(new Keychain(rwLockTabBar, false)) {
                 instance = sdTabHandles.Count == 0 ? null : sdTabHandles.Peek();
             }
@@ -649,17 +636,17 @@ namespace QTTabBarLib {
                 return;
             }
             if(doAsync) {
-                QTUtility2.log("Òì²½µ÷ÓÃ:");
-                instance.BeginInvoke(action, instance);    
+                QTUtility2.log("å¼‚æ­¥è°ƒç”¨:");
+                instance.BeginInvoke(action, instance);
             }
             else {
-                QTUtility2.log("Í¬²½µ÷ÓÃ:" );
-                instance.Invoke(action, instance);   
+                QTUtility2.log("åŒæ­¥è°ƒç”¨:" );
+                instance.Invoke(action, instance);
             }
         }
 
         /// <summary>
-        /// ×¢²á°´Å¥À¸ÊµÀı
+        /// æ³¨å†ŒæŒ‰é’®æ å®ä¾‹
         /// </summary>
         public static void RegisterButtonBar(QTButtonBar bbar) {
             using(new Keychain(rwLockBtnBar, true)) {
@@ -669,7 +656,7 @@ namespace QTTabBarLib {
 
 
         /// <summary>
-        /// ÍÆËÍ±êÇ©À¸ÊµÀıµ½·şÎñ¶Ë
+        /// æ¨é€æ ‡ç­¾æ å®ä¾‹åˆ°æœåŠ¡ç«¯
         /// </summary>
         public static void PushTabBarInstance(QTTabBarClass tabbar) {
             IntPtr handle = tabbar.Handle;
@@ -682,7 +669,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ×¢Ïú°´Å¥À¸ÊµÀı
+        /// æ³¨é”€æŒ‰é’®æ å®ä¾‹
         /// </summary>
         public static void UnregisterButtonBar() {
             using(new Keychain(rwLockBtnBar, true)) {
@@ -691,7 +678,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ×¢Ïú±êÇ©À¸ÊµÀı
+        /// æ³¨é”€æ ‡ç­¾æ å®ä¾‹
         /// </summary>
         public static bool UnregisterTabBar() {
             using(new Keychain(rwLockTabBar, true)) {
@@ -708,24 +695,26 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// »ñÈ¡ËùÓĞÊµÀı×ÜÊı
+        /// è·å–æ‰€æœ‰å®ä¾‹æ€»æ•°
         /// </summary>
         public static int GetTotalInstanceCount() {
             ICommService service = GetChannel();
-            return service == null ? dictTabInstances.Count : service.GetTotalInstanceCount();
+            try { return service == null ? 0 : service.GetTotalInstanceCount(); }
+            catch(CommunicationException ex) { QTUtility2.MakeErrorLog(ex, "IPC instance count"); return 0; }
+            catch(TimeoutException ex) { QTUtility2.MakeErrorLog(ex, "IPC instance count timeout"); return 0; }
         }
 
-        // ¶àÏß³ÌÔ­×Ó²Ù×÷ 
+        // å¤šçº¿ç¨‹åŸå­æ“ä½œ
         private static bool UseInterLocked = false;
-        // selectDict²Ù×÷µÄ»¥³â±êÖ¾£¬ÓÃÓÚ·ÀÖ¹¶àÏß³ÌÍ¬Ê±²Ù×÷selectDict
+        // selectDictæ“ä½œçš„äº’æ–¥æ ‡å¿—ï¼Œç”¨äºé˜²æ­¢å¤šçº¿ç¨‹åŒæ—¶æ“ä½œselectDict
         private static int inTimer = 0;
-        // selectDict²Ù×÷µÄËø¶ÔÏó
+        // selectDictæ“ä½œçš„é”å¯¹è±¡
         private static object LockSelectDict = new object();
 
         /// <summary>
-        /// ÉèÖÃÖ¸¶¨keyµÄÑ¡ÖĞÏîÁĞ±í
+        /// è®¾ç½®æŒ‡å®škeyçš„é€‰ä¸­é¡¹åˆ—è¡¨
         /// </summary>
-        public static void PutSelect(string key , List<string> list ) 
+        public static void PutSelect(string key , List<string> list )
         {
             /*using(new Keychain(rwLockSelectDict, true))
             {
@@ -735,7 +724,7 @@ namespace QTTabBarLib {
             {
                 if (Interlocked.Exchange(ref inTimer, 1) != 0)
                 {
-                    QTUtility2.log("¾Ü¾ø½øÈë");
+                    QTUtility2.log("æ‹’ç»è¿›å…¥");
                     return;
                 }
             }
@@ -748,7 +737,7 @@ namespace QTTabBarLib {
             }
             catch (Exception e)
             {
-                QTUtility2.log("Òì³£");
+                QTUtility2.log("å¼‚å¸¸");
             }
             finally
             {
@@ -760,9 +749,9 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ÒÆ³ıÖ¸¶¨keyµÄÑ¡ÖĞÏî
+        /// ç§»é™¤æŒ‡å®škeyçš„é€‰ä¸­é¡¹
         /// </summary>
-        public static void RemoveSelect(string key  ) 
+        public static void RemoveSelect(string key  )
         {
             /*using(new Keychain(rwLockSelectDict, true))
             {
@@ -772,7 +761,7 @@ namespace QTTabBarLib {
             {
                 if (Interlocked.Exchange(ref inTimer, 1) != 0)
                 {
-                    QTUtility2.log("¾Ü¾ø½øÈë");
+                    QTUtility2.log("æ‹’ç»è¿›å…¥");
                     return;
                 }
             }
@@ -785,7 +774,7 @@ namespace QTTabBarLib {
             }
             catch (Exception e)
             {
-                QTUtility2.log("Òì³£");
+                QTUtility2.log("å¼‚å¸¸");
             }
             finally
             {
@@ -797,7 +786,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// »ñÈ¡Ö¸¶¨keyµÄÑ¡ÖĞÏîÁĞ±í
+        /// è·å–æŒ‡å®škeyçš„é€‰ä¸­é¡¹åˆ—è¡¨
         /// </summary>
         public static List<string> GetSelect(string key)
         {
@@ -810,7 +799,7 @@ namespace QTTabBarLib {
             {
                 if (Interlocked.Exchange(ref inTimer, 1) != 0)
                 {
-                    QTUtility2.log("¾Ü¾ø½øÈë");
+                    QTUtility2.log("æ‹’ç»è¿›å…¥");
                     return null;
                 }
             }
@@ -824,7 +813,7 @@ namespace QTTabBarLib {
             }
             catch (Exception e)
             {
-                QTUtility2.log("Òì³£");
+                QTUtility2.log("å¼‚å¸¸");
                 return null;
             }
             finally
@@ -837,7 +826,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°Ïß³ÌµÄ±êÇ©À¸ÊµÀı
+        /// è·å–å½“å‰çº¿ç¨‹çš„æ ‡ç­¾æ å®ä¾‹
         /// </summary>
         public static QTTabBarClass GetThreadTabBar() {
             using(new Keychain(rwLockTabBar, false)) {
@@ -847,7 +836,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°Ïß³ÌµÄ°´Å¥À¸ÊµÀı
+        /// è·å–å½“å‰çº¿ç¨‹çš„æŒ‰é’®æ å®ä¾‹
         /// </summary>
         public static QTButtonBar GetThreadButtonBar() {
             using(new Keychain(rwLockBtnBar, false)) {
@@ -857,7 +846,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°Ïß³ÌµÄ°´Å¥À¸¾ä±ú
+        /// è·å–å½“å‰çº¿ç¨‹çš„æŒ‰é’®æ å¥æŸ„
         /// </summary>
         public static bool TryGetButtonBarHandle(IntPtr explorerHandle, out IntPtr ptr) {
             // todo
@@ -871,45 +860,15 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ÔÚ·şÎñ½ø³ÌÉÏÖ´ĞĞ²Ù×÷
+        /// åœ¨æœåŠ¡è¿›ç¨‹ä¸Šæ‰§è¡Œæ“ä½œ
         /// </summary>
-        public static void ExecuteOnServerProcess(Action action, bool doAsync) {
-            ICommService service;
-            if(isServer || (service = GetChannel()) == null) {
-                try {
-                    action();
-                }
-                catch(Exception ex) {
-                    QTUtility2.MakeErrorLog(ex);
-                }
-            }
-            else {
-                service.ExecuteOnServerProcess(DelToByte(action), doAsync);                
-            }
-        }
-
+        public static void ExecuteOnServerProcess(Action action, bool doAsync) { action(); }
         /// <summary>
-        /// ÔÚ·şÎñ½ø³ÌÉÏ»ñÈ¡·µ»ØÖµ
+        /// åœ¨æœåŠ¡è¿›ç¨‹ä¸Šè·å–è¿”å›å€¼
         /// </summary>
-        public static T GetFromServerProcess<T>(Func<T> func) {
-            ICommService service;
-            if(isServer || (service = GetChannel()) == null) {
-                try {
-                    return func();
-                }
-                catch(Exception ex) {
-                    QTUtility2.MakeErrorLog(ex);
-                    return default(T);
-                }
-            }
-            else {
-                object obj = service.GetFromServerProcess(DelToByte(func));
-                return obj == null ? default(T) : (T)obj;
-            }
-        }
-
+        public static T GetFromServerProcess<T>(Func<T> func) { return func(); }
         /// <summary>
-        /// Ìí¼ÓÍĞÅÌÍ¼±ê
+        /// æ·»åŠ æ‰˜ç›˜å›¾æ ‡
         /// </summary>
         public static void AddToTrayIcon(IntPtr tabBarHandle, IntPtr explorerHandle, string currentPath, string[] tabNames, string[] tabPaths) {
             ICommService service = GetChannel();
@@ -917,7 +876,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// ÒÆ³ıÍĞÅÌÍ¼±ê
+        /// ç§»é™¤æ‰˜ç›˜å›¾æ ‡
         /// </summary>
         public static void RemoveFromTrayIcon(IntPtr tabBarHandle) {
             ICommService service = GetChannel();
@@ -928,7 +887,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// Ñ¡ÖĞÆäËü±êÇ©À¸µÄÖ¸¶¨±êÇ©
+        /// é€‰ä¸­å…¶å®ƒæ ‡ç­¾æ çš„æŒ‡å®šæ ‡ç­¾
         /// </summary>
         public static void SelectTabOnOtherTabBar(IntPtr tabBarHandle, int index) {
             ICommService service = GetChannel();
@@ -936,7 +895,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        /// Í¬²½ËùÓĞ±êÇ©À¸µÄ¹¤¾ßÀ¸ÑÕÉ«
+        /// åŒæ­¥æ‰€æœ‰æ ‡ç­¾æ çš„å·¥å…·æ é¢œè‰²
         /// </summary>
         public static void SyncToolbarColorThreads()
         {

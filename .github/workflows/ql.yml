@@ -13,8 +13,34 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370
         with:
           languages: csharp
           build-mode: none
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370
+  native:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce
+      - uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370
+        with:
+          languages: c-cpp
+          build-mode: manual
+      - name: Compile native translation units without executing registration tools
+        shell: powershell
+        run: |
+          foreach ($platform in @('Win32','x64')) {
+            foreach ($project in @('MinHook/libMinHook.vcxproj','QTHookLib/QTHookLib.vcxproj')) {
+              msbuild $project /t:ClCompile /p:Configuration=Release "/p:Platform=$platform" /p:PlatformToolset=v143 /p:WindowsTargetPlatformVersion=10.0 /p:BuildProjectReferences=false /p:PostBuildEventUseInBuild=false /nologo /v:minimal
+              if ($LASTEXITCODE) { throw "Native extraction failed: $project $platform" }
+            }
+          }
+          foreach ($project in @('InstallerHelper/InstallerHelper.vcxproj','Register/Register.vcxproj')) {
+            msbuild $project /t:ClCompile /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:WindowsTargetPlatformVersion=10.0 /p:BuildProjectReferences=false /p:PostBuildEventUseInBuild=false /nologo /v:minimal
+            if ($LASTEXITCODE) { throw "Native utility extraction failed: $project" }
+          }
+      - uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370
+        with:
+          category: native-source

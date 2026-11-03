@@ -1,7 +1,7 @@
 ﻿#requires -version 5.1
 param([Parameter(Mandatory=$true)][string]$PackageDirectory)
 $ErrorActionPreference = 'Stop'
-$msi = Join-Path $PackageDirectory 'QTTabBar-Italiano-v0.6.1.msi'
+$msi = Join-Path $PackageDirectory 'QTTabBar-Italiano-v0.7.0.msi'
 $hash = (Get-FileHash $msi).Hash
 $script = Get-Content (Join-Path $PackageDirectory 'Installa-Stabilita.ps1') -Raw
 if (!$script.Contains($hash) -or $script.Contains('__DLL_SHA256__') -or $script.Contains('__MSI_SHA256__')) { throw 'Installer hash stamping failed.' }
@@ -20,7 +20,7 @@ function Query([string]$Sql, [int]$ColumnCount = 1) {
 }
 try {
     $upgrades = @(Query 'SELECT `UpgradeCode`, `VersionMin`, `VersionMax`, `Language`, `Attributes` FROM `Upgrade`' 5)
-    $migration = @($upgrades | Where-Object { $_[0] -eq '{EC9BAFF7-58FB-40CB-9F67-1C438A7524A5}' -and $_[2] -eq '1.6.6' -and !$_[3] -and (([int]$_[4] -band 2) -eq 0) })
+    $migration = @($upgrades | Where-Object { $_[0] -eq '{EC9BAFF7-58FB-40CB-9F67-1C438A7524A5}' -and $_[2] -eq '1.6.7' -and !$_[3] -and (([int]$_[4] -band 2) -eq 0) })
     if ($migration.Count -ne 1) { throw 'Major upgrade must include the old English-language MSI.' }
     $tables = @(Query 'SELECT `Name` FROM `_Tables`' | ForEach-Object { $_[0] })
     $actions = @()

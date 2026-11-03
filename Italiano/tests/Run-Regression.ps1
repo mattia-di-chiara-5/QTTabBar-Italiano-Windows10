@@ -1,4 +1,4 @@
-#requires -version 5.1
+﻿#requires -version 5.1
 param([string]$Dll = (Join-Path $PSScriptRoot '..\..\QTTabBar\bin\Release\QTTabBar.dll'))
 $ErrorActionPreference = 'Stop'
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
@@ -26,3 +26,12 @@ $env:DEVPATH = $isolated
 try { & $performance (Join-Path $isolated 'QTTabBar.dll') }
 finally { $env:DEVPATH = $previousDevPath }
 if ($LASTEXITCODE -ne 0) { throw 'Regressione prestazioni rilevata.' }
+
+$security = Join-Path $isolated 'SecurityRegression.exe'
+& $compiler /nologo /r:System.Drawing.dll /r:System.Core.dll /r:System.Xml.dll /r:System.Runtime.Serialization.dll /r:System.ServiceModel.dll ("/out:"+$security) (Join-Path $PSScriptRoot 'SecurityRegression.cs') (Join-Path $PSScriptRoot '..\..\QTTabBar\IpcCommand.cs') (Join-Path $PSScriptRoot '..\..\QTTabBar\IpcTransport.cs') (Join-Path $PSScriptRoot '..\..\QTTabBar\IpcAuthorization.cs') (Join-Path $PSScriptRoot '..\..\Plugins\Memo\MemoPersistence.cs')
+if ($LASTEXITCODE) { throw 'Compilazione test sicurezza non riuscita.' }
+[IO.File]::WriteAllText(($security + '.config'), $devConfig)
+$env:DEVPATH = $isolated
+try { & $security (Join-Path $isolated 'QTTabBar.dll') $isolated }
+finally { $env:DEVPATH = $previousDevPath }
+if ($LASTEXITCODE) { throw 'Regressione sicurezza rilevata.' }

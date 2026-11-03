@@ -77,38 +77,6 @@ void Box1(LPCWSTR lpText)
 	MessageBoxW(0, lpText, L"Box1", MB_ICONERROR);
 }
 
-void Log1(std::wstring log)
-{
-	//CString strTempPath;
-    //::GetTempPath(MAX_PATH, strTempPath.GetBuffer(MAX_PATH));
-    LPCWSTR strLogFile = L"c:/Log.txt";
-    HANDLE hFile = INVALID_HANDLE_VALUE;
-    DWORD dwBytesWritten = 0;
-    BOOL bErrorFlag = FALSE;
-    OVERLAPPED strOverlapped = {};
-    strOverlapped.Offset = 0xFFFFFFFF;
-    strOverlapped.OffsetHigh= 0xFFFFFFFF;
-    hFile = CreateFile(strLogFile, GENERIC_READ| GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hFile== INVALID_HANDLE_VALUE)
-    {
-        return ;
-    }
-    char TimeMessage[MAX_PATH] = { 0 };
-    SYSTEMTIME st;
-    ::GetLocalTime(&st);
-    char szTime[26] = { 0 };
-    sprintf_s(szTime, "%04d-%02d-%02d %02d:%02d:%02d %d ", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
-    sprintf_s(TimeMessage, "%s: %s\n", szTime,log);
-    DWORD dwBytesToWrite = (DWORD)strlen(TimeMessage);
-    bErrorFlag = WriteFile(hFile, TimeMessage, dwBytesToWrite, NULL, &strOverlapped);
-    if (bErrorFlag==FALSE)
-    {
-        return ;
-    }
-    CloseHandle(hFile);
-}
-
-
 // Hook declaration macro
 #define DECLARE_HOOK(id, ret, name, params)                                         \
     typedef ret (WINAPI *__TYPE__##name)params; /* Function pointer type        */  \
@@ -611,16 +579,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
         g_hModule = hModule;
         DisableThreadLibraryCalls(hModule);
 
-        //防止别的程序意外加载
-        wchar_t pName[MAX_PATH];
-        GetModuleFileNameW(NULL, pName, MAX_PATH);
 
-        //进程名转小写
-        std::wstring path = std::wstring(pName);
-        std::wstring name = path.substr(path.length() - 12, 12);
-        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-
-        // if (name == L"explorer.exe") InjectionEntryPoint();
     }
     else if (ul_reason_for_call == DLL_PROCESS_DETACH)
     {

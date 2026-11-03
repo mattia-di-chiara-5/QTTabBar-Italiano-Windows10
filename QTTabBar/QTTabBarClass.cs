@@ -1,4 +1,4 @@
-﻿//    This file is part of QTTabBar, a shell extension for Microsoft
+//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2025  Quizo, Paul Accisano, indiff
 //
@@ -3264,6 +3264,7 @@ namespace QTTabBarLib
                     // string allParentProcessNames2 = ProcessUtil.GetAllParentProcessNames();
                     // QTUtility2.log("DoFirstNavigation GetCommandLine parent process name: " + parentProcessName);
                     // QTUtility2.log("DoFirstNavigation GetCommandLine parent process name2: " + allParentProcessNames2);
+                    bool captureAccepted = false;
                     string cmd = GetCommandLine();
                     if (!String.IsNullOrEmpty(cmd))
                     {
@@ -3284,21 +3285,7 @@ namespace QTTabBarLib
                             string selectMe = GetNameToSelectFromCommandLineArg(cmd);
                             // QTUtility2.log("select cmd " + cmd + " select :" + selectMe );
                             TimeSpan start = new TimeSpan(DateTime.Now.Ticks);
-                            InstanceManager.BeginInvokeMain(tabbar =>
-                            {
-                                QTUtility2.log("Capture select target hwnd=" + tabbar.ExplorerHandle +
-                                               " path=" + path);
-                                tabbar.OpenNewTab(path);
-                                if (selectMe != "")
-                                {
-                                    tabbar.ShellBrowser.TrySetSelection(
-                                          new Address[] { new Address(selectMe) }, null, true);
-                                }
-
-                                tabbar.RestoreWindow();
-                                TimeSpan abs = new TimeSpan(DateTime.Now.Ticks).Subtract(start).Duration();
-                                QTUtility2.log(string.Format("select cmd BeginInvokeMain cost {0} ", abs.TotalMilliseconds));
-                            });
+                            captureAccepted = InstanceManager.SendMainCommand(new IpcCommand { Kind = IpcCommandKind.OpenPaths, Paths = new[] { path }, ForceTab = true, Restore = true, Selection = selectMe, WaitForSelection = false });
                         }
                         else if (lcmd.Contains("/factory") ||
                                  lcmd.Contains("-embedding") ||
@@ -3306,36 +3293,20 @@ namespace QTTabBarLib
                         {
                             mCmdType = 2;
                             TimeSpan start = new TimeSpan(DateTime.Now.Ticks);
-                            InstanceManager.BeginInvokeMain(tabbar =>
-                            {
-                                QTUtility2.log("Capture factory target hwnd=" + tabbar.ExplorerHandle +
-                                               " path=" + path);
-                                tabbar.OpenNewTab(path);
-                                tabbar.RestoreWindow();
-                                if (Config.Window.CaptureWeChatSelection)
-                                {
-                                    tabbar.Wait4Select();
-                                }
-                                TimeSpan abs = new TimeSpan(DateTime.Now.Ticks).Subtract(start).Duration();
-                                QTUtility2.log(string.Format("factory cmd BeginInvokeMain cost {0} ", abs.TotalMilliseconds));
-                            });
+                            captureAccepted = InstanceManager.SendMainCommand(new IpcCommand { Kind = IpcCommandKind.OpenPaths, Paths = new[] { path }, ForceTab = true, Restore = true, Selection = null, WaitForSelection = true });
                         }
                         else
                         {
                             mCmdType = 3;
-                            InstanceManager.BeginInvokeMain(tabbar =>
-                            {
-                                // vscode 打开的时候是同进程， 可能需要 shell捕获
-                                QTUtility2.log("Capture other target hwnd=" + tabbar.ExplorerHandle +
-                                               " path=" + path);
-                                tabbar.OpenNewTab(path);
-                                QTUtility2.log("other cmd BeginInvokeMain RestoreWindow");
-                                tabbar.RestoreWindow();
-                                // tabbar.Wait4Select(); // intellij idea / vs code 导致崩溃？
-                            });
+                            captureAccepted = InstanceManager.SendMainCommand(new IpcCommand { Kind = IpcCommandKind.OpenPaths, Paths = new[] { path }, ForceTab = true, Restore = true, Selection = null, WaitForSelection = false });
                         }
                     }
 
+                    if(!captureAccepted) {
+                        AddStartUpTabs(string.Empty, path);
+                        InitializeOpenedWindow();
+                        return;
+                    }
                     fNowQuitting = true;
                     QTUtility2.log("Capture source closing mCmdType=" + mCmdType +
                                    " fNowQuitting=" + fNowQuitting +
@@ -3415,6 +3386,11 @@ namespace QTTabBarLib
         /**
          * 计时器间隔 1 秒方式来获取微信或者qq打开后的选中文件
          */
+        internal void CompleteIpcNavigation(string selection, bool restore, bool waitForSelection) {
+            if(!string.IsNullOrEmpty(selection)) ShellBrowser.TrySetSelection(new[] { new Address(selection) }, null, true);
+            if(restore) RestoreWindow();
+            if(waitForSelection && Config.Window.CaptureWeChatSelection) Wait4Select();
+        }
         private void Wait4Select()
         {
             if (!Config.Window.CaptureWeChatSelection)
@@ -7781,7 +7757,7 @@ namespace QTTabBarLib
                     {
                         if (key != null)
                         {
-                            string[] strArray = ((string)key.GetValue("TabsLocked2", string.Empty)).Split(QTUtility.SEPARATOR_CHAR);
+                            string[] strArray = QTUtility2.ReadRegBinary<string>("TabsLocked", key) ?? new string[0];
                             if ((strArray.Length > 0) && (strArray[0].Length > 0))
                             {
                                 foreach (string str2 in strArray.Where(str2 => str2.Length > 0

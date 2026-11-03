@@ -23,15 +23,15 @@ try {
     if (!$locked) { throw 'Un altra manutenzione di QTTabBar e gia in corso.' }
     $windows = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
     if (![Environment]::Is64BitOperatingSystem -or ![Environment]::Is64BitProcess -or [int]$windows.CurrentBuild -lt 10240 -or [int]$windows.CurrentBuild -ge 22000) { throw 'Richiesto Windows 10 x64 e PowerShell a 64 bit.' }
-    $msi = Join-Path $PSScriptRoot 'QTTabBar-Italiano-v0.6.1.msi'
+    $msi = Join-Path $PSScriptRoot 'QTTabBar-Italiano-v0.7.0.msi'
     $expected = '__MSI_SHA256__'
     if ($expected -notmatch '^[A-F0-9]{64}$' -or (Get-FileHash $msi -Algorithm SHA256).Hash -ne $expected) { throw 'SHA-256 MSI non valido. Usare il pacchetto compilato della release.' }
     $entries = @(Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*','HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' -ErrorAction SilentlyContinue | Where-Object { $_.PSObject.Properties['DisplayName'] -and $_.DisplayName -match 'QTTabBar' })
-    $releaseRoot = Join-Path $env:ProgramData 'QTTabBar-Italiano\v0.6.1'
-    if ($entries.Count -eq 1 -and $entries[0].PSChildName -eq '{F70E079A-2E71-4B23-B8F2-854D700B7DAF}') {
+    $releaseRoot = Join-Path $env:ProgramData 'QTTabBar-Italiano\v0.7.0'
+    if ($entries.Count -eq 1 -and $entries[0].PSChildName -eq '{3EB8D8B3-A96E-49B0-824A-707E6CF60273}') {
         $installedDll = Join-Path $env:WINDIR 'Microsoft.NET\assembly\GAC_MSIL\QTTabBar\v4.0_1.6.3.0__973461f1cd23d8eb\QTTabBar.dll'
         if (!(Test-Path $installedDll) -or (Get-FileHash $installedDll).Hash -ne '__DLL_SHA256__') { throw 'DLL installata alterata o assente: riparare l MSI prima di proseguire.' }
-        Write-Host 'QTTabBar Italiano 0.6.1 e gia installato. Nessuna reinstallazione.'
+        Write-Host 'QTTabBar Italiano 0.7.0 e gia installato. Nessuna reinstallazione.'
         exit 0
     }
     if ($entries.Count -gt 1 -or ($entries.Count -eq 1 -and $entries[0].PSChildName -ne '{540B7E57-F7A0-4AA5-A362-736892574234}')) { throw 'La migrazione automatica supporta solo l edizione italiana 0.6.0 verificata o una nuova installazione.' }
@@ -50,11 +50,11 @@ try {
     New-Item -ItemType Directory -Path $stateRoot | Out-Null
     Start-Transcript -Path (Join-Path $stateRoot 'install.log') | Out-Null
     $transcript = $true
-    $protectedMsi = Join-Path $stateRoot 'QTTabBar-Italiano-v0.6.1.msi'
+    $protectedMsi = Join-Path $stateRoot 'QTTabBar-Italiano-v0.7.0.msi'
     Copy-Item -LiteralPath $msi -Destination $protectedMsi
     if ((Get-FileHash $protectedMsi).Hash -ne $expected) { throw 'Copia protetta MSI non valida.' }
     $oldDll = Join-Path $env:WINDIR 'Microsoft.NET\assembly\GAC_MSIL\QTTabBar\v4.0_1.6.3.0__973461f1cd23d8eb\QTTabBar.dll'
-    $state = [ordered]@{ Version='0.6.1'; UserSid=$UserSid; PreviousInstalled=($entries.Count -eq 1); ConfigExisted=(Test-Path 'HKCU:\Software\QTTabBar'); MsiHash=$expected; Date=(Get-Date).ToString('o'); Status='Prepared' }
+    $state = [ordered]@{ Version='0.7.0'; UserSid=$UserSid; PreviousInstalled=($entries.Count -eq 1); ConfigExisted=(Test-Path 'HKCU:\Software\QTTabBar'); MsiHash=$expected; Date=(Get-Date).ToString('o'); Status='Prepared' }
     # The OLD uninstaller may delete the shared Toolbar key. Preserve both views.
     $toolbarKeys = @('HKLM\SOFTWARE\Microsoft\Internet Explorer\Toolbar','HKLM\SOFTWARE\WOW6432Node\Microsoft\Internet Explorer\Toolbar')
     for ($i=0; $i -lt $toolbarKeys.Count; $i++) {

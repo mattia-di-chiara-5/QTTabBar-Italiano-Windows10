@@ -1,4 +1,4 @@
-//    This file is part of QTTabBar, a shell extension for Microsoft
+ï»¿//    This file is part of QTTabBar, a shell extension for Microsoft
 //    Windows Explorer.
 //    Copyright (C) 2007-2020  Quizo, Paul Accisano, Indiff
 //
@@ -32,7 +32,7 @@ using System.Linq;
 using System.Media;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization.Formatters.Binary;
+
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -42,7 +42,7 @@ namespace QTTabBarLib {
     public static class QTUtility2 {
         private const int THRESHOLD_ELLIPSIS = 40;
         private static bool fConsoleAllocated;
-        // ÅĞ¶ÏÊÇ·ñÆôÓÃÈÕÖ¾£¬·¢²¼¸ÄÎªfalse£¬ µ÷ÊÔÆôÓÃ. Ä¬ÈÏÊÇ¹Ø±ÕµÄ£¬ÔÚ³£¹æÑ¡ÏîÀïÃæ¿ÉÒÔÉèÖÃÆôÓÃ
+        // åˆ¤æ–­æ˜¯å¦å¯ç”¨æ—¥å¿—ï¼Œå‘å¸ƒæ”¹ä¸ºfalseï¼Œ è°ƒè¯•å¯ç”¨. é»˜è®¤æ˜¯å…³é—­çš„ï¼Œåœ¨å¸¸è§„é€‰é¡¹é‡Œé¢å¯ä»¥è®¾ç½®å¯ç”¨
         public static bool ENABLE_LOGGER = false;
 
         public static string ExplorerPath
@@ -74,16 +74,9 @@ namespace QTTabBarLib {
 
 
         public static T DeepClone<T>(T obj) {
-            using(var ms = new MemoryStream()) {
-                BinaryFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(ms, obj);
-                ms.Position = 0;
-                var deserialize = (T)formatter.Deserialize(ms);
-                Close( ms );
-                return deserialize;
-            }
+            if(typeof(T) != typeof(Config)) throw new NotSupportedException("Only local configuration cloning is supported.");
+            return (T)(object)ConfigCloner.Clone((Config)(object)obj);
         }
-
         public static string Enquote(this string s) {
             return "\"" + s + "\"";
         }
@@ -218,7 +211,7 @@ namespace QTTabBarLib {
         public static IntPtr Make_LPARAM(Point pt) {
             return (IntPtr)((pt.X & 0xffff) | ((pt.Y & 0xffff) << 0x10));
         }
-        
+
         public static Color MakeColor(int colorref) {
             return Color.FromArgb(colorref & 0xff, (colorref >> 8) & 0xff, (colorref >> 0x10) & 0xff);
         }
@@ -286,7 +279,7 @@ namespace QTTabBarLib {
             Dictionary<String, String> dic = new Dictionary<String, String>();
             if (trace != null)
             {
-                StackFrame frame = trace.GetFrame(1);//1´ú±íÉÏ¼¶£¬2´ú±íÉÏÉÏ¼¶£¬ÒÔ´ËÀàÍÆ
+                StackFrame frame = trace.GetFrame(1);//1ä»£è¡¨ä¸Šçº§ï¼Œ2ä»£è¡¨ä¸Šä¸Šçº§ï¼Œä»¥æ­¤ç±»æ¨
                 if (frame != null)
                 {
                     MethodBase method = frame.GetMethod();
@@ -317,7 +310,7 @@ namespace QTTabBarLib {
 
                 if (trace != null)
                 {
-                    StackFrame frame = trace.GetFrame(1);//1´ú±íÉÏ¼¶£¬2´ú±íÉÏÉÏ¼¶£¬ÒÔ´ËÀàÍÆ
+                    StackFrame frame = trace.GetFrame(1);//1ä»£è¡¨ä¸Šçº§ï¼Œ2ä»£è¡¨ä¸Šä¸Šçº§ï¼Œä»¥æ­¤ç±»æ¨
                     if (frame != null)
                     {
                         MethodBase method = frame.GetMethod();
@@ -358,7 +351,7 @@ namespace QTTabBarLib {
 
                 if (trace != null)
                 {
-                    StackFrame frame = trace.GetFrame(1);//1´ú±íÉÏ¼¶£¬2´ú±íÉÏÉÏ¼¶£¬ÒÔ´ËÀàÍÆ
+                    StackFrame frame = trace.GetFrame(1);//1ä»£è¡¨ä¸Šçº§ï¼Œ2ä»£è¡¨ä¸Šä¸Šçº§ï¼Œä»¥æ­¤ç±»æ¨
                     if (frame != null)
                     {
                         MethodBase method = frame.GetMethod();
@@ -378,17 +371,17 @@ namespace QTTabBarLib {
         }
 
         // private static DateTime dateTime ;
-        // ºöÂÔÒ»Ğ©Ìí¼Ó ÈÕÖ¾
+        // å¿½ç•¥ä¸€äº›æ·»åŠ  æ—¥å¿—
         private static string[] IGNORES = { "ReleaseComObject" };
 
 
-        // 1. ½« Dictionary Ìæ»»ÎªÏß³Ì°²È«µÄ ConcurrentDictionary
-        // 2. ½« DateTime Ìæ»»Îª Stopwatch ÓÃÓÚ¸ß¾«¶ÈºÄÊ±¼ÆËã
+        // 1. å°† Dictionary æ›¿æ¢ä¸ºçº¿ç¨‹å®‰å…¨çš„ ConcurrentDictionary
+        // 2. å°† DateTime æ›¿æ¢ä¸º Stopwatch ç”¨äºé«˜ç²¾åº¦è€—æ—¶è®¡ç®—
         private static readonly ConcurrentDictionary<int, Stopwatch> dictTime = new ConcurrentDictionary<int, Stopwatch>();
 
         public static void log(string level, string optional, Dictionary<String, String> dic = null)
         {
-            // ºöÂÔÂß¼­±£³Ö²»±ä
+            // å¿½ç•¥é€»è¾‘ä¿æŒä¸å˜
             if (null != IGNORES && IGNORES.Length > 0)
             {
                 string lower2 = optional.ToLower();
@@ -401,7 +394,7 @@ namespace QTTabBarLib {
                 }
             }
 
-            // Ä¿Â¼´´½¨Âß¼­±£³Ö²»±ä
+            // ç›®å½•åˆ›å»ºé€»è¾‘ä¿æŒä¸å˜
             string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string appdataQT = Path.Combine(appdata, "QTTabBar");
             if (!Directory.Exists(appdataQT))
@@ -409,31 +402,31 @@ namespace QTTabBarLib {
                 Directory.CreateDirectory(appdataQT);
             }
 
-            // 3. ¼ò»¯Ïß³ÌID»ñÈ¡£¬ÒÆ³ı¹ıÊ±µÄ AppDomain.GetCurrentThreadId()
+            // 3. ç®€åŒ–çº¿ç¨‹IDè·å–ï¼Œç§»é™¤è¿‡æ—¶çš„ AppDomain.GetCurrentThreadId()
             int threadId = Thread.CurrentThread.ManagedThreadId;
             Process process = Process.GetCurrentProcess();
 
-            // 4. Ê¹ÓÃ Stopwatch ¼ÆËãºÄÊ±£¬½â¾ö¾«¶ÈºÍÊ×´Î¼ÇÂ¼ÎÊÌâ
+            // 4. ä½¿ç”¨ Stopwatch è®¡ç®—è€—æ—¶ï¼Œè§£å†³ç²¾åº¦å’Œé¦–æ¬¡è®°å½•é—®é¢˜
             string useTime = "";
             var stopwatch = dictTime.GetOrAdd(threadId, _ => Stopwatch.StartNew());
 
-            // »ñÈ¡×ÔÉÏ´Î¼ÇÂ¼ÒÔÀ´µÄºÄÊ±£¬²¢×Ô¶¯ÖØÖÃ¼ÆÊ±Æ÷
-            // Õâ½â¾öÁËÊ×´Î¼ÇÂ¼ÎŞºÄÊ±µÄÎÊÌâ£¬ÇÒÈ«³ÌÏß³Ì°²È«
+            // è·å–è‡ªä¸Šæ¬¡è®°å½•ä»¥æ¥çš„è€—æ—¶ï¼Œå¹¶è‡ªåŠ¨é‡ç½®è®¡æ—¶å™¨
+            // è¿™è§£å†³äº†é¦–æ¬¡è®°å½•æ— è€—æ—¶çš„é—®é¢˜ï¼Œä¸”å…¨ç¨‹çº¿ç¨‹å®‰å…¨
             long elapsedMs = stopwatch.ElapsedMilliseconds;
             stopwatch.Restart();
 
-            // Èç¹ûÊÇ¸ÃÏß³ÌµÄµÚÒ»ÌõÈÕÖ¾£¬elapsedMs ¿ÉÄÜ·Ç³£Ğ¡£¨½Ó½ü0£©£¬µ«Âß¼­ÊÇÁ¬¹áµÄ
-            // Èç¹ûÏ£ÍûµÚÒ»ÌõÈÕÖ¾²»ÏÔÊ¾ºÄÊ±£¬¿ÉÒÔ¼Ó¸ö±ê¼Ç£¬µ«Í¨³£ÏÔÊ¾ 0ms »òÊµ¼Ê¼ä¸ô¸üºÏÀí
+            // å¦‚æœæ˜¯è¯¥çº¿ç¨‹çš„ç¬¬ä¸€æ¡æ—¥å¿—ï¼ŒelapsedMs å¯èƒ½éå¸¸å°ï¼ˆæ¥è¿‘0ï¼‰ï¼Œä½†é€»è¾‘æ˜¯è¿è´¯çš„
+            // å¦‚æœå¸Œæœ›ç¬¬ä¸€æ¡æ—¥å¿—ä¸æ˜¾ç¤ºè€—æ—¶ï¼Œå¯ä»¥åŠ ä¸ªæ ‡è®°ï¼Œä½†é€šå¸¸æ˜¾ç¤º 0ms æˆ–å®é™…é—´éš”æ›´åˆç†
             if (elapsedMs > 0)
             {
-                useTime = $"{elapsedMs}ºÁÃë";
+                useTime = $"{elapsedMs}æ¯«ç§’";
             }
 
             string path = Path.Combine(appdataQT, "QTTabBar.log");
             var line = new StringBuilder();
             line.Append("[").Append(level).Append("]");
 
-            // ÀàÃûºÍ·½·¨ÃûÂß¼­±£³Ö²»±ä
+            // ç±»åå’Œæ–¹æ³•åé€»è¾‘ä¿æŒä¸å˜
             if (dic != null && dic.Count > 0)
             {
                 if (dic.TryGetValue("className", out var className) && !string.IsNullOrEmpty(className))
@@ -446,7 +439,7 @@ namespace QTTabBarLib {
                 }
             }
 
-            // ½ø³ÌºÍÏß³ÌĞÅÏ¢
+            // è¿›ç¨‹å’Œçº¿ç¨‹ä¿¡æ¯
             line.Append("\tP:").Append(process.Id);
             line.Append("\tT:").Append(threadId);
 
@@ -455,8 +448,8 @@ namespace QTTabBarLib {
                 line.Append("\tcost:").Append(useTime);
             }
 
-            // 5. ¼ÇÂ¼¾ø¶ÔÊ±¼ä´Á£¨ÕâÀïÓÃ DateTime Ã»ÎÊÌâ£¬ÒòÎªÖ»ÓÃÓÚÕ¹Ê¾£¬²»ÓÃÓÚ¼ÆËã²îÖµ£©
-            line.Append("\t").Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")) // ½¨Òé¼ÓÉÏºÁÃë£¬·½±ãÅÅ²é
+            // 5. è®°å½•ç»å¯¹æ—¶é—´æˆ³ï¼ˆè¿™é‡Œç”¨ DateTime æ²¡é—®é¢˜ï¼Œå› ä¸ºåªç”¨äºå±•ç¤ºï¼Œä¸ç”¨äºè®¡ç®—å·®å€¼ï¼‰
+            line.Append("\t").Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")) // å»ºè®®åŠ ä¸Šæ¯«ç§’ï¼Œæ–¹ä¾¿æ’æŸ¥
                .Append("\t").Append(optional);
 
             writeStr(path, line);
@@ -466,7 +459,7 @@ namespace QTTabBarLib {
         /*
         public static void log_bak(string level, string optional,Dictionary<String, String> dic=null)
         {
-            // ignore 
+            // ignore
             if (null != IGNORES && IGNORES.Length > 0)
             {
                 foreach (var ignore in IGNORES)
@@ -493,7 +486,7 @@ namespace QTTabBarLib {
             if (null == cThreadId)
             {
                 cThreadId = currentThreadId;
-            } 
+            }
 
             var useTime = "";
             if (null != cThreadId)
@@ -507,7 +500,7 @@ namespace QTTabBarLib {
                     var oldTime = dictTime[cThreadId];
                     if (null != oldTime)
                     {
-                        useTime = "" + ((DateTime.Now - oldTime).TotalMilliseconds) + "ºÁÃë";
+                        useTime = "" + ((DateTime.Now - oldTime).TotalMilliseconds) + "æ¯«ç§’";
                         dictTime[cThreadId] = DateTime.Now;
                     }
                 }
@@ -528,7 +521,7 @@ namespace QTTabBarLib {
             // add className and methodName debug
             if (null != dic && dic.Count > 0 && dic.ContainsKey("methodName") && dic.ContainsKey("className"))
             {
-                // Êä³öÀàÃûºÍ·½·¨Ãû
+                // è¾“å‡ºç±»åå’Œæ–¹æ³•å
                 if (dic.ContainsKey("className"))
                 {
                     var className = dic["className"];
@@ -551,14 +544,14 @@ namespace QTTabBarLib {
                     }
                 }
             }
-            // ½ø³ÌID
+            // è¿›ç¨‹ID
             if (process != null)
             {
                 line
                     .Append("\tP:")
                     .Append(process.Id);
             }
-            // Ïß³Ì ID
+            // çº¿ç¨‹ ID
             if (cThreadId != null)
             {
                 line
@@ -586,7 +579,7 @@ namespace QTTabBarLib {
             writeStr(path, line);
         }
         */
-        
+
 
         public static void MakeErrorLog(Exception ex, string optional = null) {
             try
@@ -600,15 +593,15 @@ namespace QTTabBarLib {
                 string path = Path.Combine(appdataQT, "QTTabBarException.log");
                 var line = new StringBuilder();
                 line.AppendLine(DateTime.Now.ToString());
-                line.AppendLine(".NET °æ±¾: " + Environment.Version);
-                line.AppendLine("²Ù×÷ÏµÍ³°æ±¾: " + Environment.OSVersion.Version + 
+                line.AppendLine(".NET ç‰ˆæœ¬: " + Environment.Version);
+                line.AppendLine("æ“ä½œç³»ç»Ÿç‰ˆæœ¬: " + Environment.OSVersion.Version +
                                 " Major: " + Environment.OSVersion.Version.Major +
-                                " »·¾³: " + getEnv()
+                                " ç¯å¢ƒ: " + getEnv()
                                 );
-                line.AppendLine("QT °æ±¾: " + MakeVersionString());
+                line.AppendLine("QT ç‰ˆæœ¬: " + MakeVersionString());
                 if (!String.IsNullOrEmpty(optional))
                 {
-                    line.AppendLine("´íÎóĞÅÏ¢: " + optional);
+                    line.AppendLine("é”™è¯¯ä¿¡æ¯: " + optional);
                 }
                 if (ex == null)
                 {
@@ -667,20 +660,20 @@ namespace QTTabBarLib {
 
         /*
         public static object lockObject = new object();
-        //¶ÁĞ´Ëø£¬Ëø¶¨ÎÄ¼şĞ´ÈëÈ¨ÏŞ£¬Ã¿¸öÏß³ÌÒÀ´ÎµÈ´ıÉÏ¸öĞ´ÈëÍê³É
+        //è¯»å†™é”ï¼Œé”å®šæ–‡ä»¶å†™å…¥æƒé™ï¼Œæ¯ä¸ªçº¿ç¨‹ä¾æ¬¡ç­‰å¾…ä¸Šä¸ªå†™å…¥å®Œæˆ
         static ReaderWriterLockSlim LogWriteLock = new ReaderWriterLockSlim();
         */
 
 
         /*
-        »¥³âËøMutex
-        ¶¨Òå£º
+        äº’æ–¥é”Mutex
+        å®šä¹‰ï¼š
             private static readonly Mutex mutex = new Mutex();
-            Ê¹ÓÃ£º
+            ä½¿ç”¨ï¼š
             mutex.WaitOne();
             mutex.ReleaseMutex();
-            ×÷ÓÃ£º½«»áËø×¡´úÂë¿éµÄÄÚÈİ£¬²¢×èÖ¹ÆäËûÏß³Ì½øÈë¸Ã´úÂë¿é£¬Ö±µ½¸Ã´úÂë¿éÔËĞĞÍê³É£¬ÊÍ·Å¸ÃËø¡£
-         * Mutex±¾ÉíÊÇ¿ÉÒÔÏµÍ³¼¶±ğµÄ£¬ËùÒÔÊÇ¿ÉÒÔ¿çÔ½½ø³ÌµÄ¡£
+            ä½œç”¨ï¼šå°†ä¼šé”ä½ä»£ç å—çš„å†…å®¹ï¼Œå¹¶é˜»æ­¢å…¶ä»–çº¿ç¨‹è¿›å…¥è¯¥ä»£ç å—ï¼Œç›´åˆ°è¯¥ä»£ç å—è¿è¡Œå®Œæˆï¼Œé‡Šæ”¾è¯¥é”ã€‚
+         * Mutexæœ¬èº«æ˜¯å¯ä»¥ç³»ç»Ÿçº§åˆ«çš„ï¼Œæ‰€ä»¥æ˜¯å¯ä»¥è·¨è¶Šè¿›ç¨‹çš„ã€‚
          */
         private static readonly Mutex M_MUTEX = new Mutex();
 
@@ -689,13 +682,13 @@ namespace QTTabBarLib {
             try
             {
                 M_MUTEX.WaitOne();
-                //ÉèÖÃ¶ÁĞ´ËøÎªĞ´ÈëÄ£Ê½¶ÀÕ¼×ÊÔ´
-                //ÒòĞ´ÈëÄ£Ê½µÄ½øÈëÓëÊÍ·ÅÔÚÍ¬Ò»¸ö´úÂë¿éÄÚ£¬Çë±£Ö¤ÔÚ¿éÄÚ½øÈëĞ´ÈëÄ£Ê½Ç°²»»á´¥·¢Òì³££¬·ñÔò»áÒòÎª½øÈëÓëÊÍ·Å´ÎÊı²»·û´Ó¶ø´¥·¢Òì³£
-                //ÇëÎğ³¤Ê±¼äÕ¼ÓÃ¶ÁĞ´Ëø·ñÔò»áµ¼ÖÂÆäËûÏß³Ì¼¢¶ö¡£
+                //è®¾ç½®è¯»å†™é”ä¸ºå†™å…¥æ¨¡å¼ç‹¬å èµ„æº
+                //å› å†™å…¥æ¨¡å¼çš„è¿›å…¥ä¸é‡Šæ”¾åœ¨åŒä¸€ä¸ªä»£ç å—å†…ï¼Œè¯·ä¿è¯åœ¨å—å†…è¿›å…¥å†™å…¥æ¨¡å¼å‰ä¸ä¼šè§¦å‘å¼‚å¸¸ï¼Œå¦åˆ™ä¼šå› ä¸ºè¿›å…¥ä¸é‡Šæ”¾æ¬¡æ•°ä¸ç¬¦ä»è€Œè§¦å‘å¼‚å¸¸
+                //è¯·å‹¿é•¿æ—¶é—´å ç”¨è¯»å†™é”å¦åˆ™ä¼šå¯¼è‡´å…¶ä»–çº¿ç¨‹é¥¥é¥¿ã€‚
                 // LogWriteLock.EnterWriteLock();
                 // lock (lockObject) {
 
-                // ĞŞ¸´ ÕıÓÉÁíÒ»½ø³ÌÊ¹ÓÃ£¬Òò´Ë¸Ã½ø³ÌÎŞ·¨·ÃÎÊ¸ÃÎÄ¼ş
+                // ä¿®å¤ æ­£ç”±å¦ä¸€è¿›ç¨‹ä½¿ç”¨ï¼Œå› æ­¤è¯¥è¿›ç¨‹æ— æ³•è®¿é—®è¯¥æ–‡ä»¶
                 if (File.Exists(path)) {
                     using (FileStream fs = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
                     {
@@ -716,7 +709,7 @@ namespace QTTabBarLib {
                     }
                 }
 
-                // ´æÔÚÎÊÌâ ÕıÓÉÁíÒ»½ø³ÌÊ¹ÓÃ£¬Òò´Ë¸Ã½ø³ÌÎŞ·¨·ÃÎÊ¸ÃÎÄ¼ş
+                // å­˜åœ¨é—®é¢˜ æ­£ç”±å¦ä¸€è¿›ç¨‹ä½¿ç”¨ï¼Œå› æ­¤è¯¥è¿›ç¨‹æ— æ³•è®¿é—®è¯¥æ–‡ä»¶
                     /*using (StreamWriter writer = new StreamWriter(path, true))
                     {
                         writer.WriteLine(formatLogLine);
@@ -725,8 +718,8 @@ namespace QTTabBarLib {
             }
             finally
             {
-                //ÍË³öĞ´ÈëÄ£Ê½£¬ÊÍ·Å×ÊÔ´Õ¼ÓÃ
-                //×¢ÒâÊÍ·ÅÓë½øÈë´ÎÊıÏàÍ¬·ñÔò»á´¥·¢Òì³£
+                //é€€å‡ºå†™å…¥æ¨¡å¼ï¼Œé‡Šæ”¾èµ„æºå ç”¨
+                //æ³¨æ„é‡Šæ”¾ä¸è¿›å…¥æ¬¡æ•°ç›¸åŒå¦åˆ™ä¼šè§¦å‘å¼‚å¸¸
                 // LogWriteLock.ExitWriteLock();
 
                 M_MUTEX.ReleaseMutex();
@@ -796,9 +789,9 @@ namespace QTTabBarLib {
 
                     if (!String.IsNullOrEmpty(optional))
                     {
-                        writer.WriteLine("´íÎóĞÅÏ¢: " + optional);
+                        writer.WriteLine("é”™è¯¯ä¿¡æ¯: " + optional);
                     }
-                   
+
                     writer.WriteLine("--------------");
                     writer.WriteLine();
                     Close( writer );
@@ -829,7 +822,7 @@ namespace QTTabBarLib {
 
         public static Color MakeModColor(Color clr) {
             float num = 0.875f;
-            return Color.FromArgb(((int)((0xff - clr.R) * num)) + clr.R, 
+            return Color.FromArgb(((int)((0xff - clr.R) * num)) + clr.R,
                 ((int)((0xff - clr.G) * num)) + clr.G,
                 ((int)((0xff - clr.B) * num)) + clr.B);
         }
@@ -914,7 +907,7 @@ namespace QTTabBarLib {
         }
 
         public static string MakeVersionString() {
-            // qwop comment  Ìí¼Ó .net framework µÄ°æ±¾ºÅ
+            // qwop comment  æ·»åŠ  .net framework çš„ç‰ˆæœ¬å·
             if(QTUtility.IS_DEV_VERSION) {
                 return "DevBuild: " + QTUtility.GetLinkerTimestamp() + " (" + Environment.Version + ")";
             }
@@ -928,7 +921,7 @@ namespace QTTabBarLib {
                 }
                 return str;
                 /* */
-            } 
+            }
         }
 
         public static bool PathEquals(this string str1, string str2) {
@@ -995,24 +988,33 @@ namespace QTTabBarLib {
         }
 
         public static T[] ReadRegBinary<T>(string regValueName, RegistryKey rkUserApps) {
-            byte[] buffer;
+            if(typeof(T) != typeof(string)) throw new NotSupportedException("Registry state only supports string arrays.");
+            if(rkUserApps == null) return null;
             try {
-                buffer = (byte[])rkUserApps.GetValue(regValueName, null);
-            }
-            catch (Exception e)
-            {
-                QTUtility2.MakeErrorLog(e, "ReadRegBinary");
-                return null;
-            }
-            if((buffer != null) && (buffer.Length > 0)) {
-                using(MemoryStream stream = new MemoryStream(buffer)) {
-                    BinaryFormatter formatter = new BinaryFormatter();
-                    return (T[])formatter.Deserialize(stream);
+                object current = rkUserApps.GetValue(regValueName + "V2", null);
+                if(current != null) return (T[])(object)ValidateRegistryStrings(current as string[]);
+                // Do not deserialize legacy binary values. Preserve them for offline recovery.
+                string[] text = rkUserApps.GetValue(regValueName, null) as string[];
+                if(text != null) return (T[])(object)ValidateRegistryStrings(text);
+                if(regValueName == "TabsLocked") {
+                    string legacyText = rkUserApps.GetValue("TabsLocked2", null) as string;
+                    if(legacyText != null && legacyText.Length <= 524288)
+                        return (T[])(object)ValidateRegistryStrings(legacyText.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries));
                 }
-            }
+            } catch(Exception e) { MakeErrorLog(e, "ReadRegBinary: invalid registry state"); }
             return null;
         }
 
+        private static string[] ValidateRegistryStrings(string[] values) {
+            if(values == null || values.Length > 4096) throw new InvalidDataException("Invalid string array.");
+            long length = 0;
+            foreach(string value in values) {
+                if(value == null || value.Length > 32768 || value.IndexOf('\0') >= 0) throw new InvalidDataException("Invalid string entry.");
+                length += value.Length;
+                if(length > 524288) throw new InvalidDataException("Registry state is too large.");
+            }
+            return values;
+        }
         public static IntPtr ReadRegHandle(string valName, RegistryKey rk) {
             if(IntPtr.Size == 4) {
                 object obj2 = rk.GetValue(valName, 0);
@@ -1068,7 +1070,7 @@ namespace QTTabBarLib {
 
 
         /**
-         * ÉèÖÃ×Ö·û´®µ½¼ôÌù°å
+         * è®¾ç½®å­—ç¬¦ä¸²åˆ°å‰ªè´´æ¿
          */
         internal static void SetStringClipboard(string str) {
             try {
@@ -1083,7 +1085,7 @@ namespace QTTabBarLib {
         }
 
         /**
-         * ÉèÖÃ×Ö·û´®µ½¼ôÌù°å
+         * è®¾ç½®å­—ç¬¦ä¸²åˆ°å‰ªè´´æ¿
          */
         internal static string GetStringClipboard()
         {
@@ -1102,7 +1104,7 @@ namespace QTTabBarLib {
             }
             return "";
         }
-        // ×Ö·û´®Í¨¹ı·Ö¸ô·ûÁ¬½Ó
+        // å­—ç¬¦ä¸²é€šè¿‡åˆ†éš”ç¬¦è¿æ¥
         public static string StringJoin<T>(this IEnumerable<T> list, string separator) {
             StringBuilder sb = new StringBuilder();
             bool first = true;
@@ -1113,7 +1115,7 @@ namespace QTTabBarLib {
             }
             return sb.ToString();
         }
-        // ×Ö·û´®Í¨¹ı·Ö¸ô·ûÁ¬½Ó
+        // å­—ç¬¦ä¸²é€šè¿‡åˆ†éš”ç¬¦è¿æ¥
         public static string StringJoin(this IEnumerable list, string separator) {
             StringBuilder sb = new StringBuilder();
             bool first = true;
@@ -1132,7 +1134,7 @@ namespace QTTabBarLib {
             return s;
         }
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="pIDL"></param>
         /// <param name="path"></param>
@@ -1145,7 +1147,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        ///  Ğ´Èë×¢²á±í£¬ ¹Ø±ÕÏûÏ¢È¥³ıĞ´ÈëËø¶¨±êÇ©µÄµ÷ÓÃ
+        ///  å†™å…¥æ³¨å†Œè¡¨ï¼Œ å…³é—­æ¶ˆæ¯å»é™¤å†™å…¥é”å®šæ ‡ç­¾çš„è°ƒç”¨
         ///  qttabbarclass  public override void CloseDW(uint dwReserved)
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -1153,89 +1155,10 @@ namespace QTTabBarLib {
         /// <param name="regValueName"></param>
         /// <param name="rkUserApps"></param>
         public static void WriteRegBinary<T>(T[] array, string regValueName, RegistryKey rkUserApps) {
-            // Èç¹ûËø¶¨±êÇ©Â·¾¶ÓĞÄÚÈİ
-            if ("TabsLocked".Equals(regValueName))
-            {
-                // MessageBox.Show("Ğ´ÈëËø¶¨±êÇ©");
-                if (null != array && array.Length > 0)
-                {
-                    if (rkUserApps != null)
-                    {
-                        string[] newArray = (from string path in array
-                                            // where Directory.Exists(path)
-                                             where path.Trim().Length > 0 
-                                             select path).ToArray();
-
-                        if (null == newArray || newArray.Length == 0)
-                        {
-                            // MessageBox.Show("Ëø¶¨±êÇ©Êı¾İÎª¿Õ£º" + array.StringJoin(";"));
-                            if (rkUserApps != null)
-                            {
-                                rkUserApps.SetValue("TabsLocked2", "");
-                            }
-                        }
-                        else
-                        {
-                            //  MessageBox.Show("Ëø¶¨±êÇ©Êı¾İÎª£º" + array.StringJoin(";"));
-                            rkUserApps.SetValue("TabsLocked2", newArray.StringJoin(";"));
-                        }
-                        /*
-                        string value = array.StringJoin(";");
-                        if (value.Trim().Length > 0)
-                        {
-                            rkUserApps.SetValue("TabsLocked2", value );
-                        }
-                        else {
-                            rkUserApps.SetValue("TabsLocked2", "");
-                        } */
-                    }
-                }
-                else if (null == array || array.Length == 0  )
-                {
-                    //   MessageBox.Show("Ëø¶¨±êÇ©Êı¾İÎª¿Õ£º" + array.StringJoin(";"));
-                    if (rkUserApps != null)
-                    {
-                        rkUserApps.SetValue("TabsLocked2", "");
-                    }
-                }
-            }
-            
-
-            if(array != null) {
-                byte[] buffer;
-                BinaryFormatter formatter = new BinaryFormatter();
-                using(MemoryStream stream = new MemoryStream()) {
-                    formatter.Serialize(stream, array);
-                    buffer = stream.GetBuffer();
-                    Close( stream );
-                }
-                int num = 0;
-                for(int i = 0; i < buffer.Length; i++) {
-                    if(buffer[i] == 0) {
-                        if(num == 0) {
-                            num = i;
-                        }
-                    }
-                    else {
-                        num = 0;
-                    }
-                }
-                byte[] buffer2 = new byte[num];
-                if(num != 0) {
-                    for(int j = 0; j < num; j++) {
-                        buffer2[j] = buffer[j];
-                    }
-                }
-                else {
-                    buffer2 = buffer;
-                }
-                if(rkUserApps != null) {
-                    rkUserApps.SetValue(regValueName, buffer2);
-                }
-            }
-            // rkUserApps.Close();
+            if(typeof(T) != typeof(string)) throw new NotSupportedException("Registry state only supports string arrays.");
+            string[] values = ValidateRegistryStrings(array == null ? new string[0] : (string[])(object)array);
+            if(rkUserApps != null) rkUserApps.SetValue(regValueName + "V2", values, RegistryValueKind.MultiString);
         }
-
         public static void WriteRegHandle(string valName, RegistryKey rk, IntPtr hwnd) {
             if(IntPtr.Size == 4) {
                 rk.SetValue(valName, (int)hwnd);
@@ -1314,12 +1237,12 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        ///    ÓÃÓÚµ÷ÊÔÏûÏ¢
+        ///    ç”¨äºè°ƒè¯•æ¶ˆæ¯
         /// </summary>
         /// <param name="msg"></param>
         public static void debugMessage(Message msg)
         {
-            
+
             // if (msg.LParam != null && msg.LParam.ToString().Equals(File2Text(@"c:\1.txt")))
                 if (msg.WParam != null && msg.WParam.ToString().Equals(File2Text(@"c:\1.txt")))
             {
@@ -1332,7 +1255,7 @@ namespace QTTabBarLib {
                     "WM_SHOWWINDOW".Equals(name)
                 )
                 {
-                    // ignore 
+                    // ignore
                     return;
                 }
 
@@ -1342,7 +1265,7 @@ namespace QTTabBarLib {
         }
 
         /// <summary>
-        ///    ÓÃÓÚµ÷ÊÔÏûÏ¢
+        ///    ç”¨äºè°ƒè¯•æ¶ˆæ¯
         /// </summary>
         /// <param name="msg"></param>
         public static void debugMessage(MSG msg)
@@ -1351,7 +1274,7 @@ namespace QTTabBarLib {
             if (msg.wParam != null && msg.wParam.ToString().Equals(File2Text(@"c:\1.txt")))
             {
                 var name = Enum.GetName(typeof(MsgEnum), msg.message);
-                if ( 
+                if (
                     "WM_TIMER".Equals(name) ||
                     "RB_GETBANDBORDERS".Equals(name) ||
                     "WM_NCCALCSIZE".Equals(name) ||
@@ -1359,7 +1282,7 @@ namespace QTTabBarLib {
                     "WM_SHOWWINDOW".Equals(name)
                     )
                 {
-                    // ignore 
+                    // ignore
                     return;
                 }
                 log("check msg\t " + name + " msg int " + msg.message +
@@ -1369,28 +1292,28 @@ namespace QTTabBarLib {
 
         public static void KillCurrentProcess()
         {
-            // TASKKILL /T /PID 1230 /PID 1241 /PID 1253 
+            // TASKKILL /T /PID 1230 /PID 1241 /PID 1253
             // Process process = Process.GetCurrentProcess();
             // process.Kill();
 
             // Process.Start("TASKKILL /F /T /PID " + process.Id);
             /*string MyDosComLine1;
-            MyDosComLine1 = "TASKKILL /F /T /PID " + process.Id;//·µ»Ø¸ùÄ¿Â¼ÃüÁî
+            MyDosComLine1 = "TASKKILL /F /T /PID " + process.Id;//è¿”å›æ ¹ç›®å½•å‘½ä»¤
             Process myProcess = new Process();
-            myProcess.StartInfo.FileName = "cmd.exe ";//´ò¿ªDOS¿ØÖÆÆ½Ì¨ 
+            myProcess.StartInfo.FileName = "cmd.exe ";//æ‰“å¼€DOSæ§åˆ¶å¹³å°
             myProcess.StartInfo.UseShellExecute = false;
-            myProcess.StartInfo.CreateNoWindow = true;//ÊÇ·ñÏÔÊ¾DOS´°¿Ú£¬true´ú±íÒş²Ø;
+            myProcess.StartInfo.CreateNoWindow = true;//æ˜¯å¦æ˜¾ç¤ºDOSçª—å£ï¼Œtrueä»£è¡¨éšè—;
             myProcess.StartInfo.RedirectStandardInput = true;
             myProcess.StartInfo.RedirectStandardOutput = true;
             myProcess.StartInfo.RedirectStandardError = true;
             myProcess.Start();
-            StreamWriter sIn = myProcess.StandardInput;//±ê×¼ÊäÈëÁ÷ 
+            StreamWriter sIn = myProcess.StandardInput;//æ ‡å‡†è¾“å…¥æµ
             sIn.AutoFlush = true;
-            StreamReader sOut = myProcess.StandardOutput;//±ê×¼ÊäÈëÁ÷
-            StreamReader sErr = myProcess.StandardError;//±ê×¼´íÎóÁ÷ 
-            sIn.Write(MyDosComLine1 + Environment.NewLine);//µÚÒ»ÌõDOSÃüÁî
+            StreamReader sOut = myProcess.StandardOutput;//æ ‡å‡†è¾“å…¥æµ
+            StreamReader sErr = myProcess.StandardError;//æ ‡å‡†é”™è¯¯æµ
+            sIn.Write(MyDosComLine1 + Environment.NewLine);//ç¬¬ä¸€æ¡DOSå‘½ä»¤
             log("write dos command: " + MyDosComLine1);
-            sIn.Write("exit" + Environment.NewLine);//µÚËÄÌõDOSÃüÁî£¬ÍË³öDOS´°¿Ú
+            sIn.Write("exit" + Environment.NewLine);//ç¬¬å››æ¡DOSå‘½ä»¤ï¼Œé€€å‡ºDOSçª—å£
             if (myProcess.HasExited == false)
             {
                 myProcess.Kill();
