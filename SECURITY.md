@@ -8,3 +8,5 @@ QTTabBar Italiano 0.6.1 is the earlier in-process extension and retains legacy s
 
 Use GitHub's **Report a vulnerability** facility if enabled. Otherwise open an issue requesting a private reporting channel without exploit details, credentials, personal paths or customer data. Do not upload sensitive dumps publicly. Include affected version, artificial reproduction data, expected/actual behavior and impact.
 QTTabBar Italiano 0.7.0 preview retires direct BinaryFormatter calls in core/Memo, uses bounded typed IPC over a Windows-authenticated same-user pipe, and changes persistent data formats. Read [the security review and migration limits](Italiano/docs/SICUREZZA_0.7.0.md). It requires dedicated Explorer testing, is not a sandbox, and does not retroactively harden older installations or the emergency rollback MSI.
+
+0.7.1 fixes the maintenance wrapper's supported-version check and selects an exact, hash-pinned rollback for 0.6.0, 0.6.1 or 0.7.0. The 0.7.0 wrapper refused 0.6.1 before restarting Explorer or running MSI. Older rollback packages retain the security limitations of their respective versions.

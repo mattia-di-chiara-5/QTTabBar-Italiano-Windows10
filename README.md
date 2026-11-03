@@ -1,6 +1,6 @@
 # Esplora Italia e QTTabBar Italiano
 
-**QTTabBar Italiano 0.7.0 — prerelease di sicurezza:** [correzioni, migrazione e limiti](Italiano/docs/SICUREZZA_0.7.0.md). L'estensione dentro Explorer e l'app Esplora Italia sono prodotti distinti.
+**QTTabBar Italiano 0.7.1 — prerelease di sicurezza:** [correzioni, migrazione e limiti](Italiano/docs/SICUREZZA_0.7.0.md). Corretto l'installer per aggiornare anche la 0.6.1 e ripristinare l'esatta versione precedente. L'estensione dentro Explorer e l'app Esplora Italia sono prodotti distinti.
 
 **Esplora Italia 0.2.0 — anteprima** offre un'app separata a schede per Windows 10 x64, basata su Explorer++ 1.5.0.2844. Completa 81 stringhe italiane dei menu e aggiunge icone Fluent, tema di sistema, profilo rapido e installazione per utente.
 
