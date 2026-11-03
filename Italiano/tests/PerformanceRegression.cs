@@ -11,10 +11,16 @@ using QTTabBarLib;
 internal static class PerformanceRegression {
     private static int workerThread;
     private static ApartmentState workerApartment;
+    private static int callerThread;
+    private static readonly ManualResetEvent providerEntered = new ManualResetEvent(false);
+    private static readonly ManualResetEvent providerRelease = new ManualResetEvent(false);
 
     public static int SlowProvider(object unused) {
         workerThread = Thread.CurrentThread.ManagedThreadId;
         workerApartment = Thread.CurrentThread.GetApartmentState();
+        Require(workerThread != callerThread, "Provider ran on the calling UI thread");
+        providerEntered.Set();
+        Require(providerRelease.WaitOne(10000), "UI failed to release the provider gate");
         Thread.Sleep(250);
         return 42;
     }
@@ -85,6 +91,7 @@ internal static class PerformanceRegression {
             Console.WriteLine("PASS: 10,000 hover requests collapse to two queries; stale/disposed results are discarded");
 
             int uiThread = Thread.CurrentThread.ManagedThreadId;
+            callerThread = uiThread;
             int callbackThread = -1, resultValue = -1;
             workerThread = -1;
             workerApartment = ApartmentState.Unknown;
@@ -105,16 +112,21 @@ internal static class PerformanceRegression {
                 .Invoke(null, new object[] { queryDelegate, sync, providerCompleted });
             long returnedMs = watch.ElapsedMilliseconds;
             int uiTicks = 0;
-            while(resultValue == -1 && watch.ElapsedMilliseconds < 5000) {
+            while(resultValue == -1 && watch.ElapsedMilliseconds < 10000) {
                 Application.DoEvents();
+                // The provider cannot complete until this UI thread has returned
+                // from BeginQuery and pumped messages while the worker is held.
+                // Wall-clock startup thresholds flake on shared/paused CI VMs.
+                if(providerEntered.WaitOne(0) && !providerRelease.WaitOne(0)) {
+                    uiTicks++;
+                    if(uiTicks >= 5) providerRelease.Set();
+                }
                 Thread.Sleep(5);
-                uiTicks++;
             }
-            Require(returnedMs < 150, "Provider blocked the calling UI thread");
             Require(resultValue == 42 && uiTicks >= 5, "Slow provider failure: result=" + resultValue + ", ticks=" + uiTicks + ", worker=" + workerThread + ", returnedMs=" + returnedMs);
             Require(workerThread != uiThread && workerApartment == ApartmentState.MTA, "UIA client did not run on its MTA worker");
             Require(callbackThread == uiThread, "Cache completion did not return to its owning UI thread");
-            Console.WriteLine("PASS: slow provider (250 ms), request returned in {0} ms, UI pumped {1} times; MTA worker/STA completion", returnedMs, uiTicks);
+            Console.WriteLine("PASS: gated slow provider (250 ms), request returned in {0} ms, UI pumped {1} times before releasing worker; MTA worker/STA completion", returnedMs, uiTicks);
 
             var shellMethods = assembly.GetType("QTTabBarLib.Interop.ShellMethods", true);
             var makeTip = shellMethods.GetMethod("TryMakeSubDirTipPath", BindingFlags.Public | BindingFlags.Static);
