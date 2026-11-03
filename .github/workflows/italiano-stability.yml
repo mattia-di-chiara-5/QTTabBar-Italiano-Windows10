@@ -37,9 +37,11 @@ jobs:
       - name: Run existing managed unit tests
         shell: powershell
         run: |
-          dotnet restore QTTabBar.Tests/QTTabBar.Tests.csproj --source https://api.nuget.org/v3/index.json
-          if ($LASTEXITCODE) { throw 'Test restore failed' }
-          dotnet test QTTabBar.Tests/QTTabBar.Tests.csproj --configuration Release --no-restore /p:BuildProjectReferences=false --logger "console;verbosity=minimal"
+          msbuild QTTabBar.Tests/QTTabBar.Tests.csproj /restore /p:RestoreSources=https://api.nuget.org/v3/index.json /p:Configuration=Release /p:BuildProjectReferences=false "/p:SolutionDir=$env:GITHUB_WORKSPACE\" /nologo /v:minimal
+          if ($LASTEXITCODE) { throw 'Test build failed' }
+          $vstest = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -find Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe | Select-Object -First 1
+          if (!$vstest) { throw 'Visual Studio test runner missing' }
+          & $vstest QTTabBar.Tests/bin/Release/net48/QTTabBar.Tests.dll /Logger:Console
           if ($LASTEXITCODE) { throw 'Managed unit tests failed' }
       - name: Guard retired serialization and parse scripts
         shell: powershell
