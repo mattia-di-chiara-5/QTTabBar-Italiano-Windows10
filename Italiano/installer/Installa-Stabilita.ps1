@@ -12,7 +12,7 @@ if (!$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
     $ps = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
     $arguments = '-NoProfile -ExecutionPolicy Bypass -File "{0}" -Elevated -UserSid "{1}"' -f $PSCommandPath,$UserSid
     if ($MantieniAnteprimeAutomatiche) { $arguments += ' -MantieniAnteprimeAutomatiche' }
-    $p = Start-Process $ps -Verb RunAs -ArgumentList $arguments -Wait -PassThru
+    $p = Start-Process $ps -Verb RunAs -WindowStyle Hidden -ArgumentList $arguments -Wait -PassThru
     exit $p.ExitCode
 }
 $mutex = New-Object Threading.Mutex($false,'Global\QTTabBarItaliano_Maintenance')
@@ -92,6 +92,7 @@ try {
     }
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Ripristina-VersionePrecedente.ps1') -Destination $stateRoot
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'MigrationTargets.ps1') -Destination $stateRoot
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ExplorerSession.ps1') -Destination $stateRoot
     $state | ConvertTo-Json | Set-Content (Join-Path $stateRoot 'state.json') -Encoding UTF8
     $stateRoot | Set-Content (Join-Path $releaseRoot 'latest-state.txt') -Encoding UTF8
     Write-Host 'Backup completato. Aggiornamento di QTTabBar e riavvio di Esplora file...'
@@ -134,7 +135,8 @@ try {
     } finally {
         Get-Process explorer -ErrorAction SilentlyContinue | Where-Object SessionId -eq $session | Stop-Process -Force -ErrorAction SilentlyContinue
         Start-Sleep -Seconds 2
-        if (!(Get-Process explorer -ErrorAction SilentlyContinue | Where-Object SessionId -eq $session)) { Start-Process (Join-Path $env:WINDIR 'explorer.exe') }
+        . (Join-Path $PSScriptRoot 'ExplorerSession.ps1')
+        Start-ExplorerAsInteractiveUser $UserSid
     }
 } finally {
     if ($transcript) { Stop-Transcript | Out-Null }

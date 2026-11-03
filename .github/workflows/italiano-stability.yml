@@ -46,6 +46,9 @@ jobs:
       - name: Guard retired serialization and parse scripts
         shell: powershell
         run: .\Italiano\scripts\Test-SecuritySource.ps1
+      - name: Test Explorer restart policy without touching the runner desktop
+        shell: powershell
+        run: .\Italiano\tests\ExplorerSessionRegression.ps1
       - name: Parse every Italian PowerShell script
         shell: powershell
         run: |

@@ -10,7 +10,7 @@ if (!$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
     if ($Elevated) { throw 'Elevazione non riuscita.' }
     $arguments = '-NoProfile -ExecutionPolicy Bypass -File "{0}" -Elevated -UserSid "{1}"' -f $PSCommandPath,$UserSid
     if ($StateDirectory) { $arguments += ' -StateDirectory "{0}"' -f $StateDirectory }
-    $p = Start-Process (Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe') -Verb RunAs -ArgumentList $arguments -Wait -PassThru
+    $p = Start-Process (Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe') -Verb RunAs -WindowStyle Hidden -ArgumentList $arguments -Wait -PassThru
     exit $p.ExitCode
 }
 $mutex = New-Object Threading.Mutex($false,'Global\QTTabBarItaliano_Maintenance')
@@ -69,7 +69,8 @@ try {
 } finally {
     Get-Process explorer -ErrorAction SilentlyContinue | Where-Object SessionId -eq $session | Stop-Process -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 2
-    if (!(Get-Process explorer -ErrorAction SilentlyContinue | Where-Object SessionId -eq $session)) { Start-Process (Join-Path $env:WINDIR 'explorer.exe') }
+    . (Join-Path $PSScriptRoot 'ExplorerSession.ps1')
+    Start-ExplorerAsInteractiveUser $UserSid
 }
 } finally {
     if ($locked) { $mutex.ReleaseMutex() }

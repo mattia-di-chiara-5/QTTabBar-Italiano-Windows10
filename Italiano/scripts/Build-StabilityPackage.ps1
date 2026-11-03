@@ -109,7 +109,7 @@ New-Item -ItemType Directory -Path $package -Force | Out-Null
 $msi = Join-Path $package 'QTTabBar-Italiano-v0.7.1.msi'
 & (Join-Path $WixDirectory 'light.exe') -nologo -sice:ICE03 -out $msi $object
 if ($LASTEXITCODE -ne 0) { throw 'Creazione MSI non riuscita.' }
-foreach ($name in @('Installa-Stabilita.ps1','Ripristina-VersionePrecedente.ps1','MigrationTargets.ps1')) {
+foreach ($name in @('Installa-Stabilita.ps1','Ripristina-VersionePrecedente.ps1','MigrationTargets.ps1','ExplorerSession.ps1')) {
     Copy-Item -LiteralPath (Join-Path $root "Italiano\installer\$name") -Destination $package -Force
 }
 $rollbackDirectory = Join-Path $package 'Rollback'
